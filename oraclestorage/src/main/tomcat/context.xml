@@ -1,0 +1,7 @@
+<Context path="/">
+  <Resource name="jdbc/Oracle" auth="Container"
+            type="javax.sql.DataSource" username="${db.login}" password="${db.password}"
+            driverClassName="oracle.jdbc.OracleDriver" url="${db.url}"
+            maxActive="8" maxIdle="4" factory="org.apache.commons.dbcp.BasicDataSourceFactory"/>  
+</Context>
+
