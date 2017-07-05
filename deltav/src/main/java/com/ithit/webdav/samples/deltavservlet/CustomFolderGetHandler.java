@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Properties;
 
 /**
  * This handler processes GET requests to folders returning custom HTML page.
@@ -22,18 +21,18 @@ public class CustomFolderGetHandler implements MethodHandler {
 
     private MethodHandler previousHandler;
     private String charset;
+    private String version;
     private String pathToHTML = "WEB-INF/MyCustomHandlerPage.html";
 
-    public CustomFolderGetHandler(String charset) {
+    public CustomFolderGetHandler(String charset, String version) {
         this.charset = charset;
+        this.version = version;
     }
 
     public void processRequest(HttpServletRequest request, HttpServletResponse response, HierarchyItem item)
             throws DavException, IOException {
 
         if (item instanceof Folder) {
-            Properties properties = new Properties();
-            properties.load(request.getSession().getServletContext().getResourceAsStream("/WEB-INF/web.properties"));
             response.setCharacterEncoding(charset);
             response.setContentType("text/html");
             PrintStream stream = new PrintStream(response.getOutputStream(), true, charset);
@@ -50,7 +49,7 @@ public class CustomFolderGetHandler implements MethodHandler {
                 }
                 String versionNumber = "<%version%>";
                 if (line.contains(versionNumber)) {
-                    line = line.replace(versionNumber, properties.getProperty("project.version"));
+                    line = line.replace(versionNumber, version);
                 }
                 stream.println(line);
             }

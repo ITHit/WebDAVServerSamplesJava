@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.4"
-         xmlns="http://java.sun.com/xml/ns/j2ee"
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+	      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
     <servlet>
         <servlet-name>WebDav servlet</servlet-name>
         <servlet-class>com.ithit.webdav.samples.fsstorageservlet.WebDavServlet</servlet-class>
@@ -58,8 +59,7 @@
     <security-constraint>
         <web-resource-collection>
            <web-resource-name>All Resources</web-resource-name>
-           <url-pattern>/*</url-pattern>
-           <http-method>GETLIB</http-method>
+           <url-pattern>/secured/*</url-pattern>
            <http-method>COPY</http-method>
            <http-method>MOVE</http-method>
            <http-method>DELETE</http-method>
@@ -67,6 +67,7 @@
            <http-method>GET</http-method>
            <http-method>HEAD</http-method>
            <http-method>PUT</http-method>
+           <http-method>POST</http-method>
            <http-method>MKCOL</http-method>
            <http-method>PROPPATCH</http-method>
            <http-method>LOCK</http-method>
@@ -82,18 +83,20 @@
         </web-resource-collection>
 
         <auth-constraint>
-           <role-name>administrators</role-name>
-           <role-name>manager</role-name>
+            <role-name>administrators</role-name>
+            <role-name>role1</role-name>
         </auth-constraint>
+
     </security-constraint>
-    --> 
+    -->
+
     <!--Uncomment this for basic authentication -->
-    <!--    
+    <!--
     <login-config>
         <auth-method>BASIC</auth-method>
         <realm-name>Basic Authentication</realm-name>
     </login-config>
-    -->   
+    -->
     <!--Uncomment this for digest authentication -->
     <!--
     <login-config>

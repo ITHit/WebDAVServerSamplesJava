@@ -65,15 +65,37 @@
             width: 100%;
         }
 
-            .ithit-grid-container .column-action {
-                width: 90px;
-            }
+        .ithit-grid-container .column-action {
+            width: 180px;
+        }
+
+        .ithit-grid-container .column-action a {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .ithit-grid-container .column-action a:last-child {
+            margin-right: 0;
+        }
+
+        .ithit-grid-icon-locked {
+            color: #337ab7;
+            left: 2px;
+            top: -1px;
+        }
+
+        .glyphicon .ithit-grid-icon-locked {
+            left: -4px;
+            top: 3px;
+            text-shadow: -1px -1px 0px #fff;
+            font-size: 12px;
+        }
 
         @media (max-width: 767px) {
             .ithit-grid-container .column-action {
                 width: 14px;
                 padding: 8px 8px 8px 0;
-                text-align: center;
+                text-align: right;
             }
         }
 
@@ -338,7 +360,7 @@
                  */
                 Snippet: function (html) {
                     if(html) {
-                        var safePrefix = '__b__tag' + (new Date()).getTime()
+                        var safePrefix = '__b__tag' + (new Date()).getTime();
                         html = html.replace(/<b>/g, safePrefix + '_0').replace(/<\/b>/g, safePrefix + '_1');
                         html = $('<div />').text(html).text();
                         html = html.replace(new RegExp(safePrefix + '_0', 'g'), '<b>').replace(new RegExp(safePrefix + '_1', 'g'), '</b>');
@@ -396,37 +418,23 @@
                             }));
 
                     this.$el.find('tbody').html(
-                            aItems.map(function (oItem, i) {
-                                /** @type {ITHit.WebDAV.Client.HierarchyItem} oItem */
-                                return $('<div/>').html([$('<tr />').html([
-                                    $('<td class="hidden-xs" />').text(i + 1),
-                                    $('<td class="hidden-xs" />').html(oItem.IsFolder() ? '<span class="glyphicon glyphicon-folder-open"></span>' : ''),
-                                    this._RenderDisplayName(oItem),
-                                    $('<td />').text(!oItem.IsFolder() ? Formatters.FileSize(oItem.ContentLength) : '').css('text-align', 'right'),
-                                    $('<td class="hidden-xs" />').text(Formatters.Date(oItem.LastModified)),
-                                    $('<td class="column-action" />').html(oItem.IsFolder() ?
-                                            $('<a />')
-                                                    .html('<span class="glyphicon glyphicon-hdd" title="Browse"></span> <span class="hidden-xs">Browse</span>')
-                                                    .attr('href', 'javascript:void(0)')
-                                                    .attr('title', 'Open folder in OS File Manager')
-                                                    .on('click', function () {
-                                                        oWebDAV.OpenFolderInOsFileManager(oItem.Href)
-                                                    }) :
-                                            $('<a />')
-                                                    .html('<span class="glyphicon glyphicon-edit" title="Edit"></span> <span class="hidden-xs">Edit</span>')
-                                                    .attr('href', 'javascript:void(0)')
-                                                    .attr('title', 'Edit in associated application')
-                                                    .on('click', function () {
-                                                        oWebDAV.EditDoc(oItem.Href)
-                                                    })
-                                    )
-                                ]),
-                               $('<tr class="tr-snippet-url"/>').html([
+                        aItems.map(function (oItem, i) {
+                            var locked = oItem.ActiveLocks.length > 0 ? '<span class="ithit-grid-icon-locked glyphicon glyphicon-lock"></span>' : '';
+                            /** @type {ITHit.WebDAV.Client.HierarchyItem} oItem */
+                            return $('<div/>').html([$('<tr />').html([
+                                $('<td class="hidden-xs" />').text(i + 1),
+                                $('<td class="hidden-xs" />').html(oItem.IsFolder() ? '<span class="glyphicon glyphicon-folder-open">' + locked + '</span>' : locked),
+                                this._RenderDisplayName(oItem),
+                                $('<td />').text(!oItem.IsFolder() ? Formatters.FileSize(oItem.ContentLength) : '').css('text-align', 'right'),
+                                $('<td class="hidden-xs" />').text(Formatters.Date(oItem.LastModified)),
+                                $('<td class="column-action" />').html(this._RenderActions(oItem))
+                            ]),
+                                $('<tr class="tr-snippet-url"/>').html([
                                     $('<td class="hidden-xs" />'),
                                     $('<td class="hidden-xs" />'),
                                     this._RenderSnippetAndUrl(oItem)])]).children();
-                            }.bind(this))
-                    );          
+                        }.bind(this))
+                    );
                 },
 
                 /**
@@ -450,6 +458,41 @@
                      }
 
                     return oElement;
+                },
+
+                /**
+                 * @param {ITHit.WebDAV.Client.HierarchyItem} oItem
+                 * @returns string
+                 **/
+                _RenderActions: function(oItem) {
+                    var actions = [];
+
+                    if (oItem.IsFolder()) {
+                        actions.push($('<a />')
+                            .html('<span class="glyphicon glyphicon-hdd" title="Browse"></span> <span class="hidden-xs">Browse</span>')
+                            .attr('href', 'javascript:void(0)')
+                            .attr('title', 'Open folder in OS File Manager')
+                            .on('click', function () {
+                                oWebDAV.OpenFolderInOsFileManager(oItem.Href)
+                            }));
+                    } else {
+//                        actions.push($('<a />')
+//                            .html('<span class="glyphicon glyphicon-eye-open" title="View"></span> <span class="hidden-xs">View</span>')
+//                            .attr('href', 'javascript:void(0)')
+//                            .attr('title', 'View in associated application with read-only mode')
+//                            .on('click', function () {
+//                                oWebDAV.EditDoc(oItem.Href, null, null, 'View');
+//                            }));
+                        actions.push($('<a />')
+                            .html('<span class="glyphicon glyphicon-edit" title="Edit"></span> <span class="hidden-xs">Edit</span>')
+                            .attr('href', 'javascript:void(0)')
+                            .attr('title', 'Edit in associated application')
+                            .on('click', function () {
+                                oWebDAV.EditDoc(oItem.Href);
+                            }));
+                    }
+
+                    return actions;
                 }
 
             };
@@ -644,23 +687,27 @@
 
                 NavigateFolder: function (sPath) {
                     this.WebDavSession.OpenFolderAsync(sPath, [], function (oResponse) {
-                        this.CurrentFolder = oResponse.Result;
-                        oBreadcrumbs.SetHierarchyItem(this.CurrentFolder);
+                        if(oResponse.IsSuccess) {
+                            this.CurrentFolder = oResponse.Result;
+                            oBreadcrumbs.SetHierarchyItem(this.CurrentFolder);
 
-                        // Detect search support. If search is not supported - disable search field.
-                        this.CurrentFolder.GetSupportedFeaturesAsync(function (oResult) {
-                            /** @typedef {ITHit.WebDAV.Client.OptionsInfo} oOptionsInfo */
-                            var oOptionsInfo = oResult.Result;
+                            // Detect search support. If search is not supported - disable search field.
+                            this.CurrentFolder.GetSupportedFeaturesAsync(function (oResult) {
+                                /** @typedef {ITHit.WebDAV.Client.OptionsInfo} oOptionsInfo */
+                                var oOptionsInfo = oResult.Result;
 
-                            oSearchForm.SetDisabled(!(oOptionsInfo.Features & ITHit.WebDAV.Client.Features.Dasl));
-                        });
+                                oSearchForm.SetDisabled(!(oOptionsInfo.Features & ITHit.WebDAV.Client.Features.Dasl));
+                            });
 
-                        this.CurrentFolder.GetChildrenAsync(false, [], function (oResult) {
-                            /** @type {ITHit.WebDAV.Client.HierarchyItem[]} aItems */
-                            var aItems = oResult.Result;
+                            this.CurrentFolder.GetChildrenAsync(false, [], function (oResult) {
+                                if(oResponse.IsSuccess) {
+                                    /** @type {ITHit.WebDAV.Client.HierarchyItem[]} aItems */
+                                    var aItems = oResult.Result;
 
-                            oFolderGrid.Render(aItems, false);
-                        })
+                                    oFolderGrid.Render(aItems, false);
+                                }
+                            })
+                        }
                     }.bind(this));
                 },
 
@@ -762,6 +809,41 @@
             $('.ithit-version-value').text(ITHit.WebDAV.Client.WebDavSession.Version);
             $('.ithit-current-folder-value').text(oWebDAV.GetMountUrl());
         })();
+    </script>
+
+    <script>
+
+        // Setting up web socket connection.
+        if(location.protocol === "https:") {
+            var socketSource = new WebSocket("wss://" + location.host);
+        } else {
+            var socketSource = new WebSocket("ws://" + location.host);
+        }
+
+        socketSource.addEventListener('message', function (e) {
+            var notifyObject = JSON.parse(e.data);
+
+            // Removing domain and trailing slash.
+            var currentLocation = location.pathname.replace(/^\/|\/$/g, '');
+            // Checking message type after receiving.
+            if (notifyObject.eventType === "refresh") {
+                // Refresh folder structure if any item in this folder is updated or new item is created.
+                if (currentLocation.toUpperCase() === notifyObject.folderPath.toUpperCase()) {
+                    WebDAVController.Reload();
+                }
+            } else if (notifyObject.eventType === "delete") {
+                if (notifyObject.folderPath.substring(0, notifyObject.folderPath.lastIndexOf('/')).toUpperCase() === currentLocation.toUpperCase()) {
+                    // Refresh folder structure if any item in this folder is deleted.
+                    WebDAVController.Reload();
+                } else if (currentLocation.toUpperCase().indexOf(notifyObject.folderPath.toUpperCase()) === 0) {
+                    // Redirect client to the root folder if current path is being deleted.
+                    var originPath = location.origin + "/";
+                    history.pushState({ Url: originPath }, '', originPath);
+                    WebDAVController.NavigateFolder(originPath);
+                }
+            }
+        }, false);
+
     </script>
 </body>
 </html>

@@ -265,6 +265,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             totalWrittenBytes += readBytes;
         }
         writer.close();
+        getEngine().notifyRefresh(getParent(getPath()));
         try {
             getEngine().getIndexer().indexFile(getName(),  decode(getPath()), null, this);
         } catch (Exception ex){
@@ -304,6 +305,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         } catch (IOException e) {
             throw new ServerException(e);
         }
+        getEngine().notifyRefresh(getParent(getPath()));
         try {
             getEngine().getIndexer().deleteIndex(this);
         } catch (Exception ex){
@@ -324,6 +326,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         } catch (IOException e) {
             throw new ServerException(e);
         }
+        getEngine().notifyRefresh(folder.getPath());
         try {
             String currentPath = folder.getPath() + destName;
             getEngine().getIndexer().indexFile(decode(destName), decode(currentPath), null, this);
@@ -347,6 +350,8 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             throw new ServerException(e);
         }
         setName(destName);
+        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().notifyRefresh(folder.getPath());
         try {
             String currentPath = folder.getPath() + destName;
             getEngine().getIndexer().indexFile(decode(destName), decode(currentPath), getPath(), this);

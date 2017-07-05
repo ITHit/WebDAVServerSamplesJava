@@ -107,8 +107,10 @@ public class DataAccess {
      */
     void closeConnection() {
         try {
-            if (currentConnection != null)
+            if (currentConnection != null) {
                 currentConnection.close();
+                currentConnection = null;
+            }
         } catch (SQLException e) {
             engine.getLogger().logError("Failed to rollback connection", e);
         }

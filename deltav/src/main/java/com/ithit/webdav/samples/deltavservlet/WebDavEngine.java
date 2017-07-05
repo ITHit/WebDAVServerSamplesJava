@@ -5,6 +5,7 @@ import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.deltav.AutoVersion;
 import com.ithit.webdav.server.exceptions.ServerException;
+import com.ithit.webdav.server.util.StringUtil;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -29,6 +30,7 @@ import static com.ithit.webdav.samples.deltavservlet.Indexer.MAX_CONTENT_LENGTH;
  */
 public class WebDavEngine extends Engine {
 
+    private WebSocketServer webSocketServer;
     private HttpServletRequest request;
     private final Logger logger;
     private final String license;
@@ -217,6 +219,10 @@ public class WebDavEngine extends Engine {
         return searcher;
     }
 
+    void setWebSocketServer(WebSocketServer webSocketServer) {
+        this.webSocketServer = webSocketServer;
+    }
+
     /**
      * Build initial index of root folder.
      * @param indexFolder Index folder.
@@ -248,5 +254,21 @@ public class WebDavEngine extends Engine {
      */
     private List<HierarchyItemImpl> getFilesToIndex() {
         return dataAccess.getFiles();
+    }
+
+    void notifyRefresh(String folder) {
+        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
+        notify("refresh", folder);
+    }
+
+    void notifyDelete(String folder) {
+        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
+        notify("delete", folder);
+    }
+
+    private void notify(String type, String folder) {
+        if (webSocketServer != null) {
+            webSocketServer.send(type, folder);
+        }
     }
 }

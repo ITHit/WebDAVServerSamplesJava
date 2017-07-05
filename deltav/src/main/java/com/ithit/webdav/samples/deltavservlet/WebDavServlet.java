@@ -99,8 +99,8 @@ public class WebDavServlet extends HttpServlet {
         servletContext = servletConfig.getServletContext().getContextPath();
         license = getContents(licenseFile);
         engine = new WebDavEngine(logger, license);
-        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding());
-        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding());
+        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
+        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
         DataAccess dataAccess = new DataAccess(engine);

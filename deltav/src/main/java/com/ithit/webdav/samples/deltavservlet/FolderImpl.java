@@ -144,6 +144,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                 item = new FileImpl(newId, getId(), name, getPath() + name,
                         now, now, now, 0, false, false, false, false, getEngine().getAutoVersionMode(), getEngine());
         }
+        getEngine().notifyRefresh(getPath());
         return item;
 
     }
@@ -235,6 +236,8 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         }
         // delete this folder
         deleteThisItem();
+        getEngine().notifyDelete(getPath());
+        getEngine().notifyRefresh(folder.getPath());
     }
 
     @Override
@@ -282,6 +285,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
             }
         }
 
+        getEngine().notifyRefresh(folder.getPath());
         if (mr.getResponses().length > 0)
             throw mr;
 
@@ -323,6 +327,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
             }
             deleteThisItem();
         }
+        getEngine().notifyDelete(getPath());
     }
 
     /**

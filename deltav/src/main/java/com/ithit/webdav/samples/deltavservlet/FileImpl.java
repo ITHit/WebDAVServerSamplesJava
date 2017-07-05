@@ -112,6 +112,7 @@ public class FileImpl extends HierarchyItemImpl implements
         ensureHasToken();
 
         deleteThisItem();
+        getEngine().notifyRefresh(getParent(getPath()));
         try {
             getEngine().getIndexer().deleteIndex(this);
         } catch (Exception ex){
@@ -214,6 +215,7 @@ public class FileImpl extends HierarchyItemImpl implements
         } else {
             copy = copyThisItem(destFolder, null, destName);
         }
+        getEngine().notifyRefresh(folder.getPath());
         try {
             if (copy != null) {
                 newID = copy.getId();
@@ -344,7 +346,7 @@ public class FileImpl extends HierarchyItemImpl implements
                 if (os != null)
                     os.close();
             }
-
+            getEngine().notifyRefresh(getParent(getPath()));
             try {
                 getEngine().getIndexer().indexFile(getName(), getId(), getId(), this);
             } catch (Exception ex){
@@ -382,6 +384,8 @@ public class FileImpl extends HierarchyItemImpl implements
         } else {
             moveThisItem(destFolder, destName, parent);
         }
+        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().notifyRefresh(folder.getPath());
         try {
             getEngine().getIndexer().indexFile(destName, getId(), getId(), this);
         } catch (Exception ex){

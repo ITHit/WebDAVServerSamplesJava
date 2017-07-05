@@ -97,6 +97,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
             } catch (IOException e) {
                 throw new ServerException(e);
             }
+            getEngine().notifyRefresh(getPath());
             return FileImpl.getFile(getPath() + encode(name), getEngine());
         }
         return null;
@@ -118,6 +119,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
         if (!Files.exists(fullPath)) {
             try {
                 Files.createDirectory(fullPath);
+                getEngine().notifyRefresh(getPath());
             } catch (IOException e) {
                 throw new ServerException(e);
             }
@@ -155,6 +157,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
         try {
             removeIndex(getFullPath(), this);
             FileUtils.deleteDirectory(getFullPath().toFile());
+            getEngine().notifyDelete(getPath());
         } catch (IOException e) {
             throw new ServerException(e);
         }
@@ -176,6 +179,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
             Path sourcePath = this.getFullPath();
             Path destinationFullPath = Paths.get(destinationFolder, destName);
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile());
+            getEngine().notifyRefresh(folder.getPath());
             addIndex(destinationFullPath, folder.getPath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
@@ -212,6 +216,8 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
             throw new ServerException(e);
         }
         setName(destName);
+        getEngine().notifyDelete(getPath());
+        getEngine().notifyRefresh(folder.getPath());
     }
 
     /**

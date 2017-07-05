@@ -273,6 +273,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
             }
 
         updateModified();
+        getEngine().notifyRefresh(getParent(getPath()));
     }
 
     /**
@@ -530,6 +531,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
         getDataAccess().executeUpdate("INSERT INTO Locks (ItemID,Token,Shared,Deep,Expires,Owner)"
                         + " VALUES(?, ?, ?, ?, ?, ?)",
                 getId(), token, shared, deep, expires, owner);
+        getEngine().notifyRefresh(getParent(getPath()));
         return new LockResult(token, timeout);
     }
 
@@ -560,7 +562,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
         getDataAccess().executeUpdate("UPDATE Locks SET Expires = ? WHERE Token = ?",
                 expires, token);
-
+        getEngine().notifyRefresh(getParent(getPath()));
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());
     }
@@ -590,6 +592,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
 
         getDataAccess().executeUpdate("DELETE FROM Locks WHERE Token = ?", lockToken);
+        getEngine().notifyRefresh(getParent(getPath()));
     }
 
     /**
@@ -713,5 +716,16 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
     BigDecimal getSerialNumber() throws ServerException {
         return getDataAccess().executeScalar("SELECT SerialNumber FROM Repository WHERE ID = ?", id);
+    }
+
+    String getParent(String path) {
+        String parentPath = StringUtil.trimEnd(StringUtil.trimStart(path, "/"), "/");
+        int index = parentPath.lastIndexOf("/");
+        if (index > -1) {
+            parentPath = parentPath.substring(0, index);
+        } else {
+            parentPath = "";
+        }
+        return parentPath;
     }
 }

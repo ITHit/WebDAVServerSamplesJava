@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -87,8 +88,8 @@ public class WebDavServlet extends HttpServlet {
         servletContext = servletConfig.getServletContext().getContextPath();
         logger = new DefaultLoggerImpl(servletConfig.getServletContext());
         engine = new WebDavEngine(logger, license);
-        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding());
-        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding());
+        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
+        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
         DataAccess dataAccess = new DataAccess(engine);
@@ -118,7 +119,8 @@ public class WebDavServlet extends HttpServlet {
             throws ServletException, IOException {
 
         engine.setServletRequest(httpServletRequest);
-
+        HttpSession session = httpServletRequest.getSession();
+        session.setAttribute("engine", engine);
         DataAccess dataAccess = new DataAccess(engine);
         engine.setDataAccess(dataAccess);
 

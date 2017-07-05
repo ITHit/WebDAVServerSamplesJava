@@ -4,6 +4,7 @@ import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.ServerException;
+import com.ithit.webdav.server.util.StringUtil;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -29,6 +30,7 @@ import static com.ithit.webdav.samples.fsstorageservlet.Indexer.MAX_CONTENT_LENG
  */
 public class WebDavEngine extends Engine {
 
+    private WebSocketServer webSocketServer;
     private final Logger logger;
     private final String license;
     private HttpServletRequest request;
@@ -124,6 +126,10 @@ public class WebDavEngine extends Engine {
      */
     Searcher getSearcher() {
         return searcher;
+    }
+
+    void setWebSocketServer(WebSocketServer webSocketServer) {
+        this.webSocketServer = webSocketServer;
     }
 
 
@@ -224,6 +230,22 @@ public class WebDavEngine extends Engine {
             result.add(getHierarchyItem(context));
         } catch (Exception e) {
             getLogger().logDebug("Cannot add file to the list: " + f.getAbsolutePath());
+        }
+    }
+
+    void notifyRefresh(String folder) {
+        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
+        notify("refresh", folder);
+    }
+
+    void notifyDelete(String folder) {
+        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
+        notify("delete", folder);
+    }
+
+    private void notify(String type, String folder) {
+        if (webSocketServer != null) {
+            webSocketServer.send(type, folder);
         }
     }
 }
