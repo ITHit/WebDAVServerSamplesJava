@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>oraclestorage</artifactId>
-    <version>2.2</version>
+    <version>2.2.710</version>
     <packaging>war</packaging>
 
     <properties>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>2.2</version>
+            <version>2.2.710</version>
         </dependency>
 
         <dependency>
@@ -128,7 +128,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/oraclestorage-2.2/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/oraclestorage-2.2.710/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -207,7 +207,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/oraclestorage-2.2</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-2.2.710</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
