@@ -1,9 +1,12 @@
-package com.ithit.webdav.samples.deltavservlet;
+package com.ithit.webdav.samples.oraclestorageservlet.websocket;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
+/**
+ * Encodes notification object to the JSON
+ */
 public class NotificationEncoder implements Encoder.Text<WebSocketServer.Notification> {
 
     @Override

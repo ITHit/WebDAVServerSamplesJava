@@ -200,7 +200,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
         for (Property lookForProp : props) {
             if (SNIPPET.equalsIgnoreCase(lookForProp.getName()) && this instanceof FileImpl) {
-                result.add(new Property(lookForProp.getNamespace(), lookForProp.getName(),((FileImpl) this).getSnippet()));
+                result.add(new Property(lookForProp.getNamespace(), lookForProp.getName(), ((FileImpl) this).getSnippet()));
                 continue;
             }
             for (Property foundProp : l) {
@@ -273,7 +273,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
             }
 
         updateModified();
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
     }
 
     /**
@@ -531,7 +531,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
         getDataAccess().executeUpdate("INSERT INTO Locks (ItemID,Token,Shared,Deep,Expires,Owner)"
                         + " VALUES(?, ?, ?, ?, ?, ?)",
                 getId(), token, shared, deep, expires, owner);
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         return new LockResult(token, timeout);
     }
 
@@ -562,7 +562,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
         getDataAccess().executeUpdate("UPDATE Locks SET Expires = ? WHERE Token = ?",
                 expires, token);
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());
     }
@@ -592,7 +592,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
 
         getDataAccess().executeUpdate("DELETE FROM Locks WHERE Token = ?", lockToken);
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
     }
 
     /**

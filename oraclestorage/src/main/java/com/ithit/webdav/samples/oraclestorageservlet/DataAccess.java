@@ -88,6 +88,7 @@ public class DataAccess {
 
     /**
      * Returns default table space in which DB is stored.
+     *
      * @return Default table space in which DB is stored.
      */
     String getDefaultTableSpace() {
@@ -96,6 +97,7 @@ public class DataAccess {
 
     /**
      * Returns total bytes used by DB.
+     *
      * @return Total bytes used by DB.
      */
     long getTotalBytes() {
@@ -400,7 +402,6 @@ public class DataAccess {
 
     /**
      * Interface that helps to read object from DB.
-     *
      */
     interface ElementReader<T> {
         /**
@@ -436,7 +437,7 @@ public class DataAccess {
      *
      * @return List of {@link HierarchyItemImpl} objects. Each item is a {@link FileImpl} item.
      */
-    List<HierarchyItemImpl> getFiles()  {
+    List<HierarchyItemImpl> getFiles() {
         try {
             return readItems("SELECT ID, Parent, ItemType, Name, Created, Modified, LastChunkSaved, TotalContentLength"
                     + " FROM Repository"
@@ -448,11 +449,12 @@ public class DataAccess {
 
     /**
      * Gets {@link HierarchyItem} from DB by id and specified path.
-     * @param id File id.
+     *
+     * @param id   File id.
      * @param path Path of file.
      * @return HierarchyItem.
      */
-    HierarchyItem getFile(int id, String path)  {
+    HierarchyItem getFile(int id, String path) {
         HierarchyItem result = null;
         try {
             List<HierarchyItemImpl> hierarchyItems = readItems("SELECT ID, Parent, ItemType, Name, Created, Modified, LastChunkSaved, TotalContentLength"

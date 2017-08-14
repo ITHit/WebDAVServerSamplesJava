@@ -15,6 +15,7 @@ class SerializationUtils {
 
     /**
      * Serializes object to JSON string.
+     *
      * @param object Object to serialize.
      * @return String in JSON format
      */
@@ -25,13 +26,14 @@ class SerializationUtils {
 
     /**
      * Deserialize JSON string to object list.
+     *
      * @param clazz Type of objects in the list to deserialize.
-     * @param json JSON string to deserialize.
+     * @param json  JSON string to deserialize.
      * @return List of objects.
      */
     @SuppressWarnings("unchecked")
     static <T> List<T> deserializeList(final Class<T> clazz, final String json) {
-        T [] array = (T[])java.lang.reflect.Array.newInstance(clazz, 1);
+        T[] array = (T[]) java.lang.reflect.Array.newInstance(clazz, 1);
         array = new Gson().fromJson(json, (Type) array.getClass());
         if (array == null) {
             return new ArrayList<>();

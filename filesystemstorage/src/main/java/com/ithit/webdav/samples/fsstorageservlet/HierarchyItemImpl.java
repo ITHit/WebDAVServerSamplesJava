@@ -1,23 +1,19 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
+import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.util.StringUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -231,7 +227,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         result = l.stream().filter(x -> propNames.contains(x.getName())).collect(Collectors.toList());
         Property snippet = Arrays.stream(props).filter(x -> propNames.contains(SNIPPET)).findFirst().orElse(null);
         if (snippet != null && this instanceof FileImpl) {
-            result.add(new Property(snippet.getNamespace(), snippet.getName(),((FileImpl) this).getSnippet()));
+            result.add(new Property(snippet.getNamespace(), snippet.getName(), ((FileImpl) this).getSnippet()));
         }
         return result;
     }
@@ -239,7 +235,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
 
     private List<Property> getProperties() throws ServerException {
         if (properties == null) {
-            String propertiesJson = getPropertyValue(propertiesAttribute);
+            String propertiesJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), propertiesAttribute);
             properties = SerializationUtils.deserializeList(Property.class, propertiesJson);
         }
         return properties;
@@ -253,11 +249,11 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      */
     @Override
     public List<Property> getPropertyNames() throws ServerException {
-        if (hasCustomProperty(propertiesAttribute)) {
-            String propJson = getPropertyValue(propertiesAttribute);
+        if (ExtendedAttributesExtension.hasExtendedAttribute(getFullPath().toString(), propertiesAttribute)) {
+            String propJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), propertiesAttribute);
             return SerializationUtils.deserializeList(Property.class, propJson);
         }
-       return new LinkedList<>();
+        return new LinkedList<>();
     }
 
     /**
@@ -295,7 +291,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @throws LockedException      this item was locked and client did not provide lock token.
      * @throws MultistatusException If update fails for a property, this exception shall be thrown and contain
      *                              result of the operation for each property.
-     *
      * @throws ServerException      In case of other error.
      */
     @Override
@@ -329,13 +324,14 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         properties = properties.stream()
                 .filter(e -> !propNamesToDel.contains(e.getName()))
                 .collect(Collectors.toList());
-        setPropertyValue(propertiesAttribute, SerializationUtils.serialize(properties));
-        getEngine().notifyRefresh(getParent(getPath()));
+        ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), propertiesAttribute, SerializationUtils.serialize(properties));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
     }
 
     /**
      * Updates basic file times in the following format - Thu, 28 Mar 2013 20:15:34 GMT.
-     * @param date Date to update
+     *
+     * @param date  Date to update
      * @param field Field to update
      */
     private void updateBasicProperties(String date, String field) {
@@ -386,48 +382,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     }
 
     /**
-     * Returns property value from User Defined Attributes in the {@link HierarchyItemImpl}.
-     *
-     * @param propertyName Property name.
-     * @return Property value.
-     * @throws ServerException if User Defined Attributes  not supported.
-     */
-    protected String getPropertyValue(String propertyName) throws ServerException {
-        UserDefinedFileAttributeView view = Files.getFileAttributeView(getFullPath(), UserDefinedFileAttributeView.class);
-        int bufferSize = 1000;
-        ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
-        try {
-            if (view.read(propertyName, buffer) > 0) {
-                buffer.flip();
-                return Charset.defaultCharset().decode(buffer).toString();
-            }
-        } catch (IOException ignored) {
-            // No stream found with name specified.
-        }
-        return "";
-    }
-
-    /**
-     * Set property value to User Defined Attributes in the {@link HierarchyItemImpl}.
-     *
-     * @param propertyName Property name.
-     * @throws ServerException if User Defined Attributes  not supported.
-     */
-    protected void setPropertyValue(String propertyName, String value) throws ServerException {
-        UserDefinedFileAttributeView view = Files.getFileAttributeView(getFullPath(), UserDefinedFileAttributeView.class);
-        BasicFileAttributeView basicView = Files.getFileAttributeView(getFullPath(), BasicFileAttributeView.class);
-        ByteBuffer propValue = Charset.defaultCharset().encode(CharBuffer.wrap(value));
-        try {
-            FileTime modified = basicView.readAttributes().lastModifiedTime();
-            view.write(propertyName, propValue);
-            // We should set modified time back after updating custom properties.
-            basicView.setTimes(modified, null, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Locks this item.
      *
      * @param shared  Indicates whether a lock is shared or exclusive.
@@ -454,8 +408,8 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         long expires = System.currentTimeMillis() + timeout * 1000;
         LockInfo lockInfo = new LockInfo(shared, deep, token, expires, owner);
         activeLocks.add(lockInfo);
-        setPropertyValue(activeLocksAttribute, SerializationUtils.serialize(activeLocks));
-        getEngine().notifyRefresh(getParent(getPath()));
+        ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         return new LockResult(token, timeout);
     }
 
@@ -472,25 +426,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     }
 
     /**
-     * Check whether {@link HierarchyItemImpl} has User Defined Attributes.
-     *
-     * @param propertyName Attribute name to check.
-     * @return If attribute exists.
-     * @throws ServerException in case of errors.
-     */
-    private boolean hasCustomProperty(String propertyName) throws ServerException {
-        Path fullPath = getFullPath();
-        UserDefinedFileAttributeView view = Files.getFileAttributeView(fullPath, UserDefinedFileAttributeView.class);
-        boolean has;
-        try {
-            has = view.list().contains(propertyName);
-        } catch (IOException e) {
-            throw new ServerException(e);
-        }
-        return has;
-    }
-
-    /**
      * Gets the array of all locks for this item.
      *
      * @return Array of locks.
@@ -499,28 +434,13 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     @Override
     public List<LockInfo> getActiveLocks() throws ServerException {
         if (activeLocks == null) {
-            String activeLocksJson = getPropertyValue(activeLocksAttribute);
+            String activeLocksJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), activeLocksAttribute);
             activeLocks = SerializationUtils.deserializeList(LockInfo.class, activeLocksJson).
-            stream().filter(x -> System.currentTimeMillis() < x.getTimeout()).collect(Collectors.toList());
+                    stream().filter(x -> System.currentTimeMillis() < x.getTimeout()).collect(Collectors.toList());
         } else {
             activeLocks = new LinkedList<>();
         }
         return activeLocks;
-    }
-
-    /**
-     * Deletes UserDefined attribute from {@link HierarchyItemImpl}
-     *
-     * @param propertyName name of the attribute to be deleted
-     * @throws ServerException in case of server errors
-     */
-    private void deleteProperty(String propertyName) throws ServerException {
-        UserDefinedFileAttributeView view = Files.getFileAttributeView(getFullPath(), UserDefinedFileAttributeView.class);
-        try {
-            view.delete(propertyName);
-        } catch (IOException e) {
-            throw new ServerException(e);
-        }
     }
 
     /**
@@ -538,11 +458,11 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         if (lock != null) {
             activeLocks.remove(lock);
             if (!activeLocks.isEmpty()) {
-                setPropertyValue(activeLocksAttribute, SerializationUtils.serialize(activeLocks));
+                ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
             } else {
-                deleteProperty(activeLocksAttribute);
+                ExtendedAttributesExtension.deleteExtendedAttribute(getFullPath().toString(), activeLocksAttribute);
             }
-            getEngine().notifyRefresh(getParent(getPath()));
+            getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         } else {
             throw new PreconditionFailedException();
         }
@@ -572,8 +492,8 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         }
         long expires = System.currentTimeMillis() + timeout * 1000;
         lockInfo.setTimeout(expires);
-        setPropertyValue(activeLocksAttribute, SerializationUtils.serialize(activeLocks));
-        getEngine().notifyRefresh(getParent(getPath()));
+        ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());
     }

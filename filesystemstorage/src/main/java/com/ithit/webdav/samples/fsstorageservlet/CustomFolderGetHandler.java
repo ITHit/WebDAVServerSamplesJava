@@ -46,6 +46,11 @@ public class CustomFolderGetHandler implements MethodHandler {
             } else {
                 Path path = Paths.get(WebDavServlet.getRealPath(), pathToHTML);
                 String context = WebDavServlet.getContext() + "/";
+                String wsContext = context.replaceFirst("/", "");
+                int ind = wsContext.lastIndexOf("/");
+                if (ind >= 0) {
+                    wsContext = new StringBuilder(wsContext).replace(ind, ind + 1, "\\/").toString();
+                }
                 for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
                     String contextRootString = "<%context root%>";
                     if (line.contains(contextRootString)) {
@@ -58,6 +63,10 @@ public class CustomFolderGetHandler implements MethodHandler {
                     String versionNumber = "<%version%>";
                     if (line.contains(versionNumber)) {
                         line = line.replace(versionNumber, version);
+                    }
+                    String ws = "<%ws root%>";
+                    if (line.contains(ws)) {
+                        line = line.replace(ws, wsContext);
                     }
                     stream.println(line);
                 }

@@ -1,28 +1,16 @@
 package com.ithit.webdav.samples.deltavservlet;
 
+import com.ithit.webdav.samples.deltavservlet.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.deltav.AutoVersion;
 import com.ithit.webdav.server.exceptions.ServerException;
-import com.ithit.webdav.server.util.StringUtil;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.tika.Tika;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ForkJoinPool;
-
-import static com.ithit.webdav.samples.deltavservlet.Indexer.MAX_CONTENT_LENGTH;
 
 /**
  * Implementation if {@link Engine}.
@@ -30,13 +18,13 @@ import static com.ithit.webdav.samples.deltavservlet.Indexer.MAX_CONTENT_LENGTH;
  */
 public class WebDavEngine extends Engine {
 
+    private static final WebSocketServer _FAKED_WEB_SOCKET = new WebSocketServer();
     private WebSocketServer webSocketServer;
     private HttpServletRequest request;
     private final Logger logger;
     private final String license;
     private DataAccess dataAccess;
-    private Indexer indexer;
-    private Searcher searcher;
+    private SearchFacade searchFacade;
     private AutoVersion autoVersionMode;
     private boolean autoputUnderVersionControl;
 
@@ -108,6 +96,7 @@ public class WebDavEngine extends Engine {
 
     /**
      * Creates map from the URL parameters.
+     *
      * @param query URL with all the parameters.
      * @return Name value map with URL parameters.
      */
@@ -145,6 +134,7 @@ public class WebDavEngine extends Engine {
 
     /**
      * Indicates whether to auto put item under version control.
+     *
      * @return True if yes, false otherwise.
      */
     @Override
@@ -154,6 +144,7 @@ public class WebDavEngine extends Engine {
 
     /**
      * Set whether to auto put item under version control.
+     *
      * @param autoputUnderVersionControl True if yes, false otherwise.
      */
     void setAutoPutUnderVersionControl(boolean autoputUnderVersionControl) {
@@ -189,7 +180,8 @@ public class WebDavEngine extends Engine {
 
     /**
      * Returns {@link AutoVersion} rule for version mode.
-     * @return  {@link AutoVersion} rule for version mode.
+     *
+     * @return {@link AutoVersion} rule for version mode.
      */
     AutoVersion getAutoVersionMode() {
         return autoVersionMode;
@@ -197,78 +189,46 @@ public class WebDavEngine extends Engine {
 
     /**
      * Sets {@link AutoVersion} rule for version mode.
-     * @param autoVersionMode  {@link AutoVersion} rule for version mode.
+     *
+     * @param autoVersionMode {@link AutoVersion} rule for version mode.
      */
     void setAutoVersionMode(AutoVersion autoVersionMode) {
         this.autoVersionMode = autoVersionMode;
     }
 
     /**
-     * Returns {@link Indexer}.
-     * @return {@link Indexer}.
+     * Sets web socket server instance
+     *
+     * @param webSocketServer web socket server instance
      */
-    Indexer getIndexer() {
-        return indexer;
-    }
-
-    /**
-     * Returns {@link Searcher}.
-     * @return {@link Searcher}.
-     */
-    Searcher getSearcher() {
-        return searcher;
-    }
-
-    void setWebSocketServer(WebSocketServer webSocketServer) {
+    public void setWebSocketServer(WebSocketServer webSocketServer) {
         this.webSocketServer = webSocketServer;
     }
 
     /**
-     * Build initial index of root folder.
-     * @param indexFolder Index folder.
-     * @param interval Daemon commit interval.
+     * Returns web socket server instance
+     *
+     * @return web socket server instance
      */
-    void indexRootFolder(String indexFolder, Integer interval) {
-        ForkJoinPool forkJoinPool = new ForkJoinPool(4);
-        Directory fsDir;
-        try {
-            fsDir = FSDirectory.open(Paths.get(indexFolder));
-            StandardAnalyzer standardAnalyzer = new StandardAnalyzer();
-            IndexWriterConfig conf = new IndexWriterConfig(standardAnalyzer);
-            conf.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-            IndexWriter indexWriter = new IndexWriter(fsDir, conf);
-            Tika tika = new Tika();
-            tika.setMaxStringLength(MAX_CONTENT_LENGTH);
-            indexer = new Indexer(indexWriter, getFilesToIndex(), getLogger(), tika);
-            forkJoinPool.invoke(indexer);
-            indexWriter.commit();
-            new Indexer.CommitTask(indexWriter, getLogger()).schedule(interval);
-            searcher = new Searcher(indexFolder, standardAnalyzer, getLogger());
-        } catch (IOException e) {
-            logger.logError("Cannot initialize Lucene", e);
-        }
+    WebSocketServer getWebSocketServer() {
+        return webSocketServer == null ? _FAKED_WEB_SOCKET : webSocketServer;
     }
 
     /**
-     * Builds list of the all files stored in DB.
+     * Returns SearchFacade instance
+     *
+     * @return SearchFacade instance
      */
-    private List<HierarchyItemImpl> getFilesToIndex() {
-        return dataAccess.getFiles();
+    SearchFacade getSearchFacade() {
+        return searchFacade;
     }
 
-    void notifyRefresh(String folder) {
-        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
-        notify("refresh", folder);
-    }
-
-    void notifyDelete(String folder) {
-        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
-        notify("delete", folder);
-    }
-
-    private void notify(String type, String folder) {
-        if (webSocketServer != null) {
-            webSocketServer.send(type, folder);
-        }
+    /**
+     * Sets SearchFacade instance
+     *
+     * @param searchFacade SearchFacade instance
+     */
+    void setSearchFacade(SearchFacade searchFacade) {
+        this.searchFacade = searchFacade;
     }
 }

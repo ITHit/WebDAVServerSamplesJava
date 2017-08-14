@@ -1,5 +1,6 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
+import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.server.DefaultLoggerImpl;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.DavException;
@@ -16,13 +17,9 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 
 /**
  * This servlet processes WEBDAV requests.
@@ -32,14 +29,14 @@ public class WebDavServlet extends HttpServlet {
     private static final long serialVersionUID = 4668224632937178086L;
     private static final String DEFAULT_ROOT_PATH = "WEB-INF/Storage";
     private static final String DEFAULT_INDEX_PATH = "WEB-INF/Index";
-    private static final String TEST_PROPERTY = "test";
     private static String realPath;
     private static String servletContext;
     private static String rootLocalPath = null;
     private static boolean supportsUserDefinedAttributes;
     private Logger logger;
     private boolean showExceptions;
-    private WebDavEngine engine;
+    private SearchFacade searchFacade;
+    private String license;
 
     /**
      * Returns root folder for the WebDav.
@@ -90,7 +87,6 @@ public class WebDavServlet extends HttpServlet {
 
         String licenseFile = servletConfig.getInitParameter("license");
         showExceptions = Boolean.parseBoolean(servletConfig.getInitParameter("showExceptions"));
-        String license;
         try {
             license = FileUtils.readFileToString(new File(licenseFile));
         } catch (IOException e) {
@@ -102,12 +98,8 @@ public class WebDavServlet extends HttpServlet {
         rootLocalPath = servletConfig.getInitParameter("root");
         checkRootPath(rootLocalPath);
         String indexLocalPath = createIndexPath();
-        supportsUserDefinedAttributes = checkSupportOfUserDefinedFileAttributes();
-        engine = new WebDavEngine(logger, license);
-        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
-        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
-        handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
-        handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
+        supportsUserDefinedAttributes = ExtendedAttributesExtension.isExtendedAttributesSupported(Paths.get(getRootLocalPath()).toString());
+        WebDavEngine engine = new WebDavEngine(logger, license);
         String indexInterval = servletConfig.getInitParameter("index-interval");
         Integer interval = null;
         if (indexInterval != null) {
@@ -116,8 +108,17 @@ public class WebDavServlet extends HttpServlet {
             } catch (NumberFormatException ignored) {}
         }
         if (rootLocalPath != null && indexLocalPath != null) {
-            engine.indexRootFolder(rootLocalPath, indexLocalPath, interval);
+            searchFacade = new SearchFacade(engine, logger);
+            searchFacade.indexRootFolder(rootLocalPath, indexLocalPath, interval);
         }
+    }
+
+    /**
+     * Release all resources when stop the servlet
+     */
+    @Override
+    public void destroy() {
+        searchFacade.getIndexer().stop();
     }
 
     private void checkRootPath(String rootPath) {
@@ -142,6 +143,7 @@ public class WebDavServlet extends HttpServlet {
 
     /**
      * Creates index folder if not exists.
+     *
      * @return Absolute location of index folder.
      */
     private String createIndexPath() {
@@ -153,7 +155,7 @@ public class WebDavServlet extends HttpServlet {
                 return null;
             }
         }
-        return  indexLocalPath.toString();
+        return indexLocalPath.toString();
     }
 
     /**
@@ -167,10 +169,17 @@ public class WebDavServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws ServletException, IOException {
+
+        WebDavEngine engine = new WebDavEngine(logger, license);
+        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
+        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
+        handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
+        handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
+        engine.setServletRequest(httpServletRequest);
+        engine.setSearchFacade(searchFacade);
+
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("engine", engine);
-
-        engine.setServletRequest(httpServletRequest);
 
         try {
             engine.service(httpServletRequest, httpServletResponse);
@@ -181,28 +190,5 @@ public class WebDavServlet extends HttpServlet {
                     e.printStackTrace(new PrintStream(httpServletResponse.getOutputStream()));
             }
         }
-    }
-
-    /**
-     * Checks whether file system registered for the root folder supports User Defined Attributes.
-     *
-     * @return <b>True</b> if the file system registered for the root folder supports User Defined Attributes,
-     * <b>false</b> otherwise.
-     */
-    private boolean checkSupportOfUserDefinedFileAttributes() {
-        boolean supports = true;
-        try {
-            UserDefinedFileAttributeView view = Files.getFileAttributeView(Paths.get(rootLocalPath), UserDefinedFileAttributeView.class);
-            if (view != null) {
-                ByteBuffer bufferActiveLocks = Charset.defaultCharset().encode(CharBuffer.wrap(TEST_PROPERTY));
-                view.write(TEST_PROPERTY, bufferActiveLocks);
-                view.delete(TEST_PROPERTY);
-            } else {
-                supports = false;
-            }
-        } catch (IOException e) {
-            supports = false;
-        }
-        return supports;
     }
 }

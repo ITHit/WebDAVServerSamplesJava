@@ -4,7 +4,10 @@ import com.ithit.webdav.server.Folder;
 import com.ithit.webdav.server.Property;
 import com.ithit.webdav.server.deltav.History;
 import com.ithit.webdav.server.deltav.VersionableItem;
-import com.ithit.webdav.server.exceptions.*;
+import com.ithit.webdav.server.exceptions.LockedException;
+import com.ithit.webdav.server.exceptions.MultistatusException;
+import com.ithit.webdav.server.exceptions.ServerException;
+import com.ithit.webdav.server.exceptions.WebDavStatus;
 
 import java.util.List;
 
@@ -75,6 +78,7 @@ class VersionHistory implements History {
 
     /**
      * All versions of current item.
+     *
      * @return List with all versions of current item.
      * @throws ServerException in case of an error.
      */
@@ -85,6 +89,7 @@ class VersionHistory implements History {
 
     /**
      * Item's root version.
+     *
      * @return Root version for the item.
      * @throws ServerException in case of an error.
      */
@@ -132,7 +137,7 @@ class VersionHistory implements History {
     /**
      * Deletes this item.
      *
-     * @throws ServerException      - in case of another error.
+     * @throws ServerException - in case of another error.
      */
     public void delete() throws ServerException {
         throw new ServerException(WebDavStatus.NOT_ALLOWED);
@@ -217,7 +222,7 @@ class VersionHistory implements History {
      * @param folder   Destination folder.
      * @param destName Name of the destination item.
      * @param deep     Indicates whether to copy entire subtree.
-     * @throws ServerException      - In case of other error.
+     * @throws ServerException - In case of other error.
      */
     public void copyTo(Folder folder, String destName, boolean deep) throws ServerException {
         throw new ServerException(WebDavStatus.NOT_ALLOWED);
@@ -228,7 +233,7 @@ class VersionHistory implements History {
      *
      * @param folder   Destination folder.
      * @param destName Name of the destination item.
-     * @throws ServerException      - in case of another error.
+     * @throws ServerException - in case of another error.
      */
     public void moveTo(Folder folder, String destName) throws ServerException {
         throw new ServerException(WebDavStatus.NOT_ALLOWED);

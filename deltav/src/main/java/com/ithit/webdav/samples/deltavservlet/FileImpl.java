@@ -45,20 +45,20 @@ public class FileImpl extends HierarchyItemImpl implements
     /**
      * Initializes a new instance of the {@link FileImpl} class.
      *
-     * @param id                 Id of the item in DB.
-     * @param parentId           Id of the parent item in DB.
-     * @param name               Name of hierarchy item.
-     * @param path               Relative to WebDAV root folder path.
-     * @param created            Creation time of the hierarchy item.
-     * @param modified           Modification time of the hierarchy item.
-     * @param lastChunkSaved     Last byte saved.
-     * @param totalContentLength Length of the file.
-     * @param versionControlled  Whether file version controlled.
-     * @param checkedOut         Determines whether item is in checked-in or checked-out state.
-     * @param checkInDuringUnlock Whether we need check in file during unlock.
+     * @param id                    Id of the item in DB.
+     * @param parentId              Id of the parent item in DB.
+     * @param name                  Name of hierarchy item.
+     * @param path                  Relative to WebDAV root folder path.
+     * @param created               Creation time of the hierarchy item.
+     * @param modified              Modification time of the hierarchy item.
+     * @param lastChunkSaved        Last byte saved.
+     * @param totalContentLength    Length of the file.
+     * @param versionControlled     Whether file version controlled.
+     * @param checkedOut            Determines whether item is in checked-in or checked-out state.
+     * @param checkInDuringUnlock   Whether we need check in file during unlock.
      * @param checkInOnFileComplete Whether to checking on file complete.
-     * @param autoVersion        Auto versioning rule.
-     * @param engine             Instance of current {@link WebDavEngine}.
+     * @param autoVersion           Auto versioning rule.
+     * @param engine                Instance of current {@link WebDavEngine}.
      */
     FileImpl(int id, int parentId, String name,
              String path, long created, long modified, long lastChunkSaved,
@@ -112,10 +112,10 @@ public class FileImpl extends HierarchyItemImpl implements
         ensureHasToken();
 
         deleteThisItem();
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         try {
-            getEngine().getIndexer().deleteIndex(this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().deleteIndex(this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
     }
@@ -215,13 +215,13 @@ public class FileImpl extends HierarchyItemImpl implements
         } else {
             copy = copyThisItem(destFolder, null, destName);
         }
-        getEngine().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {
             if (copy != null) {
                 newID = copy.getId();
             }
-            getEngine().getIndexer().indexFile(destName, newID, null, this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().indexFile(destName, newID, null, this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
     }
@@ -346,10 +346,10 @@ public class FileImpl extends HierarchyItemImpl implements
                 if (os != null)
                     os.close();
             }
-            getEngine().notifyRefresh(getParent(getPath()));
+            getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
             try {
-                getEngine().getIndexer().indexFile(getName(), getId(), getId(), this);
-            } catch (Exception ex){
+                getEngine().getSearchFacade().getIndexer().indexFile(getName(), getId(), getId(), this);
+            } catch (Exception ex) {
                 getEngine().getLogger().logError("Errors during indexing.", ex);
             }
             return totalSaved;
@@ -384,11 +384,11 @@ public class FileImpl extends HierarchyItemImpl implements
         } else {
             moveThisItem(destFolder, destName, parent);
         }
-        getEngine().notifyRefresh(getParent(getPath()));
-        getEngine().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {
-            getEngine().getIndexer().indexFile(destName, getId(), getId(), this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().indexFile(destName, getId(), getId(), this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
     }
@@ -525,6 +525,7 @@ public class FileImpl extends HierarchyItemImpl implements
 
     /**
      * Creates new version of the file in the DB.
+     *
      * @param newVersionNumber New version number.
      * @return Path to the new version.
      * @throws ServerException in case of DB errors.
@@ -561,6 +562,7 @@ public class FileImpl extends HierarchyItemImpl implements
 
     /**
      * Updates CheckedOut filed in the Repository table to the specified value.
+     *
      * @param value Value to set.
      * @throws ServerException in case of DB errors.
      */
@@ -660,6 +662,7 @@ public class FileImpl extends HierarchyItemImpl implements
 
     /**
      * Sets auth versioning mode for this item.
+     *
      * @param value Auto versioning mode.
      * @throws ServerException in case of an error.
      */
@@ -773,6 +776,7 @@ public class FileImpl extends HierarchyItemImpl implements
 
     /**
      * Loads file content input stream for indexing.
+     *
      * @param id File id
      * @return InputStream for indexing.
      */

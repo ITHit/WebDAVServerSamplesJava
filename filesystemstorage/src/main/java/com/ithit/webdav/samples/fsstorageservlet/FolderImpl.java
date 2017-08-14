@@ -41,7 +41,8 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
 
     /**
      * Returns folder that corresponds to path.
-     * @param path Encoded path relative to WebDAV root.
+     *
+     * @param path   Encoded path relative to WebDAV root.
      * @param engine Instance of {@link WebDavEngine}
      * @return Folder instance or null if physical folder not found in file system.
      * @throws ServerException in case of exception
@@ -97,7 +98,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
             } catch (IOException e) {
                 throw new ServerException(e);
             }
-            getEngine().notifyRefresh(getPath());
+            getEngine().getWebSocketServer().notifyRefresh(getPath());
             return FileImpl.getFile(getPath() + encode(name), getEngine());
         }
         return null;
@@ -119,7 +120,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
         if (!Files.exists(fullPath)) {
             try {
                 Files.createDirectory(fullPath);
-                getEngine().notifyRefresh(getPath());
+                getEngine().getWebSocketServer().notifyRefresh(getPath());
             } catch (IOException e) {
                 throw new ServerException(e);
             }
@@ -157,7 +158,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
         try {
             removeIndex(getFullPath(), this);
             FileUtils.deleteDirectory(getFullPath().toFile());
-            getEngine().notifyDelete(getPath());
+            getEngine().getWebSocketServer().notifyDelete(getPath());
         } catch (IOException e) {
             throw new ServerException(e);
         }
@@ -179,7 +180,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
             Path sourcePath = this.getFullPath();
             Path destinationFullPath = Paths.get(destinationFolder, destName);
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile());
-            getEngine().notifyRefresh(folder.getPath());
+            getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
             addIndex(destinationFullPath, folder.getPath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
@@ -216,8 +217,8 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
             throw new ServerException(e);
         }
         setName(destName);
-        getEngine().notifyDelete(getPath());
-        getEngine().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyDelete(getPath());
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
     }
 
     /**
@@ -225,13 +226,13 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
      *
      * @param searchString A phrase to search.
      * @param options      Search parameters.
-     * @param propNames List of properties to retrieve with the children. They will be queried by the engine later.
+     * @param propNames    List of properties to retrieve with the children. They will be queried by the engine later.
      * @return ist of {@link HierarchyItem} satisfying the search parameters or empty list.
      */
     @Override
     public List<HierarchyItem> search(String searchString, SearchOptions options, List<Property> propNames) {
         List<HierarchyItem> results = new LinkedList<>();
-        Searcher searcher = getEngine().getSearcher();
+        SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
             return results;
         }
@@ -243,7 +244,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
         try {
             String decodedPath = decode(getPath());
             searchResult = searcher.search(searchString, options, decodedPath, snippet);
-            for (Map.Entry<String, String> entry: searchResult.entrySet()) {
+            for (Map.Entry<String, String> entry : searchResult.entrySet()) {
                 try {
                     HierarchyItem item = getEngine().getHierarchyItem(entry.getKey());
                     if (item != null) {
@@ -285,26 +286,26 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
 
     private void removeIndex(Path sourcePath, FolderImpl itSelf) {
         List<HierarchyItem> filesToDelete = new ArrayList<>();
-        getEngine().getFilesToIndex(sourcePath.toFile().listFiles(), filesToDelete, WebDavServlet.getRootLocalPath());
+        getEngine().getSearchFacade().getFilesToIndex(sourcePath.toFile().listFiles(), filesToDelete, WebDavServlet.getRootLocalPath());
         filesToDelete.add(itSelf);
-        for (HierarchyItem hi: filesToDelete) {
+        for (HierarchyItem hi : filesToDelete) {
             try {
-                getEngine().getIndexer().deleteIndex(hi);
+                getEngine().getSearchFacade().getIndexer().deleteIndex(hi);
             } catch (Exception e) {
-                getEngine().getLogger().logError("Cannot delete index." , e);
+                getEngine().getLogger().logError("Cannot delete index.", e);
             }
         }
     }
 
     private void addIndex(Path sourcePath, String path, String name) {
         List<HierarchyItem> filesToIndex = new ArrayList<>();
-        getEngine().getFilesToIndex(sourcePath.toFile().listFiles(), filesToIndex, WebDavServlet.getRootLocalPath());
-        getEngine().getIndexer().indexFile(name, decode(path), null, null);
-        for (HierarchyItem hi: filesToIndex) {
+        getEngine().getSearchFacade().getFilesToIndex(sourcePath.toFile().listFiles(), filesToIndex, WebDavServlet.getRootLocalPath());
+        getEngine().getSearchFacade().getIndexer().indexFile(name, decode(path), null, null);
+        for (HierarchyItem hi : filesToIndex) {
             try {
-                getEngine().getIndexer().indexFile(hi.getName(), decode(hi.getPath()), null, hi);
+                getEngine().getSearchFacade().getIndexer().indexFile(hi.getName(), decode(hi.getPath()), null, hi);
             } catch (Exception e) {
-                getEngine().getLogger().logError("Cannot index." , e);
+                getEngine().getLogger().logError("Cannot index.", e);
             }
         }
     }

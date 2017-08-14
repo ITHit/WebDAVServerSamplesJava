@@ -99,7 +99,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                 long now = Calendar.getInstance().getTime().getTime();
                 item = new FileImpl(newId, getId(), name, getPath() + name, now, now, now, 0, getEngine());
         }
-        getEngine().notifyRefresh(getPath());
+        getEngine().getWebSocketServer().notifyRefresh(getPath());
         return item;
 
     }
@@ -170,15 +170,15 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         if (mr.getResponses().length > 0)
             throw mr;
         try {
-            getEngine().getIndexer().deleteIndex(this);
-            getEngine().getIndexer().indexFile(newDestFolder.getName(), newDestFolder.getId(), null, this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().deleteIndex(this);
+            getEngine().getSearchFacade().getIndexer().indexFile(newDestFolder.getName(), newDestFolder.getId(), null, this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
         // delete this folder
         deleteThisItem();
-        getEngine().notifyDelete(getPath());
-        getEngine().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyDelete(getPath());
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
     }
 
     @Override
@@ -207,8 +207,8 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         }
 
         try {
-            getEngine().getIndexer().indexFile(newDestFolder.getName(), newDestFolder.getId(), null, this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().indexFile(newDestFolder.getName(), newDestFolder.getId(), null, this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
 
@@ -225,7 +225,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                 }
             }
         }
-        getEngine().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         if (mr.getResponses().length > 0)
             throw mr;
 
@@ -261,13 +261,13 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
             throw mx;
         else {
             try {
-                getEngine().getIndexer().deleteIndex(this);
-            } catch (Exception ex){
+                getEngine().getSearchFacade().getIndexer().deleteIndex(this);
+            } catch (Exception ex) {
                 getEngine().getLogger().logError("Errors during indexing.", ex);
             }
             deleteThisItem();
         }
-        getEngine().notifyDelete(getPath());
+        getEngine().getWebSocketServer().notifyDelete(getPath());
     }
 
     /**
@@ -329,18 +329,18 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      *
      * @param searchString A phrase to search.
      * @param options      Search parameters.
-     * @param propNames List of properties to retrieve with the children. They will be queried by the engine later.
+     * @param propNames    List of properties to retrieve with the children. They will be queried by the engine later.
      * @return ist of {@link HierarchyItem} satisfying the search parameters or empty list.
      */
     @Override
     public List<HierarchyItem> search(String searchString, SearchOptions options, List<Property> propNames) {
         List<HierarchyItem> results = new LinkedList<>();
-        Searcher searcher = getEngine().getSearcher();
+        SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
             return results;
         }
         boolean snippet = false;
-        for (Property pr: propNames) {
+        for (Property pr : propNames) {
             if (SNIPPET.equalsIgnoreCase(pr.getName())) {
                 snippet = true;
                 break;
@@ -356,9 +356,9 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                         "   START WITH id = ? " +
                         "   CONNECT BY id = PRIOR parent and parent!= prior id)", entry.getKey());
                 String[] pathParts = path.split("/");
-                pathParts = Arrays.copyOf(pathParts, pathParts.length-1);
+                pathParts = Arrays.copyOf(pathParts, pathParts.length - 1);
                 StringBuilder pathBuilder = new StringBuilder();
-                for (int i = pathParts.length - 1 ; i>=0 ; i--) {
+                for (int i = pathParts.length - 1; i >= 0; i--) {
                     if (Objects.equals(pathParts[i], "")) {
                         continue;
                     }

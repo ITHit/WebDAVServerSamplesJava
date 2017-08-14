@@ -25,7 +25,7 @@ class DownloadUtil {
      * @param blob       Blob to write to the stream.
      * @param startIndex Zero-bazed byte offset in file content at which to begin copying bytes to the output stream.
      * @param count      Number of bytes to be written to the output stream.
-     * @throws IOException In case of blob reading exception.
+     * @throws IOException  In case of blob reading exception.
      * @throws SQLException In case of an error.
      */
     static void readBlob(Logger logger, OutputStream output, Blob blob, long startIndex, long count) throws SQLException, IOException {

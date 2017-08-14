@@ -1,5 +1,6 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
+import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.ConflictException;
 import com.ithit.webdav.server.exceptions.LockedException;
@@ -16,7 +17,9 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents file in the File System repository.
@@ -31,11 +34,11 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
     /**
      * Initializes a new instance of the {@link FileImpl} class.
      *
-     * @param name              Name of hierarchy item.
-     * @param path              Relative to WebDAV root folder path.
-     * @param created           Creation time of the hierarchy item.
-     * @param modified          Modification time of the hierarchy item.
-     * @param engine            Instance of current {@link WebDavEngine}.
+     * @param name     Name of hierarchy item.
+     * @param path     Relative to WebDAV root folder path.
+     * @param created  Creation time of the hierarchy item.
+     * @param modified Modification time of the hierarchy item.
+     * @param engine   Instance of current {@link WebDavEngine}.
      */
     private FileImpl(String name, String path, long created, long modified, WebDavEngine engine) {
         super(name, path, created, modified, engine);
@@ -43,7 +46,8 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
 
     /**
      * Returns file that corresponds to path.
-     * @param path Encoded path relative to WebDAV root.
+     *
+     * @param path   Encoded path relative to WebDAV root.
      * @param engine Instance of {@link WebDavEngine}
      * @return File instance or null if physical file not found in file system.
      * @throws ServerException in case of exception
@@ -265,10 +269,10 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             totalWrittenBytes += readBytes;
         }
         writer.close();
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         try {
-            getEngine().getIndexer().indexFile(getName(),  decode(getPath()), null, this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().indexFile(getName(), decode(getPath()), null, this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
         return totalWrittenBytes;
@@ -281,14 +285,14 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             if (!Objects.equals(sn, "0")) {
                 serialNumber.setValue(String.valueOf((Integer.valueOf(sn) + 1)));
             }
-            setPropertyValue("SerialNumber", SerializationUtils.serialize(Collections.singletonList(serialNumber)));
+            ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), "SerialNumber", SerializationUtils.serialize(Collections.singletonList(serialNumber)));
         } catch (Exception ex) {
             getEngine().getLogger().logError("Cannot update serial number.", ex);
         }
     }
 
     private String getSerialNumber() throws ServerException {
-        String serialJson = getPropertyValue("SerialNumber");
+        String serialJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), "SerialNumber");
         List<Property> properties = SerializationUtils.deserializeList(Property.class, serialJson);
         if (properties.size() == 1) {
             return properties.get(0).getValue();
@@ -305,10 +309,10 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         } catch (IOException e) {
             throw new ServerException(e);
         }
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         try {
-            getEngine().getIndexer().deleteIndex(this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().deleteIndex(this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
     }
@@ -326,11 +330,11 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         } catch (IOException e) {
             throw new ServerException(e);
         }
-        getEngine().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {
             String currentPath = folder.getPath() + destName;
-            getEngine().getIndexer().indexFile(decode(destName), decode(currentPath), null, this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().indexFile(decode(destName), decode(currentPath), null, this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
     }
@@ -350,18 +354,19 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             throw new ServerException(e);
         }
         setName(destName);
-        getEngine().notifyRefresh(getParent(getPath()));
-        getEngine().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {
             String currentPath = folder.getPath() + destName;
-            getEngine().getIndexer().indexFile(decode(destName), decode(currentPath), getPath(), this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().indexFile(decode(destName), decode(currentPath), getPath(), this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
     }
 
     /**
      * Returns snippet of file content that matches search conditions.
+     *
      * @return Snippet of file content that matches search conditions.
      */
     String getSnippet() {
@@ -370,6 +375,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
 
     /**
      * Sets snippet of file content that matches search conditions.
+     *
      * @param snippet Snippet of file content that matches search conditions.
      */
     void setSnippet(String snippet) {

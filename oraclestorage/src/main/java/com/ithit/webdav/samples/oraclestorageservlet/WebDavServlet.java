@@ -27,7 +27,8 @@ public class WebDavServlet extends HttpServlet {
     private Logger logger;
     private boolean showExceptions;
     private static final String DEFAULT_INDEX_PATH = "WEB-INF/Index";
-    private WebDavEngine engine;
+    private String license;
+    private SearchFacade searchFacade;
 
     /**
      * Reads license file content.
@@ -83,15 +84,11 @@ public class WebDavServlet extends HttpServlet {
 
         String licenseFile = servletConfig.getInitParameter("license");
         showExceptions = "true".equals(servletConfig.getInitParameter("showExceptions"));
-        String license = getContents(licenseFile);
+        license = getContents(licenseFile);
         realPath = servletConfig.getServletContext().getRealPath("");
         servletContext = servletConfig.getServletContext().getContextPath();
         logger = new DefaultLoggerImpl(servletConfig.getServletContext());
-        engine = new WebDavEngine(logger, license);
-        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
-        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
-        handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
-        handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
+        WebDavEngine engine = new WebDavEngine(logger, license);
         DataAccess dataAccess = new DataAccess(engine);
         engine.setDataAccess(dataAccess);
         String indexLocalPath = createIndexPath();
@@ -102,8 +99,17 @@ public class WebDavServlet extends HttpServlet {
                 interval = Integer.valueOf(indexInterval);
             } catch (NumberFormatException ignored) {}
         }
-        engine.indexRootFolder(indexLocalPath, interval);
+        searchFacade = new SearchFacade(dataAccess, logger);
+        searchFacade.indexRootFolder(indexLocalPath, interval);
         dataAccess.closeConnection();
+    }
+
+    /**
+     * Release all resources when stop the servlet
+     */
+    @Override
+    public void destroy() {
+        searchFacade.getIndexer().stop();
     }
 
     /**
@@ -118,7 +124,14 @@ public class WebDavServlet extends HttpServlet {
     protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws ServletException, IOException {
 
+        WebDavEngine engine = new WebDavEngine(logger, license);
+        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
+        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
+        handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
+        handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
+
         engine.setServletRequest(httpServletRequest);
+        engine.setSearchFacade(searchFacade);
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("engine", engine);
         DataAccess dataAccess = new DataAccess(engine);
@@ -140,6 +153,7 @@ public class WebDavServlet extends HttpServlet {
 
     /**
      * Creates index folder if not exists.
+     *
      * @return Absolute location of index folder.
      */
     private String createIndexPath() {
@@ -151,6 +165,6 @@ public class WebDavServlet extends HttpServlet {
                 return null;
             }
         }
-        return  indexLocalPath.toString();
+        return indexLocalPath.toString();
     }
 }

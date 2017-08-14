@@ -84,10 +84,10 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
         ensureHasToken();
 
         deleteThisItem();
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         try {
-            getEngine().getIndexer().deleteIndex(this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().deleteIndex(this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
     }
@@ -182,13 +182,13 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
         } else {
             copy = copyThisItem(destFolder, null, destName);
         }
-        getEngine().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {
             if (copy != null) {
                 newID = copy.getId();
             }
-            getEngine().getIndexer().indexFile(destName, newID, null, this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().indexFile(destName, newID, null, this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
     }
@@ -331,10 +331,10 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
                 if (os != null)
                     os.close();
             }
-            getEngine().notifyRefresh(getParent(getPath()));
+            getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
             try {
-                getEngine().getIndexer().indexFile(getName(), getId(), getId(), this);
-            } catch (Exception ex){
+                getEngine().getSearchFacade().getIndexer().indexFile(getName(), getId(), getId(), this);
+            } catch (Exception ex) {
                 getEngine().getLogger().logError("Errors during indexing.", ex);
             }
             return totalSaved;
@@ -369,11 +369,11 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
         } else {
             moveThisItem(destFolder, destName, parent);
         }
-        getEngine().notifyRefresh(getParent(getPath()));
-        getEngine().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {
-            getEngine().getIndexer().indexFile(destName, getId(), getId(), this);
-        } catch (Exception ex){
+            getEngine().getSearchFacade().getIndexer().indexFile(destName, getId(), getId(), this);
+        } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }
     }
@@ -467,6 +467,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
 
     /**
      * Loads file content input stream for indexing.
+     *
      * @param id File id.
      * @return InputStream for indexing.
      */

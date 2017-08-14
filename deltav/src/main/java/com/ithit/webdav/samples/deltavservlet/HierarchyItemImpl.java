@@ -209,7 +209,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
         for (Property lookForProp : props) {
             if (SNIPPET.equalsIgnoreCase(lookForProp.getName()) && this instanceof FileImpl) {
-                result.add(new Property(lookForProp.getNamespace(), lookForProp.getName(),((FileImpl) this).getSnippet()));
+                result.add(new Property(lookForProp.getNamespace(), lookForProp.getName(), ((FileImpl) this).getSnippet()));
                 continue;
             }
             for (Property foundProp : l) {
@@ -282,7 +282,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
             }
 
         updateModified();
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
     }
 
     /**
@@ -540,7 +540,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
         getDataAccess().executeUpdate("INSERT INTO Locks (ItemID,Token,Shared,Deep,Expires,Owner)"
                         + " VALUES(?, ?, ?, ?, ?, ?)",
                 getId(), token, shared, deep, expires, owner);
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         return new LockResult(token, timeout);
     }
 
@@ -571,7 +571,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
         getDataAccess().executeUpdate("UPDATE Locks SET Expires = ? WHERE Token = ?",
                 expires, token);
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());
     }
@@ -600,11 +600,12 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
             throw new PreconditionFailedException();
 
         getDataAccess().executeUpdate("DELETE FROM Locks WHERE Token = ?", lockToken);
-        getEngine().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
     }
 
     /**
      * Returns SQL time corresponding to now.
+     *
      * @return Returns SQL time corresponding to now.
      */
     private Timestamp getNow() {
@@ -741,6 +742,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
     /**
      * Returns User name performing request.
+     *
      * @return Returns User name performing request.
      */
     String getUserName() {
@@ -753,7 +755,8 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
     /**
      * Get DB field value with specified name.
-     * @param columnName Column name to get data.
+     *
+     * @param columnName   Column name to get data.
      * @param defaultValue Default value if data is null for this field.
      * @return Field value or default value of null.
      * @throws ServerException in case of DB errors.
@@ -767,8 +770,9 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
     /**
      * Set DB field with specified name with new value.
+     *
      * @param columnName Column name to set data.
-     * @param value New value to set.
+     * @param value      New value to set.
      * @throws ServerException in case of DB errors.
      */
     <T> void setDbField(String columnName, T value) throws ServerException {

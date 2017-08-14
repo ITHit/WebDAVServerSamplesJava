@@ -6,7 +6,10 @@ import com.ithit.webdav.server.Property;
 import com.ithit.webdav.server.deltav.DeltaVItem;
 import com.ithit.webdav.server.deltav.Version;
 import com.ithit.webdav.server.deltav.VersionableItem;
-import com.ithit.webdav.server.exceptions.*;
+import com.ithit.webdav.server.exceptions.LockedException;
+import com.ithit.webdav.server.exceptions.MultistatusException;
+import com.ithit.webdav.server.exceptions.ServerException;
+import com.ithit.webdav.server.exceptions.WebDavStatus;
 import com.ithit.webdav.server.util.StringUtil;
 
 import java.io.IOException;
@@ -18,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  Represents single item version.
+ * Represents single item version.
  * <p>
  * Defines the properties and methods that item version must implement. In addition to methods and properties provided by
  * {@link DeltaVItem} this interface also provides methods for getting version name, next version and previous version.
@@ -44,12 +47,12 @@ class VersionImpl implements Version, File {
     /**
      * Initializes new instance of the {@link VersionImpl}.
      *
-     * @param engine   Instance of current {@link WebDavEngine}.
+     * @param engine    Instance of current {@link WebDavEngine}.
      * @param versionId Version id of the item in DB.
-     * @param itemId   Id of the item in DB.
-     * @param itemPath Relative to WebDAV root folder path.
+     * @param itemId    Id of the item in DB.
+     * @param itemPath  Relative to WebDAV root folder path.
      * @param verNumber Number of the version item.
-     * @param created Creation time of the hierarchy item.
+     * @param created   Creation time of the hierarchy item.
      */
     VersionImpl(WebDavEngine engine, int versionId, int itemId, String itemPath,
                 int verNumber, long created) {
@@ -77,7 +80,8 @@ class VersionImpl implements Version, File {
      * <li>Version: myfolder/mydoc.docx?version=5</li>
      * </ul>
      * </p>
-     * @param itemPath Relative to WebDAV root folder path.
+     *
+     * @param itemPath      Relative to WebDAV root folder path.
      * @param versionNumber Number of the version item.
      * @return Item path relative to storage root.
      */
@@ -285,6 +289,7 @@ class VersionImpl implements Version, File {
 
     /**
      * Returns current version number.
+     *
      * @return Current version number.
      */
     int getVersionNumber() {
@@ -293,6 +298,7 @@ class VersionImpl implements Version, File {
 
     /**
      * Returns unique item id.
+     *
      * @return Unique item id.
      */
     int getItemId() {
@@ -301,6 +307,7 @@ class VersionImpl implements Version, File {
 
     /**
      * Returns current version id.
+     *
      * @return Current version id.
      */
     int getVersionId() {
@@ -395,7 +402,7 @@ class VersionImpl implements Version, File {
     /**
      * Deletes this item.
      *
-     * @throws ServerException      - in case of another error.
+     * @throws ServerException - in case of another error.
      */
     public void delete() throws ServerException {
         engine.getDataAccess().executeUpdate("DELETE FROM Version WHERE Id = ?", versionId);
@@ -418,7 +425,7 @@ class VersionImpl implements Version, File {
      * @param folder   Destination folder.
      * @param destName Name of the destination item.
      * @param deep     Indicates whether to copy entire subtree.
-     * @throws ServerException      - In case of other error.
+     * @throws ServerException - In case of other error.
      */
     public void copyTo(Folder folder, String destName, boolean deep) throws ServerException {
         throw new ServerException(WebDavStatus.NOT_ALLOWED);
@@ -429,7 +436,7 @@ class VersionImpl implements Version, File {
      *
      * @param folder   Destination folder.
      * @param destName Name of the destination item.
-     * @throws ServerException      - in case of another error.
+     * @throws ServerException - in case of another error.
      */
     public void moveTo(Folder folder, String destName) throws ServerException {
         throw new ServerException(WebDavStatus.NOT_ALLOWED);
@@ -441,7 +448,7 @@ class VersionImpl implements Version, File {
      * @param setProps Array of properties to be set.
      * @param delProps Array of properties to be removed. {@link Property#value} field is ignored.
      *                 Specifying the removal of a property that does not exist is not an error.
-     * @throws ServerException      In case of other error.
+     * @throws ServerException In case of other error.
      */
     public void updateProperties(Property[] setProps, Property[] delProps) throws ServerException {
         throw new ServerException(WebDavStatus.NOT_ALLOWED);
@@ -478,18 +485,15 @@ class VersionImpl implements Version, File {
      * &lt;/html>
      * </pre>
      * </p>
-
      *
-     * @param content           {@link InputStream} to read the content of the file from.
-     * @param contentType       Indicates media type of the file.
-     * @param startIndex        Index in file to which corresponds first byte in {@code content}.
+     * @param content       {@link InputStream} to read the content of the file from.
+     * @param contentType   Indicates media type of the file.
+     * @param startIndex    Index in file to which corresponds first byte in {@code content}.
      * @param totalFileSize Total size of the file being uploaded. -1 if size is unknown.
-     *
+     * @return Number of bytes written.
      * @throws LockedException File was locked and client did not provide lock token.
      * @throws ServerException In case of an error.
      * @throws IOException     I/O error.
-     *
-     * @return Number of bytes written.
      */
     public long write(InputStream content, String contentType, long startIndex, long totalFileSize)
             throws LockedException, ServerException, IOException {
@@ -498,7 +502,8 @@ class VersionImpl implements Version, File {
 
     /**
      * Get DB field value with specified name.
-     * @param columnName Column name to get data.
+     *
+     * @param columnName   Column name to get data.
      * @param defaultValue Default value if data is null for this field.
      * @return Field value or default value of null.
      * @throws ServerException in case of DB errors.
@@ -512,8 +517,9 @@ class VersionImpl implements Version, File {
 
     /**
      * Set DB field with specified name with new value.
+     *
      * @param columnName Column name to set data.
-     * @param value New value to set.
+     * @param value      New value to set.
      * @throws ServerException in case of DB errors.
      */
     private <T> void setDbField(String columnName, T value) throws ServerException {
