@@ -4,6 +4,8 @@ import com.ithit.webdav.server.Folder;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.MethodHandler;
 import com.ithit.webdav.server.exceptions.DavException;
+import com.ithit.webdav.server.http.DavRequest;
+import com.ithit.webdav.server.http.DavResponse;
 import org.apache.commons.io.FileUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +35,7 @@ public class CustomFolderGetHandler implements MethodHandler {
     }
 
     @Override
-    public void processRequest(HttpServletRequest request, HttpServletResponse response, HierarchyItem item)
+    public void processRequest(DavRequest request, DavResponse response, HierarchyItem item)
             throws DavException, IOException {
         if (item instanceof Folder) {
             PrintStream stream = new PrintStream(response.getOutputStream(), true, charset);

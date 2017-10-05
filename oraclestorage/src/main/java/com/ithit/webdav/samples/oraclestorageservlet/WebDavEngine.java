@@ -1,5 +1,6 @@
 package com.ithit.webdav.samples.oraclestorageservlet;
 
+import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.samples.oraclestorageservlet.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
@@ -16,7 +17,7 @@ public class WebDavEngine extends Engine {
 
     private static final WebSocketServer _FAKED_WEB_SOCKET = new WebSocketServer();
     private WebSocketServer webSocketServer;
-    private HttpServletRequest request;
+    private HttpServletDavRequest request;
     private final Logger logger;
     private final String license;
     private DataAccess dataAccess;
@@ -38,7 +39,7 @@ public class WebDavEngine extends Engine {
      *
      * @param httpServletRequest Original servlet request.
      */
-    void setServletRequest(HttpServletRequest httpServletRequest) {
+    void setServletRequest(HttpServletDavRequest httpServletRequest) {
         this.request = httpServletRequest;
     }
 
@@ -101,7 +102,7 @@ public class WebDavEngine extends Engine {
      *
      * @return Returns original {@link HttpServletRequest}.
      */
-    HttpServletRequest getRequest() {
+    HttpServletDavRequest getRequest() {
         return request;
     }
 

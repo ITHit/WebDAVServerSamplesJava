@@ -1,5 +1,8 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
+import com.ithit.webdav.integration.servlet.HttpDavLoggingContext;
+import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
+import com.ithit.webdav.integration.servlet.HttpServletDavResponse;
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.server.DefaultLoggerImpl;
 import com.ithit.webdav.server.Logger;
@@ -92,7 +95,7 @@ public class WebDavServlet extends HttpServlet {
         } catch (IOException e) {
             throw new ServletException("File not found: " + licenseFile, e);
         }
-        logger = new DefaultLoggerImpl(servletConfig.getServletContext());
+        logger = new DefaultLoggerImpl(new HttpDavLoggingContext(servletConfig.getServletContext()));
         realPath = servletConfig.getServletContext().getRealPath("/");
         servletContext = servletConfig.getServletContext().getContextPath();
         rootLocalPath = servletConfig.getInitParameter("root");
@@ -171,23 +174,24 @@ public class WebDavServlet extends HttpServlet {
             throws ServletException, IOException {
 
         WebDavEngine engine = new WebDavEngine(logger, license);
+        HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest);
+        HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
         CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
         CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
-        engine.setServletRequest(httpServletRequest);
+        engine.setServletRequest(davRequest);
         engine.setSearchFacade(searchFacade);
 
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("engine", engine);
-
         try {
-            engine.service(httpServletRequest, httpServletResponse);
+            engine.service(davRequest, davResponse);
         } catch (DavException e) {
             if (e.getStatus() == WebDavStatus.INTERNAL_ERROR) {
                 logger.logError("Exception during request processing", e);
                 if (showExceptions)
-                    e.printStackTrace(new PrintStream(httpServletResponse.getOutputStream()));
+                    e.printStackTrace(new PrintStream(davResponse.getOutputStream()));
             }
         }
     }

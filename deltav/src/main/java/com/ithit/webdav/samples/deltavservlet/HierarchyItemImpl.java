@@ -746,8 +746,8 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
      * @return Returns User name performing request.
      */
     String getUserName() {
-        if (getEngine().getRequest().getUserPrincipal() != null) {
-            return getEngine().getRequest().getUserPrincipal().getName();
+        if (getEngine().getRequest().getHttpServletRequest().getUserPrincipal() != null) {
+            return getEngine().getRequest().getHttpServletRequest().getUserPrincipal().getName();
         }
 
         return "Anonymous";

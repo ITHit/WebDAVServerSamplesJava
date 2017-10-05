@@ -4,9 +4,9 @@ import com.ithit.webdav.server.Folder;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.MethodHandler;
 import com.ithit.webdav.server.exceptions.DavException;
+import com.ithit.webdav.server.http.DavRequest;
+import com.ithit.webdav.server.http.DavResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +29,7 @@ public class CustomFolderGetHandler implements MethodHandler {
         this.version = version;
     }
 
-    public void processRequest(HttpServletRequest request, HttpServletResponse response, HierarchyItem item)
+    public void processRequest(DavRequest request, DavResponse response, HierarchyItem item)
             throws DavException, IOException {
 
         if (item instanceof Folder) {

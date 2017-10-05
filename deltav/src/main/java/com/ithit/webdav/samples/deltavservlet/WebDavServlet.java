@@ -1,5 +1,8 @@
 package com.ithit.webdav.samples.deltavservlet;
 
+import com.ithit.webdav.integration.servlet.HttpDavLoggingContext;
+import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
+import com.ithit.webdav.integration.servlet.HttpServletDavResponse;
 import com.ithit.webdav.server.DefaultLoggerImpl;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.deltav.AutoVersion;
@@ -15,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -85,7 +89,7 @@ public class WebDavServlet extends HttpServlet {
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
 
-        logger = new DefaultLoggerImpl(servletConfig.getServletContext());
+        logger = new DefaultLoggerImpl(new HttpDavLoggingContext(servletConfig.getServletContext()));
 
         String licenseFile = servletConfig.getInitParameter("license");
         showExceptions = "true".equals(servletConfig.getInitParameter("showExceptions"));
@@ -136,6 +140,8 @@ public class WebDavServlet extends HttpServlet {
             throws ServletException, IOException {
 
         WebDavEngine engine = new WebDavEngine(logger, license);
+        HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest);
+        HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
         CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
         CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
@@ -143,21 +149,20 @@ public class WebDavServlet extends HttpServlet {
 
         engine.setAutoPutUnderVersionControl(autoputUnderVersionControl);
         engine.setAutoVersionMode(autoVersionMode);
-        engine.setServletRequest(httpServletRequest);
+        engine.setServletRequest(davRequest);
         engine.setSearchFacade(searchFacade);
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("engine", engine);
         DataAccess dataAccess = new DataAccess(engine);
         engine.setDataAccess(dataAccess);
-
         try {
-            engine.service(httpServletRequest, httpServletResponse);
+            engine.service(davRequest, davResponse);
             dataAccess.commit();
         } catch (DavException e) {
             if (e.getStatus() == WebDavStatus.INTERNAL_ERROR) {
                 logger.logError("Exception during request processing", e);
                 if (showExceptions)
-                    e.printStackTrace(httpServletResponse.getWriter());
+                    e.printStackTrace(new PrintWriter(davResponse.getOutputStream()));
             }
         } finally {
             dataAccess.closeConnection();
