@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>deltav</artifactId>
-    <version>3.0.1-Beta</version>
+    <version>3.0.1012</version>
     <packaging>war</packaging>
 
     <properties>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>3.0.1-Beta</version>
+            <version>3.0.1012</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>3.0.1-Beta</version>
+            <version>3.0.1012</version>
         </dependency>
 
         <dependency>
@@ -133,7 +133,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/deltav-3.0.1-Beta/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/deltav-3.0.1012/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -212,7 +212,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/deltav-3.0.1-Beta</warSourceDirectory>
+                    <warSourceDirectory>target/deltav-3.0.1012</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
