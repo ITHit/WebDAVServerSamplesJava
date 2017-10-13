@@ -4,6 +4,7 @@ import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.util.StringUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
@@ -746,8 +747,8 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
      * @return Returns User name performing request.
      */
     String getUserName() {
-        if (getEngine().getRequest().getHttpServletRequest().getUserPrincipal() != null) {
-            return getEngine().getRequest().getHttpServletRequest().getUserPrincipal().getName();
+        if (((HttpServletRequest)getEngine().getRequest().getOriginalRequest()).getUserPrincipal() != null) {
+            return ((HttpServletRequest)getEngine().getRequest().getOriginalRequest()).getUserPrincipal().getName();
         }
 
         return "Anonymous";
