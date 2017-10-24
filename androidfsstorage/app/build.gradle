@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+apply plugin: 'ru.tinkoff.gradle.jarjar'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
+    defaultConfig {
+        applicationId "com.ithit.webdav.samples.androidfsstorage"
+        minSdkVersion 19
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+jarJar {
+    rules = [
+            'stax-api-1.0.1.jar': 'javax.xml.** com.ithit.webdav.xml.@1',
+            'webdav-server-3.0.2008.jar': 'javax.xml.stream.** com.ithit.webdav.xml.stream.@1'
+    ]
+}
+
+dependencies {
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: 'build/libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'io.apisense:rhino-android:1.0'
+    compile 'commons-io:commons-io:2.4'
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.android.support:appcompat-v7:26.+'
+    compile ('com.ithit.webdav.integration:android-integration:3.0.2008', {
+        exclude group: 'org.nanohttpd', module: 'nanohttpd'
+    })
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    jarJar 'stax:stax-api:1.0.1'
+    jarJar 'com.ithit.webdav:webdav-server:3.0.2008'
+    testCompile 'junit:junit:4.12'
+}
