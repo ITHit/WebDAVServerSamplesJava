@@ -33,3 +33,4 @@ This example demonstrates how you can implement file versioning support in your 
 ## Android WebDAV Server on NanoHTTPD Example
  A modified NanoHTTPD mobile WebDAV server that runs on Android. It stores all files in mobile device file system while locks and properties in SQLite. This sample provides access to the documents inside a mobile app folder. To see the documents a user opens a sample web page served by this server in a web browser on any machine in the local network. A user can open, edit and save documents back to the mobile device as well as can upload, download and manage documents using any WebDAV client. The sample requires license. 
  Its text should be added to the **webdavsettings.json** file (see **assets** folder) in the **License** section. Please change all double quotes to single quotes in the license text or remove **xml** header.
+ To build example execute **buildAndroid.bat** or **buildAndroid**  in the root folder.
