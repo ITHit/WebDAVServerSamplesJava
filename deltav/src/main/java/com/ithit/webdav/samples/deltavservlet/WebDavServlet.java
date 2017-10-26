@@ -5,9 +5,11 @@ import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.integration.servlet.HttpServletDavResponse;
 import com.ithit.webdav.server.DefaultLoggerImpl;
 import com.ithit.webdav.server.Logger;
+import com.ithit.webdav.server.MimeType;
 import com.ithit.webdav.server.deltav.AutoVersion;
 import com.ithit.webdav.server.exceptions.DavException;
 import com.ithit.webdav.server.exceptions.WebDavStatus;
+import com.ithit.webdav.server.util.StringUtil;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -15,13 +17,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * This servlet processes WEBDAV requests.
@@ -36,6 +37,7 @@ public class WebDavServlet extends HttpServlet {
     private boolean autoputUnderVersionControl;
     private static final String DEFAULT_INDEX_PATH = "WEB-INF/Index";
     private SearchFacade searchFacade;
+    private String resourcePath;
 
     /**
      * Reads license file content.
@@ -53,9 +55,7 @@ public class WebDavServlet extends HttpServlet {
                 contents.append(line);
                 contents.append(System.getProperty("line.separator"));
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new ServletException("File not found: " + fileName, ex);
+        } catch (IOException ignored) {
         }
 
         return contents.toString();
@@ -92,6 +92,7 @@ public class WebDavServlet extends HttpServlet {
         logger = new DefaultLoggerImpl(new HttpDavLoggingContext(servletConfig.getServletContext()));
 
         String licenseFile = servletConfig.getInitParameter("license");
+        resourcePath = servletConfig.getInitParameter("resources");
         showExceptions = "true".equals(servletConfig.getInitParameter("showExceptions"));
         try {
             autoVersionMode = AutoVersion.valueOf(servletConfig.getInitParameter("autoVersionMode"));
@@ -140,6 +141,11 @@ public class WebDavServlet extends HttpServlet {
             throws ServletException, IOException {
 
         WebDavEngine engine = new WebDavEngine(logger, license);
+        if (!StringUtil.isNullOrEmpty(resourcePath)) {
+            if (StringUtil.trimStart(httpServletRequest.getRequestURI(), "/").startsWith(StringUtil.trimStart(resourcePath, "/"))) {
+                processResources(httpServletRequest, httpServletResponse, engine.getResponseCharacterEncoding());
+            }
+        }
         HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest);
         HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
         CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
@@ -166,6 +172,43 @@ public class WebDavServlet extends HttpServlet {
             }
         } finally {
             dataAccess.closeConnection();
+        }
+    }
+
+    private void processResources(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String  charset) throws IOException {
+        Path path = Paths.get(WebDavServlet.getRealPath(), "WEB-INF", httpServletRequest.getRequestURI());
+        try( OutputStream out = httpServletResponse.getOutputStream()) {
+            if (!httpServletRequest.getRequestURI().contains("Plugins")) {
+                PrintStream stream = new PrintStream(out, true, charset);
+                httpServletResponse.setCharacterEncoding(charset);
+                httpServletResponse.setContentType(MimeType.getInstance().getMimeType(getFileExtension(path.toFile())));
+                List<String> lines = Files.readAllLines(path, Charset.defaultCharset());
+                for (String s : lines) {
+                    stream.println(s);
+                }
+            } else {
+                httpServletResponse.setContentType("application/octet-stream");
+                String fileName = path.getFileName().toString();
+                httpServletResponse.setHeader("Content-disposition", "attachment; filename=" + fileName);
+                File file = path.toFile();
+                httpServletResponse.setContentLength((int) file.length());
+                try (FileInputStream in = new FileInputStream(file)) {
+                    byte[] buffer = new byte[4096];
+                    int length;
+                    while ((length = in.read(buffer)) > 0) {
+                        out.write(buffer, 0, length);
+                    }
+                }
+            }
+        }
+    }
+
+    private String getFileExtension(File file) {
+        String name = file.getName();
+        try {
+            return name.substring(name.lastIndexOf(".") + 1);
+        } catch (Exception e) {
+            return "";
         }
     }
 

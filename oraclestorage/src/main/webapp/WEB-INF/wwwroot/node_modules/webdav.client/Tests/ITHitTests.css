@@ -1,0 +1,72 @@
+
+.ITHitTests-popup {
+    position: fixed;
+    top: 5%;
+    left: 5%;
+    right: 5%;
+    bottom: 5%;
+    padding: 1%;
+    background-color: #eee;
+    box-shadow: 0 0 40px #000;
+    border: solid 2px #2B81AF
+}
+
+.ITHitTests-popup-content {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    font: normal 12px "Courier New", Courier, monospace, Arial;
+}
+
+a.ITHitTests-popup-closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    background-color: #2B81AF;
+    color: #fff;
+    font-size: 13px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer
+}
+
+a.ITHitTests-popup-closeButton:hover {
+    background-color: #37a4df;
+}
+
+#qunit-tests li {
+    position: relative;
+}
+#qunit-tests li a {
+    padding: 0 0 0 1em;
+    color: #7f7f7f;
+}
+#qunit-tests li .actions {
+    position: absolute;
+    top: 5px;
+    right: 13px;
+    width: 200px;
+}
+#qunit-tests li .runtime {
+    position: absolute;
+    top: 5px;
+    right: 220px;
+}
+#qunit-tests li strong {
+    display: inline-block;
+    padding-right: 270px;
+    box-sizing: border-box;
+}
+#qunit-tests li .runtime {
+    padding-top: 3px;
+}
+#qunit-header .ITHitTests-progress-text {
+    padding-left: 10px;
+}
+
+#qunit-tests li li.pass.warning {
+	border-left-color: #efef00;
+}

@@ -23,28 +23,14 @@
             <param-name>index-interval</param-name>
             <param-value>2</param-value>
         </init-param>
+        <init-param>
+            <param-name>resources</param-name>
+            <param-value>wwwroot</param-value>
+        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>WebDav servlet</servlet-name>
         <url-pattern>/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>AjaxBrowser</servlet-name>
-        <jsp-file>/WEB-INF/afb/AjaxFileBrowser.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AjaxBrowser</servlet-name>
-        <url-pattern>/afb/AjaxFileBrowser.jsp</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>AjaxTest</servlet-name>
-        <jsp-file>/WEB-INF/afb/AjaxIntegrationTests.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AjaxTest</servlet-name>
-        <url-pattern>/afb/AjaxIntegrationTests.jsp</url-pattern>
     </servlet-mapping>
 
     <!--Uncomment this and configure roles if you want to enable security-->
