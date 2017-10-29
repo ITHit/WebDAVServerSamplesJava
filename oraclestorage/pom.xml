@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>oraclestorage</artifactId>
-    <version>3.0.2107</version>
+    <version>3.0.2114</version>
     <packaging>war</packaging>
 
     <properties>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>3.0.2107</version>
+            <version>3.0.2114</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>3.0.2107</version>
+            <version>3.0.2114</version>
         </dependency>
 
         <dependency>
@@ -133,7 +133,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/oraclestorage-3.0.2107/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/oraclestorage-3.0.2114/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -212,7 +212,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/oraclestorage-3.0.2107</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-3.0.2114</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -239,6 +239,37 @@
                     <delimiter>/</delimiter>
                     <delimiterType>row</delimiterType>
                 </configuration>
+            </plugin>
+			<plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.6</version>			
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+							<escapeString>\</escapeString>
+                            <installDirectory>${java.io.tmpdir}</installDirectory>
+                            <nodeVersion>v4.6.0</nodeVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+							<escapeString>\</escapeString>
+                            <arguments>install</arguments>
+                            <workingDirectory>src/main/webapp/WEB-INF/wwwroot</workingDirectory>
+                            <installDirectory>${java.io.tmpdir}</installDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
