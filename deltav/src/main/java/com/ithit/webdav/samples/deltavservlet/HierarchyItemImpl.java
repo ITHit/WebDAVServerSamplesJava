@@ -388,7 +388,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
         List<LockInfo> itemLocks = getActiveLocks();
         if (itemLocks.size() == 0)
             return true;
-        List<String> clientLockTokens = Engine.getClientLockTokens(getEngine().getRequest());
+        List<String> clientLockTokens = getEngine().getRequest().getClientLockTokens();
         for (String clientLockToken : clientLockTokens)
             for (LockInfo itemLock : itemLocks)
                 if (clientLockToken.equals(itemLock.getToken()))

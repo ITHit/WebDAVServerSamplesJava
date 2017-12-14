@@ -1,7 +1,6 @@
 package com.ithit.webdav.samples.androidfsstorage;
 
 import com.ithit.webdav.samples.androidfsstorage.extendedattributes.ExtendedAttributesExtension;
-import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.Folder;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Lock;
@@ -279,7 +278,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         if (activeLocks.size() == 0) {
             return true;
         }
-        List<String> clientLockTokens = Engine.getClientLockTokens(getEngine().getRequest());
+        List<String> clientLockTokens = getEngine().getRequest().getClientLockTokens();
         for (LockInfo lockInfo: activeLocks) {
             if (clientLockTokens.contains(lockInfo.getToken())) {
                 return true;

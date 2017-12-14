@@ -55,7 +55,7 @@ public class CustomFolderGetHandler implements MethodHandler {
             }
             stream.flush();
         } else {
-            if (request.getRequestURI().contains("afb/AjaxIntegrationTests.html")) {
+            if (request.getRequestURI().contains("wwwroot/AjaxIntegrationTests.html")) {
                 PrintStream stream = new PrintStream(response.getOutputStream(), true, charset);
                 response.setCharacterEncoding(charset);
                 response.setContentType("text/html");
@@ -63,7 +63,7 @@ public class CustomFolderGetHandler implements MethodHandler {
                     stream.println(line);
                 }
                 stream.flush();
-            } else if (request.getRequestURI().contains("afb/AjaxFileBrowser.html")) {
+            } else if (request.getRequestURI().contains("wwwroot/AjaxFileBrowser.html")) {
                 PrintStream stream = new PrintStream(response.getOutputStream(), true, charset);
                 response.setCharacterEncoding(charset);
                 response.setContentType("text/html");

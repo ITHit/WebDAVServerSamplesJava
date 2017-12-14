@@ -38,16 +38,16 @@ class AndroidConfigurationHelper {
     }
 
     private String readConfig(AssetManager assetManager, String jsonFileName) {
-        String jsonString = "";
+        StringBuilder jsonString = new StringBuilder();
         try {
             List<String> jsonLines = IOUtils.readLines(assetManager.open(jsonFileName));
 
             for (String s: jsonLines) {
-                jsonString += s;
+                jsonString.append(s);
             }
         } catch (IOException ignored) {
         }
-        return jsonString;
+        return jsonString.toString();
     }
 
 

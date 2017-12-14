@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>deltav</artifactId>
-    <version>3.0.2114</version>
+    <version>3.1.2208</version>
     <packaging>war</packaging>
 
     <properties>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>3.0.2114</version>
+            <version>3.1.2208</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>3.0.2114</version>
+            <version>3.1.2208</version>
         </dependency>
 
         <dependency>
@@ -133,7 +133,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/deltav-3.0.2114/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/deltav-3.1.2208/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -212,7 +212,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/deltav-3.0.2114</warSourceDirectory>
+                    <warSourceDirectory>target/deltav-3.1.2208</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -251,7 +251,6 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-							<escapeString>\</escapeString>
                             <installDirectory>${java.io.tmpdir}</installDirectory>
                             <nodeVersion>v4.6.0</nodeVersion>
                         </configuration>
@@ -263,13 +262,15 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-							<escapeString>\</escapeString>
                             <arguments>install</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot</workingDirectory>
                             <installDirectory>${java.io.tmpdir}</installDirectory>
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <escapeString>\</escapeString>
+                </configuration>
             </plugin>
         </plugins>
     </build>

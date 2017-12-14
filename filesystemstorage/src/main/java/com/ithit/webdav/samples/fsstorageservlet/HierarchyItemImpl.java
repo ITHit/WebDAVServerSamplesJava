@@ -278,7 +278,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         if (activeLocks.size() == 0) {
             return true;
         }
-        List<String> clientLockTokens = Engine.getClientLockTokens(getEngine().getRequest());
+        List<String> clientLockTokens = getEngine().getRequest().getClientLockTokens();
         return !activeLocks.stream().filter(x -> clientLockTokens.contains(x.getToken())).collect(Collectors.toList()).isEmpty();
     }
 

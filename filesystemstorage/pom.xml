@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>3.0.2114</version>
+    <version>3.1.2208</version>
     <packaging>war</packaging>
 
     <properties>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>3.0.2114</version>
+            <version>3.1.2208</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -112,7 +112,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>3.0.2114</version>
+            <version>3.1.2208</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -198,7 +198,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-3.0.2114</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-3.1.2208</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
@@ -212,7 +212,6 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-							<escapeString>\</escapeString>
                             <installDirectory>${java.io.tmpdir}</installDirectory>
                             <nodeVersion>v4.6.0</nodeVersion>
                         </configuration>
@@ -224,13 +223,15 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-							<escapeString>\</escapeString>
                             <arguments>install</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot</workingDirectory>
                             <installDirectory>${java.io.tmpdir}</installDirectory>
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <escapeString>\</escapeString>
+                </configuration>
             </plugin>
         </plugins>
     </build>

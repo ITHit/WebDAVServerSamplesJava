@@ -3,13 +3,13 @@ package com.ithit.webdav.samples.androidfsstorage;
 import android.app.Service;
 import android.content.Intent;
 
-import com.ithit.webdav.integration.android.AndroidLoggingContext;
 import com.ithit.webdav.samples.androidfsstorage.android.NanoBroadcastReceiver;
+import com.ithit.webdav.server.Logger;
 
 /**
  * Represents logging messages to the application view on devices, running Android.
  */
-public class AndroidLogContext extends AndroidLoggingContext {
+public class AndroidNanoLogger implements Logger {
 
     /**
      * Logging intent service.
@@ -20,7 +20,7 @@ public class AndroidLogContext extends AndroidLoggingContext {
      * Creates new instance of this class.
      * @param intentService Logging intent service.
      */
-    public AndroidLogContext(Service intentService) {
+    public AndroidNanoLogger(Service intentService) {
         this.intentService = intentService;
     }
 
@@ -29,7 +29,7 @@ public class AndroidLogContext extends AndroidLoggingContext {
      * @param message Text message.
      */
     @Override
-    public void log(String message) {
+    public void logDebug(String message) {
         Intent broadcastIntent = new Intent(NanoBroadcastReceiver.LOG_OUTPUT);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra("message", message);
@@ -42,7 +42,7 @@ public class AndroidLogContext extends AndroidLoggingContext {
      * @param throwable Error.
      */
     @Override
-    public void log(String message, Throwable throwable) {
+    public void logError(String message, Throwable throwable) {
         Intent broadcastIntent = new Intent(NanoBroadcastReceiver.LOG_OUTPUT);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         StringBuilder trace = new StringBuilder();
@@ -51,5 +51,10 @@ public class AndroidLogContext extends AndroidLoggingContext {
         }
         broadcastIntent.putExtra("message", message + "\n\n" + trace);
         intentService.sendBroadcast(broadcastIntent);
+    }
+
+    @Override
+    public boolean isDebugEnabled() {
+        return true;
     }
 }

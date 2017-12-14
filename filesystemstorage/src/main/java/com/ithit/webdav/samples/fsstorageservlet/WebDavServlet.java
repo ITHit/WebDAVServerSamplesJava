@@ -1,10 +1,10 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
-import com.ithit.webdav.integration.servlet.HttpDavLoggingContext;
 import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.integration.servlet.HttpServletDavResponse;
+import com.ithit.webdav.integration.servlet.HttpServletLoggerImpl;
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
-import com.ithit.webdav.server.DefaultLoggerImpl;
+import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.MimeType;
 import com.ithit.webdav.server.exceptions.DavException;
@@ -97,7 +97,7 @@ public class WebDavServlet extends HttpServlet {
         } catch (IOException e) {
             license = "";
         }
-        logger = new DefaultLoggerImpl(new HttpDavLoggingContext(servletConfig.getServletContext()));
+        logger = new HttpServletLoggerImpl(servletConfig.getServletContext());
         realPath = servletConfig.getServletContext().getRealPath("/");
         servletContext = servletConfig.getServletContext().getContextPath();
         rootLocalPath = servletConfig.getInitParameter("root");
@@ -183,8 +183,8 @@ public class WebDavServlet extends HttpServlet {
         }
         HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest);
         HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
-        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
-        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion());
+        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), Engine.getVersion());
+        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), Engine.getVersion());
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
         engine.setServletRequest(davRequest);

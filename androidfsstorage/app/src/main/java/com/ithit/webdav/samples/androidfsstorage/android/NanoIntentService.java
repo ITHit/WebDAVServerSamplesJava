@@ -7,10 +7,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.ithit.webdav.samples.androidfsstorage.AndroidLogContext;
+import com.ithit.webdav.samples.androidfsstorage.AndroidNanoLogger;
 import com.ithit.webdav.samples.androidfsstorage.AndroidWebDavServer;
 import com.ithit.webdav.samples.androidfsstorage.Config;
-import com.ithit.webdav.server.DefaultLoggerImpl;
 import com.ithit.webdav.server.Logger;
 
 import org.apache.commons.io.IOUtils;
@@ -40,7 +39,7 @@ public class NanoIntentService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Logger logger = new DefaultLoggerImpl(new AndroidLogContext(this));
+        Logger logger = new AndroidNanoLogger(this);
 
         InputStream getPage = null;
         InputStream errorPage = null;
@@ -49,8 +48,8 @@ public class NanoIntentService extends Service {
         try {
             getPage = getApplicationContext().getAssets().open("MyCustomHandlerPage.html");
             errorPage = getApplicationContext().getAssets().open("attributesErrorPage.html");
-            testPage = getApplicationContext().getAssets().open("afb/AjaxIntegrationTests.html");
-            browserPage = getApplicationContext().getAssets().open("afb/AjaxFileBrowser.html");
+            testPage = getApplicationContext().getAssets().open("wwwroot/AjaxIntegrationTests.html");
+            browserPage = getApplicationContext().getAssets().open("wwwroot/AjaxFileBrowser.html");
             List<String> getPageLines = IOUtils.readLines(getPage, StandardCharsets.UTF_8);
             List<String> errorPageLines = IOUtils.readLines(errorPage, StandardCharsets.UTF_8);
             List<String> testPageLines = IOUtils.readLines(testPage, StandardCharsets.UTF_8);
