@@ -8,6 +8,7 @@ import com.ithit.webdav.server.exceptions.MultistatusException;
 import com.ithit.webdav.server.exceptions.ServerException;
 import com.ithit.webdav.server.resumableupload.ResumableUpload;
 import com.ithit.webdav.server.resumableupload.UploadProgress;
+import com.sun.nio.file.ExtendedOpenOption;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -243,11 +244,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
     public long write(InputStream content, String contentType, long startIndex, long totalFileLength)
             throws LockedException, ServerException, IOException {
         ensureHasToken();
-        Path fullPath = getFullPath();
-        if (!Files.exists(fullPath)) {
-            Files.createFile(fullPath);
-        }
-        SeekableByteChannel writer = Files.newByteChannel(fullPath, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+        SeekableByteChannel writer = Files.newByteChannel(getFullPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, ExtendedOpenOption.NOSHARE_DELETE);
         if (startIndex == 0) {
             // If we override the file we must set position to 0 because writer could be at not 0 position.
             writer = writer.truncate(0);
@@ -259,22 +256,24 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         byte[] inputBuffer = new byte[bufferSize];
         long totalWrittenBytes = startIndex;
         int readBytes;
-        while ((readBytes = content.read(inputBuffer)) > -1) {
-            ByteBuffer byteBuffer = ByteBuffer.wrap(inputBuffer, 0, readBytes);
-            try {
-                writer.write(byteBuffer);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            totalWrittenBytes += readBytes;
-        }
-        writer.close();
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         try {
-            getEngine().getSearchFacade().getIndexer().indexFile(getName(), decode(getPath()), null, this);
+            while ((readBytes = content.read(inputBuffer)) > -1) {
+                ByteBuffer byteBuffer;
+                byteBuffer = ByteBuffer.wrap(inputBuffer, 0, readBytes);
+                writer.write(byteBuffer);
+                totalWrittenBytes += readBytes;
+            }
+            try {
+                getEngine().getSearchFacade().getIndexer().indexFile(getName(), decode(getPath()), null, this);
+            } catch (Exception ex){
+                getEngine().getLogger().logError("Errors during indexing.", ex);
+            }
         } catch (Exception ex) {
-            getEngine().getLogger().logError("Errors during indexing.", ex);
+            ex.printStackTrace();
+        } finally {
+            writer.close();
         }
+        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         return totalWrittenBytes;
     }
 
@@ -307,6 +306,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         try {
             Files.delete(getFullPath());
         } catch (IOException e) {
+            getEngine().getLogger().logError("Tried to delete file in use.", e);
             throw new ServerException(e);
         }
         getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));

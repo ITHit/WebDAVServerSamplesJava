@@ -23,7 +23,7 @@ android {
 jarJar {
     rules = [
             'stax-api-1.0.1.jar': 'javax.xml.** com.ithit.webdav.xml.@1',
-            'webdav-server-3.1.2208.jar': 'javax.xml.stream.** com.ithit.webdav.xml.stream.@1'
+            'webdav-server-3.2.2370.jar': 'javax.xml.stream.** com.ithit.webdav.xml.stream.@1'
     ]
 }
 
@@ -38,11 +38,11 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.android.support:appcompat-v7:26.+'
-    compile ('com.ithit.webdav.integration:android-integration:3.1.2208', {
+    compile ('com.ithit.webdav.integration:android-integration:3.2.2370', {
         exclude group: 'org.nanohttpd', module: 'nanohttpd'
     })
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     jarJar 'stax:stax-api:1.0.1'
-    jarJar 'com.ithit.webdav:webdav-server:3.1.2208'
+    jarJar 'com.ithit.webdav:webdav-server:3.2.2370'
     testCompile 'junit:junit:4.12'
 }
