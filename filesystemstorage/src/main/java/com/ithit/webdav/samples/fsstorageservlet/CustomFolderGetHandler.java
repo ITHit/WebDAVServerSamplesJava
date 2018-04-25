@@ -8,8 +8,6 @@ import com.ithit.webdav.server.http.DavRequest;
 import com.ithit.webdav.server.http.DavResponse;
 import org.apache.commons.io.FileUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -57,10 +55,6 @@ public class CustomFolderGetHandler implements MethodHandler {
                     String contextRootString = "<%context root%>";
                     if (line.contains(contextRootString)) {
                         line = line.replace(contextRootString, context);
-                    }
-                    String contextPathString = "<%context path%>";
-                    if (line.contains(contextPathString)) {
-                        line = line.replace(contextPathString, context);
                     }
                     String versionNumber = "<%version%>";
                     if (line.contains(versionNumber)) {

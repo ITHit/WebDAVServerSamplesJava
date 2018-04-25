@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-exec ./gradlew clean jarjar
+exec ./gradlew clean jarjar npmInstall
 exec ./gradlew install

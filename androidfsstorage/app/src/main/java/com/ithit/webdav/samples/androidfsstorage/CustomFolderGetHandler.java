@@ -7,7 +7,10 @@ import com.ithit.webdav.server.exceptions.DavException;
 import com.ithit.webdav.server.http.DavRequest;
 import com.ithit.webdav.server.http.DavResponse;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -16,21 +19,15 @@ import java.util.List;
  */
 public class CustomFolderGetHandler implements MethodHandler {
 
+    private final Config config;
     private MethodHandler previousHandler;
     private String charset;
     private String version;
-    private List<String> mainPage;
-    private List<String> errorPage;
-    private List<String> testPage;
-    private List<String> browserPage;
 
-    public CustomFolderGetHandler(String charset, String version, List<String> mainPage, List<String> errorPage, List<String> testPage, List<String> browserPage) {
+    public CustomFolderGetHandler(String charset, String version, Config config) {
         this.charset = charset;
         this.version = version;
-        this.mainPage = mainPage;
-        this.errorPage = errorPage;
-        this.testPage = testPage;
-        this.browserPage = browserPage;
+        this.config = config;
     }
 
     @Override
@@ -41,11 +38,11 @@ public class CustomFolderGetHandler implements MethodHandler {
             response.setCharacterEncoding(charset);
             response.setContentType("text/html");
             if (!AndroidWebDavServer.isSupportsUserDefinedAttributes()) {
-                for (String line: errorPage) {
+                for (String line: config.getErrorPage()) {
                     stream.println(line);
                 }
             } else {
-                for (String line : mainPage) {
+                for (String line : config.getMainPage()) {
                     String versionNumber = "<%version%>";
                     if (line.contains(versionNumber)) {
                         line = line.replace(versionNumber, version);
@@ -56,25 +53,48 @@ public class CustomFolderGetHandler implements MethodHandler {
             stream.flush();
         } else {
             if (request.getRequestURI().contains("wwwroot/AjaxIntegrationTests.html")) {
-                PrintStream stream = new PrintStream(response.getOutputStream(), true, charset);
-                response.setCharacterEncoding(charset);
-                response.setContentType("text/html");
-                for (String line: testPage) {
-                    stream.println(line);
-                }
-                stream.flush();
+                processTextResource(response, "text/html", config.getTestPage());
             } else if (request.getRequestURI().contains("wwwroot/AjaxFileBrowser.html")) {
-                PrintStream stream = new PrintStream(response.getOutputStream(), true, charset);
-                response.setCharacterEncoding(charset);
-                response.setContentType("text/html");
-                for (String line: browserPage) {
-                    stream.println(line);
-                }
-                stream.flush();
+                processTextResource(response, "text/html", config.getBrowserPage());
+            } else if (request.getRequestURI().contains("wwwroot/css/webdav-layout.css")) {
+                processTextResource(response, "text/css", config.getCss());
+            } else if (request.getRequestURI().contains("wwwroot/js/webdav-gridview.js")) {
+                processTextResource(response, "application/javascript", config.getJsGrid());
+            } else if (request.getRequestURI().contains("wwwroot/js/webdav-uploader.js")) {
+                processTextResource(response, "application/javascript", config.getJsUploader());
+            } else if (request.getRequestURI().contains("wwwroot/js/webdav-websocket.js")) {
+                processTextResource(response, "application/javascript", config.getJsWebSocket());
+            } else if (request.getRequestURI().contains("wwwroot/js/node_modules/webdav.client/ITHitWebDAVClient.js")) {
+                processTextResource(response, "application/javascript", config.getJsClient());
+            } else if (request.getRequestURI().contains("wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.msi")) {
+                processBinaryResource(response, config.getWindowsOpener());
+            } else if (request.getRequestURI().contains("wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.deb")) {
+                processBinaryResource(response, config.getDepOpener());
+            } else if (request.getRequestURI().contains("wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.pkg")) {
+                processBinaryResource(response, config.getPkgOpener());
+            } else if (request.getRequestURI().contains("wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.rpm")) {
+                processBinaryResource(response, config.getRpmOpener());
             } else {
                 previousHandler.processRequest(request, response, item);
             }
         }
+    }
+
+    private void processBinaryResource(DavResponse response, byte[] resource) throws IOException {
+        OutputStream os = response.getOutputStream();
+        response.setContentType("application/octet-stream");
+        response.setContentLength(resource.length);
+        IOUtils.write(resource, os);
+    }
+
+    private void processTextResource(DavResponse response, String contentType, List<String> resourceLines) throws IOException {
+        PrintStream stream = new PrintStream(response.getOutputStream(), true, charset);
+        response.setCharacterEncoding(charset);
+        response.setContentType(contentType);
+        for (String line : resourceLines) {
+            stream.println(line);
+        }
+        stream.flush();
     }
 
     /**

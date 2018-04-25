@@ -20,7 +20,7 @@ public class AndroidWebDavServer extends NanoHTTPD {
     private static String rootPath = "";
     private static boolean supportsUserDefinedAttributes;
 
-    private void init() throws IOException {
+    private void init() {
         supportsUserDefinedAttributes = ExtendedAttributesExtension.getExtendedAttributeSupport(config.getDatabaseHandler()).isExtendedAttributeSupported(rootPath);
     }
 
@@ -56,8 +56,8 @@ public class AndroidWebDavServer extends NanoHTTPD {
         WebDavEngine engine = new WebDavEngine(config.getLogger(), config.getLicense());
         AndroidDavRequest davRequest = new AndroidDavRequest(session, config);
         AndroidDavResponse davResponse = new AndroidDavResponse();
-        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion(), config.getMainPage(), config.getErrorPage(), config.getTestPage(), config.getBrowserPage());
-        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion(), config.getMainPage(), config.getErrorPage(), config.getTestPage(), config.getBrowserPage());
+        CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion(), config);
+        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion(), config);
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
         engine.setServletRequest(davRequest);

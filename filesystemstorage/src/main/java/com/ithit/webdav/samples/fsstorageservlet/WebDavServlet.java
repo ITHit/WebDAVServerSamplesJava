@@ -6,7 +6,6 @@ import com.ithit.webdav.integration.servlet.HttpServletLoggerImpl;
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.Logger;
-import com.ithit.webdav.server.MimeType;
 import com.ithit.webdav.server.exceptions.DavException;
 import com.ithit.webdav.server.exceptions.WebDavStatus;
 import com.ithit.webdav.server.util.StringUtil;
@@ -18,12 +17,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 /**
  * This servlet processes WEBDAV requests.
@@ -41,7 +40,6 @@ public class WebDavServlet extends HttpServlet {
     private boolean showExceptions;
     private SearchFacade searchFacade;
     private String license;
-    private String resourcePath;
 
     /**
      * Returns root folder for the WebDav.
@@ -101,7 +99,6 @@ public class WebDavServlet extends HttpServlet {
         realPath = servletConfig.getServletContext().getRealPath("/");
         servletContext = servletConfig.getServletContext().getContextPath();
         rootLocalPath = servletConfig.getInitParameter("root");
-        resourcePath = servletConfig.getInitParameter("resources");
         checkRootPath(rootLocalPath);
         String indexLocalPath = createIndexPath();
         supportsUserDefinedAttributes = ExtendedAttributesExtension.isExtendedAttributesSupported(Paths.get(getRootLocalPath()).toString());
@@ -176,11 +173,6 @@ public class WebDavServlet extends HttpServlet {
     protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws ServletException, IOException {
         WebDavEngine engine = new WebDavEngine(logger, license);
-        if (!StringUtil.isNullOrEmpty(resourcePath)) {
-            if (StringUtil.trimStart(httpServletRequest.getRequestURI(), "/").startsWith(StringUtil.trimStart(resourcePath, "/"))) {
-                processResources(httpServletRequest, httpServletResponse, engine.getResponseCharacterEncoding());
-            }
-        }
         HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest);
         HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
         CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), Engine.getVersion());
@@ -203,40 +195,4 @@ public class WebDavServlet extends HttpServlet {
         }
     }
 
-    private void processResources(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String  charset) throws IOException {
-        Path path = Paths.get(WebDavServlet.getRealPath(), "WEB-INF", httpServletRequest.getRequestURI());
-        try( OutputStream out = httpServletResponse.getOutputStream()) {
-            if (!httpServletRequest.getRequestURI().contains("Plugins")) {
-                PrintStream stream = new PrintStream(out, true, charset);
-                httpServletResponse.setCharacterEncoding(charset);
-                httpServletResponse.setContentType(MimeType.getInstance().getMimeType(getFileExtension(path.toFile())));
-                List<String> lines = Files.readAllLines(path, Charset.defaultCharset());
-                for (String s : lines) {
-                    stream.println(s);
-                }
-            } else {
-                httpServletResponse.setContentType("application/octet-stream");
-                String fileName = path.getFileName().toString();
-                httpServletResponse.setHeader("Content-disposition", "attachment; filename=" + fileName);
-                File file = path.toFile();
-                httpServletResponse.setContentLength((int) file.length());
-                try (FileInputStream in = new FileInputStream(file)) {
-                    byte[] buffer = new byte[4096];
-                    int length;
-                    while ((length = in.read(buffer)) > 0) {
-                        out.write(buffer, 0, length);
-                    }
-                }
-            }
-        }
-    }
-
-    private String getFileExtension(File file) {
-        String name = file.getName();
-        try {
-            return name.substring(name.lastIndexOf(".") + 1);
-        } catch (Exception e) {
-            return "";
-        }
-    }
 }

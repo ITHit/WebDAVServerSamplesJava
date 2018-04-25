@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>oraclestorage</artifactId>
-    <version>3.2.2389</version>
+    <version>3.2.2420</version>
     <packaging>war</packaging>
 
     <properties>
@@ -16,14 +16,14 @@
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>3.2.2389</version>
+            <version>3.2.2420</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>3.2.2389</version>
+            <version>3.2.2420</version>
         </dependency>
 
         <dependency>
@@ -133,7 +133,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/oraclestorage-3.2.2389/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/oraclestorage-3.2.2420/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -212,7 +212,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/oraclestorage-3.2.2389</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-3.2.2420</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -263,7 +263,7 @@
                         <phase>generate-resources</phase>
                         <configuration>
                             <arguments>install</arguments>
-                            <workingDirectory>src/main/webapp/WEB-INF/wwwroot</workingDirectory>
+                            <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
                             <installDirectory>${java.io.tmpdir}</installDirectory>
                         </configuration>
                     </execution>

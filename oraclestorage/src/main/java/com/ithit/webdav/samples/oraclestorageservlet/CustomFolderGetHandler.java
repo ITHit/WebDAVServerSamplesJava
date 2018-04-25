@@ -48,10 +48,6 @@ public class CustomFolderGetHandler implements MethodHandler {
                 if (line.contains(contextRootString)) {
                     line = line.replace(contextRootString, context);
                 }
-                String contextPathString = "<%context path%>";
-                if (line.contains(contextPathString)) {
-                    line = line.replace(contextPathString, context);
-                }
                 String versionNumber = "<%version%>";
                 if (line.contains(versionNumber)) {
                     line = line.replace(versionNumber, version);

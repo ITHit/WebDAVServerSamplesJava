@@ -1,48 +1,81 @@
+plugins {
+    id "com.moowork.node" version "1.2.0"
+}
 apply plugin: 'com.android.application'
 apply plugin: 'ru.tinkoff.gradle.jarjar'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.ithit.webdav.samples.androidfsstorage"
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    applicationVariants.all { variant ->
+        variant.mergeAssets.doLast {
+            delete(fileTree(dir: variant.mergeAssets.outputDir, includes: ['**/webdav.client/Help/**', '**/webdav.client/Tests/**']))
         }
     }
 }
 
 jarJar {
     rules = [
-            'stax-api-1.0.1.jar': 'javax.xml.** com.ithit.webdav.xml.@1',
-            'webdav-server-3.2.2389.jar': 'javax.xml.stream.** com.ithit.webdav.xml.stream.@1'
+            'stax-api-1.0.1.jar'        : 'javax.xml.** com.ithit.webdav.xml.@1',
+            'webdav-server-3.2.2420.jar': 'javax.xml.stream.** com.ithit.webdav.xml.stream.@1'
     ]
 }
 
+node {
+    // Version of node to use.
+    version = '4.6.0'
+
+    // Version of npm to use.
+    npmVersion = '2.15.9'
+
+    // Base URL for fetching node distributions (change if you have a mirror).
+    distBaseUrl = 'https://nodejs.org/dist'
+
+    // If true, it will download node using above parameters.
+    // If false, it will try to use globally installed node.
+    download = true
+
+    // Set the work directory for unpacking node
+    workDir = file("${project.buildDir}/node")
+
+    // Set the work directory for NPM
+    npmWorkDir = file("${project.buildDir}/npm")
+
+    // Set the work directory where node_modules should be located
+    nodeModulesDir = file("${project.projectDir}/src/main/assets/wwwroot/js")
+}
+
+build.dependsOn(npmInstall)
+
 dependencies {
 
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile fileTree(dir: 'build/libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'build/libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'io.apisense:rhino-android:1.0'
-    compile 'commons-io:commons-io:2.4'
-    compile 'com.google.code.gson:gson:2.7'
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile ('com.ithit.webdav.integration:android-integration:3.2.2389', {
+    implementation 'io.apisense:rhino-android:1.0'
+    implementation 'commons-io:commons-io:2.4'
+    implementation 'com.google.code.gson:gson:2.7'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation('com.ithit.webdav.integration:android-integration:3.2.2420', {
         exclude group: 'org.nanohttpd', module: 'nanohttpd'
     })
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     jarJar 'stax:stax-api:1.0.1'
-    jarJar 'com.ithit.webdav:webdav-server:3.2.2389'
-    testCompile 'junit:junit:4.12'
+    jarJar 'com.ithit.webdav:webdav-server:3.2.2420'
+    testImplementation 'junit:junit:4.12'
 }

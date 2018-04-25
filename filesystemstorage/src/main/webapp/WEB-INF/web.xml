@@ -4,6 +4,16 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 	      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
+    <!-- This is servlet for handling static resources when main servlet is on the root context, otherwise simple root filter is enough -->
+    <servlet>
+        <servlet-name>FileServlet</servlet-name>
+        <servlet-class>com.ithit.webdav.samples.fsstorageservlet.staticresourceservlet.FileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileServlet</servlet-name>
+        <url-pattern>/wwwroot/*</url-pattern>
+    </servlet-mapping>
+    <!-- Main WebDAV servlet declaration -->
     <servlet>
         <servlet-name>WebDav servlet</servlet-name>
         <servlet-class>com.ithit.webdav.samples.fsstorageservlet.WebDavServlet</servlet-class>

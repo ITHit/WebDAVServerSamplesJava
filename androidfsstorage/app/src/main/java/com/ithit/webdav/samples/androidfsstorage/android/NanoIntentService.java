@@ -45,15 +45,43 @@ public class NanoIntentService extends Service {
         InputStream errorPage = null;
         InputStream testPage = null;
         InputStream browserPage = null;
+        InputStream css = null;
+        InputStream jsGrid = null;
+        InputStream jsUploader = null;
+        InputStream jsWebSockets = null;
+        InputStream jsClient = null;
+        InputStream windowsOpener = null;
+        InputStream debOpener = null;
+        InputStream pkgOpener = null;
+        InputStream rpmOpener = null;
         try {
             getPage = getApplicationContext().getAssets().open("MyCustomHandlerPage.html");
             errorPage = getApplicationContext().getAssets().open("attributesErrorPage.html");
             testPage = getApplicationContext().getAssets().open("wwwroot/AjaxIntegrationTests.html");
             browserPage = getApplicationContext().getAssets().open("wwwroot/AjaxFileBrowser.html");
+            css = getApplicationContext().getAssets().open("wwwroot/css/webdav-layout.css");
+            jsGrid = getApplicationContext().getAssets().open("wwwroot/js/webdav-gridview.js");
+            jsUploader = getApplicationContext().getAssets().open("wwwroot/js/webdav-uploader.js");
+            jsWebSockets = getApplicationContext().getAssets().open("wwwroot/js/webdav-websocket.js");
+            jsClient = getApplicationContext().getAssets().open("wwwroot/js/node_modules/webdav.client/ITHitWebDAVClient.js");
+            windowsOpener = getApplicationContext().getAssets().open("wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.msi");
+            debOpener = getApplicationContext().getAssets().open("wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.deb");
+            pkgOpener = getApplicationContext().getAssets().open("wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.pkg");
+            rpmOpener = getApplicationContext().getAssets().open("wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.rpm");
             List<String> getPageLines = IOUtils.readLines(getPage, StandardCharsets.UTF_8);
             List<String> errorPageLines = IOUtils.readLines(errorPage, StandardCharsets.UTF_8);
             List<String> testPageLines = IOUtils.readLines(testPage, StandardCharsets.UTF_8);
             List<String> browserPageLines = IOUtils.readLines(browserPage, StandardCharsets.UTF_8);
+            List<String> cssLines = IOUtils.readLines(css, StandardCharsets.UTF_8);
+            List<String> jsGridLines = IOUtils.readLines(jsGrid, StandardCharsets.UTF_8);
+            List<String> jsUploaderLines = IOUtils.readLines(jsUploader, StandardCharsets.UTF_8);
+            List<String> jsWebSocketLines = IOUtils.readLines(jsWebSockets, StandardCharsets.UTF_8);
+            List<String> jsClientLines = IOUtils.readLines(jsClient, StandardCharsets.UTF_8);
+            byte[] windowsOpenerBA = IOUtils.toByteArray(windowsOpener);
+            byte[] debOpenerBA = IOUtils.toByteArray(debOpener);
+            byte[] pkgOpenerBA = IOUtils.toByteArray(pkgOpener);
+            byte[] rpmOpenerBA = IOUtils.toByteArray(rpmOpener);
+
             AndroidConfigurationHelper configurationHelper = new AndroidConfigurationHelper(getAssets(), "webdavsettings.json");
             String license = configurationHelper.getJsonValueCollection().get("License");
             // Copy storage files directory from application assets to application files folder.
@@ -64,7 +92,8 @@ public class NanoIntentService extends Service {
                 fileLocation = extras.getString(MainActivity.FILE_LOCATION, fileLocation);
             }
             String ipAddress = getIPAddress();
-            androidWebDavServer = new AndroidWebDavServer(new Config(ipAddress, 8181, license, fileLocation, getPageLines, errorPageLines, testPageLines, browserPageLines, logger, new DatabaseHandlerImpl(this)));
+            androidWebDavServer = new AndroidWebDavServer(new Config(ipAddress, 8181, license, fileLocation, getPageLines, errorPageLines, testPageLines, browserPageLines,
+                    cssLines, jsGridLines, jsUploaderLines, jsWebSocketLines, jsClientLines, windowsOpenerBA, debOpenerBA, pkgOpenerBA, rpmOpenerBA, logger, new DatabaseHandlerImpl(this)));
             logger.logDebug("To access WebDAV server open browser at any machine in your network at the following URL: " +
                     "http://" + ipAddress + ":8181");
         } catch (Exception e) {
@@ -74,6 +103,15 @@ public class NanoIntentService extends Service {
             IOUtils.closeQuietly(errorPage);
             IOUtils.closeQuietly(testPage);
             IOUtils.closeQuietly(browserPage);
+            IOUtils.closeQuietly(css);
+            IOUtils.closeQuietly(jsGrid);
+            IOUtils.closeQuietly(jsUploader);
+            IOUtils.closeQuietly(jsWebSockets);
+            IOUtils.closeQuietly(jsClient);
+            IOUtils.closeQuietly(windowsOpener);
+            IOUtils.closeQuietly(debOpener);
+            IOUtils.closeQuietly(pkgOpener);
+            IOUtils.closeQuietly(rpmOpener);
         }
         return super.onStartCommand(intent, flags, startId);
     }
