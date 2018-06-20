@@ -33,6 +33,7 @@ public class WebDavServlet extends HttpServlet {
     private static final String DEFAULT_INDEX_PATH = "WEB-INF/Index";
     private String license;
     private SearchFacade searchFacade;
+    static final String START_TIME = "" + System.currentTimeMillis();
 
     /**
      * Reads license file content.

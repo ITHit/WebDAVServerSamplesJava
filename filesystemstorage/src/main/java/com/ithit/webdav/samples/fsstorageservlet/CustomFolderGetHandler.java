@@ -64,6 +64,10 @@ public class CustomFolderGetHandler implements MethodHandler {
                     if (line.contains(ws)) {
                         line = line.replace(ws, wsContext);
                     }
+                    String version = "<%startTime%>";
+                    if (line.contains(version)) {
+                        line = line.replace(version, WebDavServlet.START_TIME);
+                    }
                     stream.println(line);
                 }
             }

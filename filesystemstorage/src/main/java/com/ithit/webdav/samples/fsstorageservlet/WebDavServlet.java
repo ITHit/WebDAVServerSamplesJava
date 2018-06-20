@@ -40,6 +40,7 @@ public class WebDavServlet extends HttpServlet {
     private boolean showExceptions;
     private SearchFacade searchFacade;
     private String license;
+    static final String START_TIME = "" + System.currentTimeMillis();
 
     /**
      * Returns root folder for the WebDav.

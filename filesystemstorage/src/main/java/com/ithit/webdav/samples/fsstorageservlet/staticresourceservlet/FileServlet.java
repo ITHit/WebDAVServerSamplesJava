@@ -43,7 +43,7 @@ public class FileServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
-    private static final Long DEFAULT_EXPIRE_TIME_IN_SECONDS = TimeUnit.DAYS.toSeconds(5);
+    private static final Long DEFAULT_EXPIRE_TIME_IN_SECONDS = TimeUnit.DAYS.toSeconds(1);
     private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
     private static final String ETAG = "W/\"%s-%s\"";
     private static final Pattern RANGE_PATTERN = Pattern.compile("^bytes=[0-9]*-[0-9]*(,[0-9]*-[0-9]*)*$");

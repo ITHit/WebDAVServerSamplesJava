@@ -33,10 +33,6 @@
             <param-name>index-interval</param-name>
             <param-value>2</param-value>
         </init-param>
-        <init-param>
-            <param-name>resources</param-name>
-            <param-value>wwwroot</param-value>
-        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>WebDav servlet</servlet-name>
