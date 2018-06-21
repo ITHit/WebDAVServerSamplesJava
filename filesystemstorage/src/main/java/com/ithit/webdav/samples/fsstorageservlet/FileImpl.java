@@ -325,10 +325,15 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         if (!Files.exists(Paths.get(destinationFolder))) {
             throw new ConflictException();
         }
+        Path newPath = Paths.get(destinationFolder, destName);
         try {
-            Files.copy(getFullPath(), Paths.get(destinationFolder, destName));
+            Files.copy(getFullPath(), newPath);
         } catch (IOException e) {
             throw new ServerException(e);
+        }
+        // Locks should not be copied, delete them
+        if (ExtendedAttributesExtension.hasExtendedAttribute(newPath.toString(), activeLocksAttribute)) {
+            ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
         }
         getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {
@@ -348,12 +353,17 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         if (!Files.exists(Paths.get(destinationFolder))) {
             throw new ConflictException();
         }
+        Path newPath = Paths.get(destinationFolder, destName);
         try {
             Files.move(getFullPath(), Paths.get(destinationFolder, destName), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new ServerException(e);
         }
         setName(destName);
+        // Locks should not be copied, delete them
+        if (ExtendedAttributesExtension.hasExtendedAttribute(newPath.toString(), activeLocksAttribute)) {
+            ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
+        }
         getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {

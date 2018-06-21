@@ -701,7 +701,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
      */
     void moveThisItem(FolderImpl destFolder, String destName, FolderImpl parent) throws ServerException {
 
-//        getDataAccess().executeUpdate("DELETE FROM Locks WHERE ItemID = ?", getId());
+        getDataAccess().executeUpdate("DELETE FROM Locks WHERE ItemID = ?", getId());
         getDataAccess().executeUpdate("UPDATE Repository SET"
                 + " Name = ?"
                 + ", Parent = ?"

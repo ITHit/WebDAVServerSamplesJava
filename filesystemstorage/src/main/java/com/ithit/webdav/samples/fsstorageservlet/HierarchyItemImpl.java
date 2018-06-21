@@ -30,7 +30,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     private final long modified;
     private final WebDavEngine engine;
     private String name;
-    private String activeLocksAttribute = "Locks";
+    String activeLocksAttribute = "Locks";
     private String propertiesAttribute = "Properties";
     private List<Property> properties;
     private List<LockInfo> activeLocks;
