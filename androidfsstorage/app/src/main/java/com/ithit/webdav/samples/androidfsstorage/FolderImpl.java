@@ -7,6 +7,8 @@ import com.ithit.webdav.server.exceptions.LockedException;
 import com.ithit.webdav.server.exceptions.MultistatusException;
 import com.ithit.webdav.server.exceptions.ServerException;
 import com.ithit.webdav.server.exceptions.WebDavStatus;
+import com.ithit.webdav.server.paging.OrderProperty;
+import com.ithit.webdav.server.paging.PageResults;
 import com.ithit.webdav.server.quota.Quota;
 
 import org.apache.commons.io.FileUtils;
@@ -123,12 +125,15 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
      * Gets the array of this folder's children.
      *
      * @param propNames List of properties to retrieve with the children. They will be queried by the engine later.
-     * @return Array of {@link HierarchyItemImpl} objects. Each item is a {@link FileImpl} or {@link FolderImpl} item.
+     * @param offset The number of items to skip before returning the remaining items.
+     * @param nResults The number of items to return.
+     * @param orderProps List of order properties requested by the client.
+     * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in a folder.
      * @throws ServerException In case of an error.
      */
     // <<<< getChildren
     @Override
-    public List<? extends HierarchyItemImpl> getChildren(List<Property> propNames) throws ServerException {
+    public PageResults getChildren(List<Property> propNames, Long offset, Long nResults, List<OrderProperty> orderProps) throws ServerException {
         String decodedPath = HierarchyItemImpl.decodeAndConvertToPath(getPath());
         File fullFolderPath = FileUtils.getFile(getRootFolder() + decodedPath);
         List<HierarchyItemImpl> children = new ArrayList<>();
@@ -139,9 +144,9 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
                 children.add(item);
             }
         } catch (Exception ex) {
-            return children;
+            return new PageResults(children, null);
         }
-        return children;
+        return new PageResults(children, null);
     }
     // getChildren >>>>
 

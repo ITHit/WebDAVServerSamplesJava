@@ -430,7 +430,7 @@ class SearchFacade {
             Fragmenter fragmenter = new SimpleSpanFragmenter(queryScorer);
             SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
             Highlighter highlighter = new Highlighter(htmlFormatter, queryScorer);
-            highlighter.setMaxDocCharsToAnalyze(MAX_CONTENT_LENGTH);
+//            highlighter.setMaxDocCharsToAnalyze(MAX_CONTENT_LENGTH);
             highlighter.setTextFragmenter(fragmenter);
 
             ScoreDoc scoreDocs[] = indexSearcher.search(query, 100).scoreDocs;

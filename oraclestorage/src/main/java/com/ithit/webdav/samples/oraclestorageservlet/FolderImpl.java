@@ -2,6 +2,8 @@ package com.ithit.webdav.samples.oraclestorageservlet;
 
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
+import com.ithit.webdav.server.paging.OrderProperty;
+import com.ithit.webdav.server.paging.PageResults;
 import com.ithit.webdav.server.quota.Quota;
 import com.ithit.webdav.server.search.Search;
 import com.ithit.webdav.server.search.SearchOptions;
@@ -35,13 +37,16 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      * Gets the array of this folder's children.
      *
      * @param propNames List of properties to retrieve with the children. They will be queried by the engine later.
-     * @return Array of {@link HierarchyItemImpl} objects. Each item is a {@link FileImpl} or {@link FolderImpl} item.
+     * @param offset The number of items to skip before returning the remaining items.
+     * @param nResults The number of items to return.
+     * @param orderProps List of order properties requested by the client.
+     * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in a folder.
      * @throws ServerException In case of an error.
      */
-    public List<HierarchyItemImpl> getChildren(List<Property> propNames) throws ServerException {
-        return getDataAccess().readItems("SELECT ID, Parent, ItemType, Name, Created, Modified, LastChunkSaved, TotalContentLength"
+    public PageResults getChildren(List<Property> propNames, Long offset, Long nResults, List<OrderProperty> orderProps) throws ServerException {
+        return new PageResults(getDataAccess().readItems("SELECT ID, Parent, ItemType, Name, Created, Modified, LastChunkSaved, TotalContentLength"
                 + " FROM Repository"
-                + " WHERE Parent = ? AND ID != 0", getPath(), true, id);
+                + " WHERE Parent = ? AND ID != 0", getPath(), true, id), null);
     }
 
     /**
@@ -158,7 +163,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         }
         // move children
         MultistatusException mr = new MultistatusException();
-        for (HierarchyItem child : getChildren(Collections.<Property>emptyList())) {
+        for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
             try {
                 child.moveTo(newDestFolder, child.getName());
             } catch (MultistatusException e) {
@@ -215,7 +220,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         // copy children
         MultistatusException mr = new MultistatusException();
         if (deep) {
-            for (HierarchyItemImpl child : getChildren(Collections.<Property>emptyList())) {
+            for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
                 try {
                     child.copyTo(newDestFolder, child.getName(), deep);
                 } catch (MultistatusException ex) {
@@ -250,7 +255,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
 
         MultistatusException mx = new MultistatusException();
 
-        for (HierarchyItem child : getChildren(Collections.<Property>emptyList())) {
+        for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
             try {
                 child.delete();
             } catch (MultistatusException ex) {
@@ -276,12 +281,12 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      * @throws ServerException in case of DB errors.
      */
     void removeTree() throws ServerException {
-        for (HierarchyItemImpl child : getChildren(Collections.<Property>emptyList())) {
+        for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
             FolderImpl childFolder = child instanceof FolderImpl ? (FolderImpl) child : null;
             if (childFolder != null)
                 childFolder.removeTree();
             else
-                child.deleteThisItem();
+                ((HierarchyItemImpl)child).deleteThisItem();
         }
         deleteThisItem();
     }
@@ -295,13 +300,13 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
 
         if (!clientHasToken())
             return false;
-        for (HierarchyItemImpl child : getChildren(Collections.<Property>emptyList())) {
+        for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
             FolderImpl childFolder = child instanceof FolderImpl ? (FolderImpl) child : null;
             if (childFolder != null) {
                 if (!childFolder.clientHasTokenForTree())
                     return false;
             } else {
-                if (!child.clientHasToken())
+                if (!((HierarchyItemImpl)child).clientHasToken())
                     return false;
             }
         }
@@ -330,14 +335,16 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      * @param searchString A phrase to search.
      * @param options      Search parameters.
      * @param propNames    List of properties to retrieve with the children. They will be queried by the engine later.
-     * @return ist of {@link HierarchyItem} satisfying the search parameters or empty list.
+     * @param offset The number of items to skip before returning the remaining items.
+     * @param nResults The number of items to return.
+     * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in search results.
      */
     @Override
-    public List<HierarchyItem> search(String searchString, SearchOptions options, List<Property> propNames) {
+    public PageResults search(String searchString, SearchOptions options, List<Property> propNames, Long offset, Long nResults) {
         List<HierarchyItem> results = new LinkedList<>();
         SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
-            return results;
+            return new PageResults(results, null);
         }
         boolean snippet = false;
         for (Property pr : propNames) {
@@ -380,7 +387,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                 getEngine().getLogger().logError("Error during search.", ex);
             }
         }
-        return results;
+        return new PageResults(results, null);
     }
 
     /**

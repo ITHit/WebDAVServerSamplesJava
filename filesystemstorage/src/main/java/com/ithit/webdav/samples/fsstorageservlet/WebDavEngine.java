@@ -7,8 +7,6 @@ import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.ServerException;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Implementation if {@link Engine}.
  * Resolves hierarchy items by paths.

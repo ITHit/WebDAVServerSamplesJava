@@ -488,10 +488,10 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
         FolderImpl folder = root instanceof FolderImpl ? (FolderImpl) root : null;
         if (folder != null)
-            for (HierarchyItemImpl child : folder.getChildren(Collections.<Property>emptyList())) {
-                if (child.itemHasLock(skipShared))
+            for (HierarchyItem child : folder.getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
+                if (((HierarchyItemImpl)child).itemHasLock(skipShared))
                     mr.addResponse(child.getPath(), WebDavStatus.LOCKED);
-                checkNoItemsLocked(mr, child, skipShared);
+                checkNoItemsLocked(mr, ((HierarchyItemImpl)child), skipShared);
             }
 
     }

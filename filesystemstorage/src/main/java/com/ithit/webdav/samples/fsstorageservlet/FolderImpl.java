@@ -5,6 +5,8 @@ import com.ithit.webdav.server.Folder;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Property;
 import com.ithit.webdav.server.exceptions.*;
+import com.ithit.webdav.server.paging.OrderProperty;
+import com.ithit.webdav.server.paging.PageResults;
 import com.ithit.webdav.server.quota.Quota;
 import com.ithit.webdav.server.search.Search;
 import com.ithit.webdav.server.search.SearchOptions;
@@ -18,6 +20,9 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Represents a folder in the File system repository.
@@ -131,24 +136,35 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
      * Gets the array of this folder's children.
      *
      * @param propNames List of properties to retrieve with the children. They will be queried by the engine later.
-     * @return Array of {@link HierarchyItemImpl} objects. Each item is a {@link FileImpl} or {@link FolderImpl} item.
+     * @param offset The number of items to skip before returning the remaining items.
+     * @param nResults The number of items to return.
+     * @param orderProps List of order properties requested by the client.
+     * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in a folder.
      * @throws ServerException In case of an error.
      */
     @Override
-    public List<? extends HierarchyItemImpl> getChildren(List<Property> propNames) throws ServerException {
+    public PageResults getChildren(List<Property> propNames, Long offset, Long nResults, List<OrderProperty> orderProps) throws ServerException {
         String decodedPath = HierarchyItemImpl.decodeAndConvertToPath(getPath());
         Path fullFolderPath = Paths.get(getRootFolder() + decodedPath);
         List<HierarchyItemImpl> children = new ArrayList<>();
+        Long total = null;
         try (DirectoryStream<Path> ds = Files.newDirectoryStream(fullFolderPath)) {
-            for (Path p : ds) {
+            List<Path> paths = StreamSupport.stream(ds.spliterator(), false).collect(Collectors.toList());
+            paths = sortChildren(paths, orderProps);
+            for (Path p : paths) {
                 String childPath = getPath() + encode(p.getFileName().toString());
                 HierarchyItemImpl item = (HierarchyItemImpl) getEngine().getHierarchyItem(childPath);
                 children.add(item);
             }
+            total = (long) paths.size();
+            if (offset != null && nResults != null)
+            {
+                children = children.stream().skip(offset).limit(nResults).collect(Collectors.toList());
+            }
         } catch (IOException e) {
             getEngine().getLogger().logError(e.getMessage(), e);
         }
-        return children;
+        return new PageResults(children, total);
     }
 
     @Override
@@ -199,6 +215,68 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
         return destFolder.startsWith(getPath().replace("/", java.io.File.separator));
     }
 
+    /**
+     * Sorts array of FileSystemInfo according to the specified order.
+     * @param paths Array of files and folders to sort.
+     * @param orderProps Sorting order.
+     * @return Sorted list of files and folders.
+     */
+    private List<Path> sortChildren(List<Path> paths, List<OrderProperty> orderProps) {
+        if (orderProps != null && !orderProps.isEmpty()) {
+            int index = 0;
+            Comparator<Path> comparator = null;
+            for (OrderProperty orderProperty :
+                    orderProps) {
+                Comparator<Path> tempComp = null;
+                if ("is-directory".equals(orderProperty.getProperty().getName())) {
+                    Function<Path, Boolean> sortFunc = item -> item.toFile().isDirectory();
+                    tempComp = Comparator.comparing(sortFunc);
+                }
+                if ("quota-used-bytes".equals(orderProperty.getProperty().getName())) {
+                    Function<Path, Long> sortFunc = item -> item.toFile().length();
+                    tempComp = Comparator.comparing(sortFunc);
+                }
+                if ("getlastmodified".equals(orderProperty.getProperty().getName())) {
+                    Function<Path, Long> sortFunc = item -> item.toFile().lastModified();
+                    tempComp = Comparator.comparing(sortFunc);
+                }
+                if ("displayname".equals(orderProperty.getProperty().getName())) {
+                    Function<Path, String> sortFunc = item -> item.getFileName().toString();
+                    tempComp = Comparator.comparing(sortFunc);
+                }
+                if ("getcontenttype".equals(orderProperty.getProperty().getName())) {
+                    Function<Path, String> sortFunc = item -> getExtension(item.getFileName().toString());
+                    tempComp = Comparator.comparing(sortFunc);
+                }
+                if (tempComp != null) {
+                    if (index++ == 0) {
+                        if (orderProperty.isAscending()) {
+                            comparator = tempComp;
+                        } else {
+                            comparator = tempComp.reversed();
+                        }
+                    } else {
+                        if (orderProperty.isAscending()) {
+                            comparator = comparator != null ? comparator.thenComparing(tempComp) : tempComp;
+                        } else {
+                            comparator = comparator != null ? comparator.thenComparing(tempComp.reversed()) : tempComp.reversed();
+                        }
+                    }
+                }
+            }
+            if (comparator != null) {
+                paths = paths.stream().sorted(comparator).collect(Collectors.toList());
+            }
+        }
+        return paths;
+    }
+
+    private String getExtension(String name) {
+        int periodIndex = name.lastIndexOf('.');
+        return periodIndex == -1 ? "" : name.substring(periodIndex + 1);
+
+    }
+
     @Override
     public void moveTo(Folder folder, String destName) throws LockedException,
             ConflictException, MultistatusException, ServerException {
@@ -227,14 +305,16 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
      * @param searchString A phrase to search.
      * @param options      Search parameters.
      * @param propNames    List of properties to retrieve with the children. They will be queried by the engine later.
-     * @return ist of {@link HierarchyItem} satisfying the search parameters or empty list.
+     * @param offset The number of items to skip before returning the remaining items.
+     * @param nResults The number of items to return.
+     * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in search results.
      */
     @Override
-    public List<HierarchyItem> search(String searchString, SearchOptions options, List<Property> propNames) {
+    public PageResults search(String searchString, SearchOptions options, List<Property> propNames, Long offset, Long nResults) {
         List<HierarchyItem> results = new LinkedList<>();
         SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
-            return results;
+            return new PageResults(results, null);
         }
         boolean snippet = false;
         if (propNames.stream().filter(x -> SNIPPET.equalsIgnoreCase(x.getName())).findFirst().orElse(null) != null) {
@@ -260,7 +340,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
         } catch (ServerException e) {
             getEngine().getLogger().logError("Error during search.", e);
         }
-        return results;
+        return new PageResults((offset != null && nResults != null) ? results.stream().skip(offset).limit(nResults).collect(Collectors.toList()) : results, (long) results.size());
     }
 
     /**
