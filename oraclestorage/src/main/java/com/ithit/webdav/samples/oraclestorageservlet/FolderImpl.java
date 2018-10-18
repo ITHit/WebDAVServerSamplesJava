@@ -5,6 +5,7 @@ import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.paging.OrderProperty;
 import com.ithit.webdav.server.paging.PageResults;
 import com.ithit.webdav.server.quota.Quota;
+import com.ithit.webdav.server.resumableupload.ResumableUploadBase;
 import com.ithit.webdav.server.search.Search;
 import com.ithit.webdav.server.search.SearchOptions;
 
@@ -14,7 +15,7 @@ import java.util.*;
 /**
  * Represents a folder in the Oracle DB repository.
  */
-public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
+public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, ResumableUploadBase {
 
     private long usedBytes;
 
@@ -44,9 +45,10 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      * @throws ServerException In case of an error.
      */
     public PageResults getChildren(List<Property> propNames, Long offset, Long nResults, List<OrderProperty> orderProps) throws ServerException {
-        return new PageResults(getDataAccess().readItems("SELECT ID, Parent, ItemType, Name, Created, Modified, LastChunkSaved, TotalContentLength"
+        List<HierarchyItemImpl> hierarchyItems = getDataAccess().readItems("SELECT ID, Parent, ItemType, Name, Created, Modified, LastChunkSaved, TotalContentLength"
                 + " FROM Repository"
-                + " WHERE Parent = ? AND ID != 0", getPath(), true, id), null);
+                + " WHERE Parent = ? AND ID != 0", getPath(), true, id);
+        return new PageResults(hierarchyItems, (long) hierarchyItems.size());
     }
 
     /**
@@ -344,7 +346,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         List<HierarchyItem> results = new LinkedList<>();
         SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
-            return new PageResults(results, null);
+            return new PageResults(results, (long) results.size());
         }
         boolean snippet = false;
         for (Property pr : propNames) {
@@ -387,7 +389,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                 getEngine().getLogger().logError("Error during search.", ex);
             }
         }
-        return new PageResults(results, null);
+        return new PageResults(results, (long) results.size());
     }
 
     /**

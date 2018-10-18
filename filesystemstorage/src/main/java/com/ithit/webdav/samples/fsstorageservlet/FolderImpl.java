@@ -8,6 +8,7 @@ import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.paging.OrderProperty;
 import com.ithit.webdav.server.paging.PageResults;
 import com.ithit.webdav.server.quota.Quota;
+import com.ithit.webdav.server.resumableupload.ResumableUploadBase;
 import com.ithit.webdav.server.search.Search;
 import com.ithit.webdav.server.search.SearchOptions;
 import org.apache.commons.io.FileUtils;
@@ -27,7 +28,7 @@ import java.util.stream.StreamSupport;
 /**
  * Represents a folder in the File system repository.
  */
-class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
+class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, ResumableUploadBase {
 
 
     /**
@@ -314,7 +315,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota {
         List<HierarchyItem> results = new LinkedList<>();
         SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
-            return new PageResults(results, null);
+            return new PageResults(results, (long) results.size());
         }
         boolean snippet = false;
         if (propNames.stream().filter(x -> SNIPPET.equalsIgnoreCase(x.getName())).findFirst().orElse(null) != null) {
