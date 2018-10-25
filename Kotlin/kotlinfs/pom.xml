@@ -5,15 +5,27 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ithit.webdav.samples</groupId>
-    <artifactId>deltav</artifactId>
-    <version>4.0.2623-beta</version>
+    <artifactId>kotlinfs</artifactId>
+    <version>4.1.2703</version>
     <packaging>war</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lucene-core.version>6.2.0</lucene-core.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.7</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
+        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -23,25 +35,31 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.0.2623-beta</version>
+            <version>4.1.2703</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>1.2.2</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.4</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.hynnet</groupId>
             <artifactId>oracle-driver-ojdbc6</artifactId>
             <version>12.1.0.1</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -121,13 +139,23 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.0.2623-beta</version>
+            <version>4.1.2703</version>
         </dependency>
-
         <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-            <version>1.1</version>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>1.2.71</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>1.2.71</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -139,6 +167,7 @@
     </repositories>
 
     <build>
+        <sourceDirectory>D:\myproj\Java\ithit\webdav-server-for-java\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -151,57 +180,25 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>tomcat</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/deltav-4.0.2623-beta/META-INF</outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/tomcat</directory>
-                                    <includes>
-                                        <include>*.xml</include>
-                                    </includes>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/storageresources</directory>
+                            <targetPath>WEB-INF</targetPath>
+                            <excludes>
+                                <exclude>**/pom.xml</exclude>
+                            </excludes>
+                        </resource>
+                    </webResources>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
                 <version>1.8</version>
                 <executions>
-                    <execution>
-                        <id>getprop</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <input
-                                        message="Please enter the test database url ofr jdbc connection: "
-                                        addproperty="db.url" defaultvalue="jdbc:oracle:thin:@localhost:1521:XE"/>
-                                <input
-                                        message="Please enter the test database login: "
-                                        addproperty="db.login" defaultvalue="system"/>
-                                <input
-                                        message="Please enter the test database login: "
-                                        addproperty="db.password" />
-                            </target>
-                            <exportAntProperties>true</exportAntProperties>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>windows</id>
                         <phase>none</phase>
@@ -240,32 +237,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/deltav-4.0.2623-beta</warSourceDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>sql-maven-plugin</artifactId>
-                <version>1.5</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.hynnet</groupId>
-                        <artifactId>oracle-driver-ojdbc6</artifactId>
-                        <version>12.1.0.1</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <driver>oracle.jdbc.driver.OracleDriver</driver>
-                    <url>${db.url}</url>
-                    <username>${db.login}</username>
-                    <password>${db.password}</password>
-                    <onError>continue</onError>
-                    <skipOnConnectionError>true</skipOnConnectionError>
-                    <srcFiles>
-                        <srcFile>src/main/dbresources/db/deltav.sql</srcFile>
-                    </srcFiles>
-                    <delimiter>/</delimiter>
-                    <delimiterType>row</delimiterType>
+                    <warSourceDirectory>target/kotlinfs-4.1.2703</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
@@ -298,6 +270,30 @@
                 </executions>
                 <configuration>
                     <escapeString>\</escapeString>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>1.2.71</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>1.8</jvmTarget>
                 </configuration>
             </plugin>
         </plugins>

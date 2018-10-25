@@ -5,27 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ithit.webdav.samples</groupId>
-    <artifactId>filesystemstorage</artifactId>
-    <version>4.0.2623-beta</version>
+    <artifactId>oraclestorage</artifactId>
+    <version>4.1.2703</version>
     <packaging>war</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene-core.version>6.2.0</lucene-core.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.7</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-            <version>1.1</version>
-        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -35,31 +23,25 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.0.2623-beta</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-            <scope>compile</scope>
+            <version>4.1.2703</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>1.2.2</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.4</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.hynnet</groupId>
             <artifactId>oracle-driver-ojdbc6</artifactId>
             <version>12.1.0.1</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -139,12 +121,13 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.0.2623-beta</version>
+            <version>4.1.2703</version>
         </dependency>
+
         <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna-platform</artifactId>
-            <version>4.4.0</version>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
         </dependency>
     </dependencies>
 
@@ -168,25 +151,57 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <webResources>
-                        <resource>
-                            <directory>src/main/storageresources</directory>
-                            <targetPath>WEB-INF</targetPath>
-                            <excludes>
-                                <exclude>**/pom.xml</exclude>
-                            </excludes>
-                        </resource>
-                    </webResources>
-                </configuration>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>tomcat</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/oraclestorage-4.1.2703/META-INF</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/tomcat</directory>
+                                    <includes>
+                                        <include>*.xml</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
                 <version>1.8</version>
                 <executions>
+                    <execution>
+                        <id>getprop</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <input
+                                        message="Please enter the test database url ofr jdbc connection: "
+                                        addproperty="db.url" defaultvalue="jdbc:oracle:thin:@localhost:1521:XE"/>
+                                <input
+                                        message="Please enter the test database login: "
+                                        addproperty="db.login" defaultvalue="system"/>
+                                <input
+                                        message="Please enter the test database login: "
+                                        addproperty="db.password" />
+                            </target>
+                            <exportAntProperties>true</exportAntProperties>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>windows</id>
                         <phase>none</phase>
@@ -225,13 +240,38 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-4.0.2623-beta</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-4.1.2703</warSourceDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <version>1.5</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.hynnet</groupId>
+                        <artifactId>oracle-driver-ojdbc6</artifactId>
+                        <version>12.1.0.1</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <driver>oracle.jdbc.driver.OracleDriver</driver>
+                    <url>${db.url}</url>
+                    <username>${db.login}</username>
+                    <password>${db.password}</password>
+                    <onError>continue</onError>
+                    <skipOnConnectionError>true</skipOnConnectionError>
+                    <srcFiles>
+                        <srcFile>src/main/dbresources/db/OracleStorage.sql</srcFile>
+                    </srcFiles>
+                    <delimiter>/</delimiter>
+                    <delimiterType>row</delimiterType>
                 </configuration>
             </plugin>
 			<plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.6</version>				
+                <version>1.6</version>			
                 <executions>
                     <execution>
                         <id>install node and npm</id>

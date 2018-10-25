@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+	      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+    <!-- This is servlet for handling static resources when main servlet is on the root context, otherwise simple root filter is enough -->
+    <servlet>
+        <servlet-name>FileServlet</servlet-name>
+        <servlet-class>com.ithit.webdav.samples.kotlinfs.staticresourceservlet.FileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileServlet</servlet-name>
+        <url-pattern>/wwwroot/*</url-pattern>
+    </servlet-mapping>
+    <!-- Main WebDAV servlet declaration -->
+    <servlet>
+        <servlet-name>WebDav servlet</servlet-name>
+        <servlet-class>com.ithit.webdav.samples.kotlinfs.WebDavServlet</servlet-class>
+        <init-param>
+            <param-name>license</param-name>
+            <param-value>D:\License.lic</param-value>
+        </init-param>
+        <init-param>
+            <param-name>showExceptions</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>root</param-name>
+            <param-value></param-value>
+        </init-param>
+        <init-param>
+            <param-name>index-interval</param-name>
+            <param-value>2</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WebDav servlet</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+    <!--Uncomment this and configure roles if you want to enable security-->
+    <!--
+    <security-role>
+        <role-name>administrators</role-name>
+    </security-role>
+    <security-role>
+        <role-name>role1</role-name>
+    </security-role>
+
+    <security-constraint>
+        <web-resource-collection>
+           <web-resource-name>All Resources</web-resource-name>
+           <url-pattern>/secured/*</url-pattern>
+           <http-method>COPY</http-method>
+           <http-method>MOVE</http-method>
+           <http-method>DELETE</http-method>
+           <http-method>PROPFIND</http-method>
+           <http-method>GET</http-method>
+           <http-method>HEAD</http-method>
+           <http-method>PUT</http-method>
+           <http-method>POST</http-method>
+           <http-method>MKCOL</http-method>
+           <http-method>PROPPATCH</http-method>
+           <http-method>LOCK</http-method>
+           <http-method>UNLOCK</http-method>
+           <http-method>VERSION-CONTROL</http-method>
+           <http-method>CHECKIN</http-method>
+           <http-method>CHECKOUT</http-method>
+           <http-method>UNCHECKOUT</http-method>
+           <http-method>REPORT</http-method>
+           <http-method>UPDATE</http-method>
+           <http-method>CANCELUPLOAD</http-method>
+           <http-method>SEARCH</http-method>
+        </web-resource-collection>
+
+        <auth-constraint>
+            <role-name>administrators</role-name>
+            <role-name>role1</role-name>
+        </auth-constraint>
+
+    </security-constraint>
+    -->
+
+    <!--Uncomment this for basic authentication -->
+    <!--
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>Basic Authentication</realm-name>
+    </login-config>
+    -->
+    <!--Uncomment this for digest authentication -->
+    <!--
+    <login-config>
+        <auth-method>DIGEST</auth-method>
+        <realm-name>Digest Authentication</realm-name>
+    </login-config>
+    -->
+ 
+    
+</web-app>
