@@ -1,5 +1,5 @@
 # Java WebDAV Server Examples
-IT Hit WebDAV Server Library for Java is provided with several examples that demonstrate how to build a WebDAV server with SQL back-end or with file system storage. You can adapt these samples to publish data from virtually any back-end storage including CMS/DMS/CRM, Azure or Amazon storage. 
+IT Hit WebDAV Server Library for Java is provided with several examples in Java and Kotlin that demonstrate how to build a WebDAV server with SQL back-end or with file system storage. You can adapt these samples to publish data from virtually any back-end storage including CMS/DMS/CRM, Azure or Amazon storage. 
 
 A sample HTML page included with samples demonstrates how to use [IT Hit WebDAV Ajax Libray](https://www.webdavsystem.com/ajax/) to open documents from a web page for editing, list documents and navigate folder structure as well as build search capadilities.
 
@@ -25,7 +25,7 @@ WebDAV server with Oracle back-end example is a Class 2 server that stores all d
 This example is a fully-functional WebDAV server that can be used to open, edit and save Microsoft Office documents as well as any other types of files directly to server, without download/upload steps. [more...](https://www.webdavsystem.com/javaserver/server_examples/sql_storage/)
 
 ## WebDAV Server with File System Back-end Example
-WebDAV server with file system back-end storage is a fully functional Class 2 server that stores all data in file system. It utilizes File Extended Attributes to store locks and custom properties. This sample can be configured to use Basic or Digest authentication. [more...](https://www.webdavsystem.com/javaserver/server_examples/storage_file_system/)
+WebDAV server with file system back-end storage is a fully functional Class 2 server that stores all data in file system. It utilizes File Extended Attributes to store locks and custom properties. This sample is provided in Java and Kotlin and can be configured to use Basic or Digest authentication. [more...](https://www.webdavsystem.com/javaserver/server_examples/storage_file_system/)
 
 ## WebDAV Server with Versioning Example
 This example demonstrates how you can implement file versioning support in your WebDAV server. It is using auto-versioning and each time you save a file the new version is created. Your client application does not need to know anything about versioning support on a server side. While capable of handling any WebDAV clients, this DeltaV sample is optimized to work with Microsoft Office. It is using Lock/Unlock commands to minimize an amount of versions created. [more...](https://www.webdavsystem.com/javaserver/server_examples/deltav_storage/)
