@@ -32,13 +32,35 @@
     width: 85px;
 }
 
+th.sort {
+    position: relative;
+    cursor: pointer;
+}
+
+th.sort.ascending, th.sort.descending {
+    padding-right: 15px;
+}
+
+th.sort.ascending:after, th.sort.descending:after {
+    content: "\f0de";
+    font-family: "Font Awesome 5 Free";
+    display: inline-block;
+    position: absolute;
+    left: -5px;
+}
+
+th.sort.descending:after {
+    content: "\f0dd";
+    bottom: 8px;
+}
+
 @media (max-width: 767px) {
     .ithit-search-container .twitter-typeahead {
         padding-right: 53px;
     }
 
     .ithit-search-container button {
-        width: 38px;
+        width: 50px;
     }
 }
 
@@ -76,10 +98,20 @@ table.ithit-grid-container > tbody > tr > td {
 }
 
 table.ithit-grid-container > thead > tr > th:nth-child(1),
-table.ithit-grid-container > tbody > tr > td:nth-child(1),
+table.ithit-grid-container > tbody > tr > td:nth-child(1) {
+    text-align: right;
+}
+
+table.ithit-grid-container > thead > tr > th:nth-child(4),
+table.ithit-grid-container > tbody > tr > td:nth-child(4) {
+    min-width: 120px;
+    max-width: 120px;
+}
+
 table.ithit-grid-container > thead > tr > th:nth-child(5),
 table.ithit-grid-container > tbody > tr > td:nth-child(5) {
-    text-align: right;
+    min-width: 100px;
+    max-width: 100px;
 }
 
 table.ithit-grid-container > tbody > tr > td:nth-child(3) {
@@ -198,6 +230,10 @@ table tr.tr-snippet-url td > div:last-child {
 
 table tr.hover {
     background-color: #f5f5f5;
+}
+
+.table td, .table th {
+    padding: 0.5rem;
 }
 
 .table-responsive {
@@ -329,6 +365,16 @@ button.btn.btn-transparent {
     margin-top: 15px;
 }
 
-.btn {
-    min-width: 70px;
+p.error-message {
+    margin: 0;
+}
+
+.btn-info {
+    padding: 0px 5px !important;
+    line-height: 1.2;
+    margin-top: -3px;
+}
+
+.btn-info .fas {
+    vertical-align: initial;
 }

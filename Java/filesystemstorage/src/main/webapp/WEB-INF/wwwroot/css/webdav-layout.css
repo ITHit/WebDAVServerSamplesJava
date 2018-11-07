@@ -46,12 +46,11 @@ th.sort.ascending:after, th.sort.descending:after {
     font-family: "Font Awesome 5 Free";
     display: inline-block;
     position: absolute;
-    right: 0;
+    left: -5px;
 }
 
 th.sort.descending:after {
     content: "\f0dd";
-    right: 0;
     bottom: 8px;
 }
 
@@ -99,10 +98,20 @@ table.ithit-grid-container > tbody > tr > td {
 }
 
 table.ithit-grid-container > thead > tr > th:nth-child(1),
-table.ithit-grid-container > tbody > tr > td:nth-child(1),
+table.ithit-grid-container > tbody > tr > td:nth-child(1) {
+    text-align: right;
+}
+
+table.ithit-grid-container > thead > tr > th:nth-child(4),
+table.ithit-grid-container > tbody > tr > td:nth-child(4) {
+    min-width: 120px;
+    max-width: 120px;
+}
+
 table.ithit-grid-container > thead > tr > th:nth-child(5),
 table.ithit-grid-container > tbody > tr > td:nth-child(5) {
-    text-align: right;
+    min-width: 100px;
+    max-width: 100px;
 }
 
 table.ithit-grid-container > tbody > tr > td:nth-child(3) {

@@ -6,12 +6,11 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>4.1.2703</version>
+    <version>4.1.2715</version>
     <packaging>war</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lucene-core.version>6.2.0</lucene-core.version>
     </properties>
 
     <dependencies>
@@ -35,7 +34,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.1.2703</version>
+            <version>4.1.2715</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -64,27 +63,27 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>6.2.0</version>
+            <version>7.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>6.2.0</version>
+            <version>7.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-highlighter</artifactId>
-            <version>6.2.0</version>
+            <version>7.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.19</version>
+            <version>1.19.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
-            <version>1.19</version>
+            <version>1.19.1</version>
             <exclusions>
                 <exclusion>
                     <artifactId>cxf-core</artifactId>
@@ -134,12 +133,16 @@
                     <artifactId>activation</artifactId>
                     <groupId>javax.activation</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.sis.storage</groupId>
+                    <artifactId>sis-netcdf</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.1.2703</version>
+            <version>4.1.2715</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -225,7 +228,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-4.1.2703</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-4.1.2715</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>

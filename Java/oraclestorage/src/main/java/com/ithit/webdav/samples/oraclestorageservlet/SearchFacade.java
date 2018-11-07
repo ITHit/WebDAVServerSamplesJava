@@ -19,6 +19,7 @@ import org.apache.lucene.search.highlight.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.tika.Tika;
+import org.apache.tika.exception.ZeroByteFileException;
 import org.apache.tika.metadata.Metadata;
 
 import java.io.IOException;
@@ -196,7 +197,9 @@ class SearchFacade {
                     doc.add(new TextField(CONTENTS, content, Field.Store.YES));
                 }
             } catch (Exception ex) {
-                logger.logError("Cannot index content.", ex);
+                if (!(ex instanceof ZeroByteFileException)) {
+                    logger.logError("Error while indexing content: " + currentId, ex);
+                }
             } finally {
                 if (stream != null) {
                     try {

@@ -19,6 +19,7 @@ import org.apache.lucene.search.highlight.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.tika.Tika;
+import org.apache.tika.exception.ZeroByteFileException;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 
@@ -253,12 +254,14 @@ class SearchFacade {
                 doc.add(pathField);
                 doc.add(parentField);
                 doc.add(nameField);
-                if (item != null && item instanceof FileImpl) {
+                if (item instanceof FileImpl) {
                     try (TikaInputStream stream = TikaInputStream.get(fullPath, metadata)) {
                         String content = tika.parseToString(stream, metadata, MAX_CONTENT_LENGTH);
                         doc.add(new TextField(CONTENTS, content, Field.Store.YES));
                     } catch (Throwable e) {
-                        logger.logError("Error while indexing content: " + fullPath, e);
+                        if (!(e instanceof ZeroByteFileException)) {
+                            logger.logError("Error while indexing content: " + fullPath, e);
+                        }
                     }
                 }
                 if (indexWriter.getConfig().getOpenMode() == IndexWriterConfig.OpenMode.CREATE) {
@@ -430,7 +433,6 @@ class SearchFacade {
             Fragmenter fragmenter = new SimpleSpanFragmenter(queryScorer);
             SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
             Highlighter highlighter = new Highlighter(htmlFormatter, queryScorer);
-//            highlighter.setMaxDocCharsToAnalyze(MAX_CONTENT_LENGTH);
             highlighter.setTextFragmenter(fragmenter);
 
             ScoreDoc scoreDocs[] = indexSearcher.search(query, 100).scoreDocs;
