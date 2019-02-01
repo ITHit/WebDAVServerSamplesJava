@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>oraclestorage</artifactId>
-    <version>4.1.2715</version>
+    <version>4.1.2742</version>
     <packaging>war</packaging>
 
     <properties>
@@ -23,12 +23,12 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.1.2715</version>
+            <version>4.1.2742</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
-            <version>1.2.2</version>
+            <version>1.4</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -46,27 +46,27 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>7.5.0</version>
+            <version>7.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>7.5.0</version>
+            <version>7.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-highlighter</artifactId>
-            <version>7.5.0</version>
+            <version>7.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.19.1</version>
+            <version>1.20</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
-            <version>1.19.1</version>
+            <version>1.20</version>
             <exclusions>
                 <exclusion>
                     <artifactId>cxf-core</artifactId>
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.1.2715</version>
+            <version>4.1.2742</version>
         </dependency>
 
         <dependency>
@@ -165,7 +165,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/oraclestorage-4.1.2715/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/oraclestorage-4.1.2742/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -244,7 +244,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/oraclestorage-4.1.2715</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-4.1.2742</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -300,9 +300,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <escapeString>\</escapeString>
-                </configuration>
             </plugin>
         </plugins>
     </build>

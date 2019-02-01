@@ -32,6 +32,8 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
 
     private String snippet;
 
+    private OpenOption[] allowedOpenFileOptions;
+
     /**
      * Initializes a new instance of the {@link FileImpl} class.
      *
@@ -43,6 +45,12 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
      */
     private FileImpl(String name, String path, long created, long modified, WebDavEngine engine) {
         super(name, path, created, modified, engine);
+
+        /* Mac OS X doesn't work with ExtendedOpenOption.NOSHARE_DELETE */
+        this.allowedOpenFileOptions = (System.getProperty("os.name").contains("Mac")) ?
+                (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ}) :
+                (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ,
+                        ExtendedOpenOption.NOSHARE_DELETE});
     }
 
     /**
@@ -244,7 +252,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
     public long write(InputStream content, String contentType, long startIndex, long totalFileLength)
             throws LockedException, ServerException, IOException {
         ensureHasToken();
-        SeekableByteChannel writer = Files.newByteChannel(getFullPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, ExtendedOpenOption.NOSHARE_DELETE);
+        SeekableByteChannel writer = Files.newByteChannel(getFullPath(), this.allowedOpenFileOptions);
         if (startIndex == 0) {
             // If we override the file we must set position to 0 because writer could be at not 0 position.
             writer = writer.truncate(0);

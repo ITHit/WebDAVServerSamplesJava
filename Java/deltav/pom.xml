@@ -6,11 +6,12 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>deltav</artifactId>
-    <version>4.1.2715</version>
+    <version>4.1.2742</version>
     <packaging>war</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -23,12 +24,12 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.1.2715</version>
+            <version>4.1.2742</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
-            <version>1.2.2</version>
+            <version>1.4</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -46,27 +47,27 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>7.5.0</version>
+            <version>7.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>7.5.0</version>
+            <version>7.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-highlighter</artifactId>
-            <version>7.5.0</version>
+            <version>7.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.19.1</version>
+            <version>1.20</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
-            <version>1.19.1</version>
+            <version>1.20</version>
             <exclusions>
                 <exclusion>
                     <artifactId>cxf-core</artifactId>
@@ -125,7 +126,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.1.2715</version>
+            <version>4.1.2742</version>
         </dependency>
 
         <dependency>
@@ -165,7 +166,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/deltav-4.1.2715/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/deltav-4.1.2742/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -244,7 +245,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/deltav-4.1.2715</warSourceDirectory>
+                    <warSourceDirectory>target/deltav-4.1.2742</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -275,7 +276,7 @@
 			<plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.6</version>				
+                <version>${frontend-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>install node and npm</id>
@@ -300,9 +301,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <escapeString>\</escapeString>
-                </configuration>
             </plugin>
         </plugins>
     </build>

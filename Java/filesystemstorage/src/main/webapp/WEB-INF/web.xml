@@ -27,7 +27,7 @@
         </init-param>
         <init-param>
             <param-name>root</param-name>
-            <param-value></param-value>
+            <param-value>/Users/evgenymokhnachev/projects/jira_dms/web_dav_folder/</param-value>
         </init-param>
         <init-param>
             <param-name>index-interval</param-name>
