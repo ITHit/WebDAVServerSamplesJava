@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>4.1.2743</version>
+    <version>4.1.2760</version>
     <packaging>war</packaging>
 
     <properties>
@@ -34,7 +32,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.1.2743</version>
+            <version>4.1.2760</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -136,7 +134,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.1.2743</version>
+            <version>4.1.2760</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -193,7 +191,7 @@
                         <configuration>
                             <target>
                                 <exec executable="start" vmlauncher="false">
-                                    <arg line="http://localhost:11021/"/>
+                                    <arg line="http://localhost:11021/" />
                                 </exec>
                             </target>
                         </configuration>
@@ -207,7 +205,7 @@
                         <configuration>
                             <target>
                                 <exec executable="xdg-open">
-                                    <arg line="http://localhost:11021/"/>
+                                    <arg line="http://localhost:11021/" />
                                 </exec>
                             </target>
                         </configuration>
@@ -222,7 +220,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-4.1.2743</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-4.1.2760</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>

@@ -46,8 +46,9 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
     private FileImpl(String name, String path, long created, long modified, WebDavEngine engine) {
         super(name, path, created, modified, engine);
 
-        /* Mac OS X doesn't work with ExtendedOpenOption.NOSHARE_DELETE */
-        this.allowedOpenFileOptions = (System.getProperty("os.name").contains("Mac")) ?
+        /* Mac OS X and Ubuntu doesn't work with ExtendedOpenOption.NOSHARE_DELETE */
+        String systemName = System.getProperty("os.name").toLowerCase();
+        this.allowedOpenFileOptions = (systemName.contains("mac") || systemName.contains("linux")) ?
                 (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ}) :
                 (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ,
                         ExtendedOpenOption.NOSHARE_DELETE});

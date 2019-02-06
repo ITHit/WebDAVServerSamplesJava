@@ -5,8 +5,8 @@ import com.ithit.webdav.server.exceptions.ServerException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 
@@ -40,11 +40,15 @@ class DefaultExtendedAttribute implements ExtendedAttribute {
                 .getFileAttributeView(Paths.get(path), UserDefinedFileAttributeView.class);
         ByteBuffer buf;
         try {
+            if (view.list().isEmpty()) {
+                return null;
+            }
+
             buf = ByteBuffer.allocate(view.size(attribName));
             view.read(attribName, buf);
             buf.flip();
             return Charset.defaultCharset().decode(buf).toString();
-        } catch (NoSuchFileException ignored) {
+        } catch (FileSystemException ignore) {
         } catch (IOException e) {
             throw new ServerException(String.format("Reading attribute '%s' from file '%s' failed.", attribName, path), e);
         }
