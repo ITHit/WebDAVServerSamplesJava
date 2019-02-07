@@ -32,7 +32,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.1.2760</version>
+            <version>4.1.2762</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -140,7 +140,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.1.2760</version>
+            <version>4.1.2762</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -238,7 +238,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/kotlinfs-4.1.2760</warSourceDirectory>
+                    <warSourceDirectory>target/kotlinfs-4.1.2762</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
