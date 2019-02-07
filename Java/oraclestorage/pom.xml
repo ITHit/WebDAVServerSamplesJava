@@ -1,10 +1,12 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>oraclestorage</artifactId>
-    <version>4.1.2760</version>
+    <version>4.1.2715</version>
     <packaging>war</packaging>
 
     <properties>
@@ -21,12 +23,12 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.1.2762</version>
+            <version>4.1.2715</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
+            <version>1.2.2</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -44,17 +46,17 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>7.6.0</version>
+            <version>7.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>7.6.0</version>
+            <version>7.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-highlighter</artifactId>
-            <version>7.6.0</version>
+            <version>7.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
@@ -123,7 +125,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.1.2762</version>
+            <version>4.1.2715</version>
         </dependency>
 
         <dependency>
@@ -163,7 +165,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/oraclestorage-4.1.2762/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/oraclestorage-4.1.2715/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -191,9 +193,15 @@
                         </goals>
                         <configuration>
                             <target>
-                                <input message="Please enter the test database url ofr jdbc connection: " addproperty="db.url" defaultvalue="jdbc:oracle:thin:@localhost:1521:XE" />
-                                <input message="Please enter the test database login: " addproperty="db.login" defaultvalue="system" />
-                                <input message="Please enter the test database login: " addproperty="db.password" />
+                                <input
+                                        message="Please enter the test database url ofr jdbc connection: "
+                                        addproperty="db.url" defaultvalue="jdbc:oracle:thin:@localhost:1521:XE"/>
+                                <input
+                                        message="Please enter the test database login: "
+                                        addproperty="db.login" defaultvalue="system"/>
+                                <input
+                                        message="Please enter the test database login: "
+                                        addproperty="db.password" />
                             </target>
                             <exportAntProperties>true</exportAntProperties>
                         </configuration>
@@ -207,7 +215,7 @@
                         <configuration>
                             <target>
                                 <exec executable="start" vmlauncher="false">
-                                    <arg line="http://localhost:11021/" />
+                                    <arg line="http://localhost:11021/"/>
                                 </exec>
                             </target>
                         </configuration>
@@ -221,7 +229,7 @@
                         <configuration>
                             <target>
                                 <exec executable="xdg-open">
-                                    <arg line="http://localhost:11021/" />
+                                    <arg line="http://localhost:11021/"/>
                                 </exec>
                             </target>
                         </configuration>
@@ -236,7 +244,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/oraclestorage-4.1.2762</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-4.1.2715</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -292,6 +300,9 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <escapeString>\</escapeString>
+                </configuration>
             </plugin>
         </plugins>
     </build>

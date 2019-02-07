@@ -13,7 +13,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
-import java.nio.channels.SeekableByteChannel
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributeView
 import java.nio.file.attribute.BasicFileAttributes
@@ -227,7 +226,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
     @Throws(LockedException::class, ServerException::class, IOException::class)
     override fun write(content: InputStream, contentType: String?, startIndex: Long, totalFileLength: Long): Long {
         ensureHasToken()
-        var writer = Files.newByteChannel(fullPath, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, ExtendedOpenOption.NOSHARE_DELETE);
+        var writer = Files.newByteChannel(fullPath, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, ExtendedOpenOption.NOSHARE_DELETE)
         if (startIndex == 0L) {
             // If we override the file we must set position to 0 because writer could be at not 0 position.
             writer = writer.truncate(0)
