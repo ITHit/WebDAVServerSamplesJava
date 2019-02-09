@@ -21,10 +21,10 @@
          */
         Date: function (oDate) {
             return [
-                    ('0' + (oDate.getMonth() + 1)).slice(-2),
-                    ('0' + oDate.getDate()).slice(-2),
-                    oDate.getFullYear()
-                ].join('/') +
+                ('0' + (oDate.getMonth() + 1)).slice(-2),
+                ('0' + oDate.getDate()).slice(-2),
+                oDate.getFullYear()
+            ].join('/') +
                 ' ' +
                 [
                     ('0' + oDate.getHours() % 12 || 12).slice(-2),
@@ -47,7 +47,7 @@
                 html = html.replace(/<b>/g, safePrefix + '_0').replace(/<\/b>/g, safePrefix + '_1');
                 html = $('<div />').text(html).text();
                 html = html.replace(new RegExp(safePrefix + '_0', 'g'), '<b>').
-                replace(new RegExp(safePrefix + '_1', 'g'), '</b>');
+                    replace(new RegExp(safePrefix + '_1', 'g'), '</b>');
             }
             return $('<div />').addClass('snippet').html(html);
         },
@@ -99,13 +99,13 @@
                         $('<tr />').html([
                             $('<td class="d-none d-sm-table-cell" />').text(i + 1),
                             $('<td />').
-                            html(oItem.IsFolder() ? '<span class="fas fa-folder">' + locked +
-                                '</span>' : locked),
+                                html(oItem.IsFolder() ? '<span class="fas fa-folder">' + locked +
+                                    '</span>' : locked),
                             this._RenderDisplayName(oItem),
                             $('<td class="d-none d-sm-table-cell" />').text(oItem.IsFolder() ? 'Folder' : ('File ' + Formatters.GetFileExtension(oItem.DisplayName))),
                             $('<td />').
-                            text(!oItem.IsFolder() ? Formatters.FileSize(oItem.ContentLength) : '').
-                            css('text-align', 'right'),
+                                text(!oItem.IsFolder() ? Formatters.FileSize(oItem.ContentLength) : '').
+                                css('text-align', 'right'),
                             $('<td class="d-none d-sm-table-cell" />').text(Formatters.Date(oItem.LastModified)),
                             $('<td class="column-action" />').html(this._RenderActions(oItem))
                         ]),
@@ -118,8 +118,8 @@
         },
 
         /**
-         * @param {ITHit.WebDAV.Client.HierarchyItem} oItem
-         **/
+        * @param {ITHit.WebDAV.Client.HierarchyItem} oItem
+        **/
         _RenderDisplayName: function (oItem) {
             var oElement = oItem.IsFolder() ?
                 $('<td class="ellipsis" />').html($('<a />').text(oItem.DisplayName).attr('href', oItem.Href)) :
@@ -151,18 +151,18 @@
 
             if (oItem.IsFolder()) {
                 actions.push($('<button class="btn btn-transparent browse-lnk" type="button"/>').
-                html('<span class="fas fa-hdd"></span> <span class="d-none d-md-inline">Browse</span>').
-                attr('title', 'Open this folder in Operating System file manager.').
-                on('click', function () {
-                    oWebDAV.OpenFolderInOsFileManager(oItem.Href);
-                }).prop("disabled", !isDavProtocolSupported));
+                    html('<span class="fas fa-hdd"></span> <span class="d-none d-md-inline">Browse</span>').
+                    attr('title', 'Open this folder in Operating System file manager.').
+                    on('click', function () {
+                        oWebDAV.OpenFolderInOsFileManager(oItem.Href);
+                    }).prop("disabled", !isDavProtocolSupported));
             } else {
                 actions.push($('<button class="btn btn-transparent"/>').
-                html('<span class="fas fa-edit"></span> <span class="d-none d-md-inline">Edit</span>').
-                attr('title', 'Edit document in associated application.').
-                on('click', function () {
-                    oWebDAV.EditDoc(oItem.Href);
-                }).prop("disabled", !isDavProtocolSupported && !isMicrosoftOfficeDocument));
+                    html('<span class="fas fa-edit"></span> <span class="d-none d-md-inline">Edit</span>').
+                    attr('title', 'Edit document in associated application.').
+                    on('click', function () {
+                        oWebDAV.EditDoc(oItem.Href);
+                    }).prop("disabled", !isDavProtocolSupported && !isMicrosoftOfficeDocument));
                 actions.push($('<button class="btn btn-transparent"/>')
                     .html('<span class="fas fa-window-maximize"></span>')
                     .attr('title', 'Select application to open this file with.')
@@ -209,8 +209,8 @@
         SetDisabled: function (bIsDisabled) {
             this.$el.find('button').prop('disabled', bIsDisabled);
             this.$el.find('input').
-            prop('disabled', bIsDisabled).
-            attr('placeholder', !bIsDisabled ? '' : 'The server does not support search');
+                prop('disabled', bIsDisabled).
+                attr('placeholder', !bIsDisabled ? '' : 'The server does not support search');
         },
 
         GetValue: function () {
@@ -406,7 +406,7 @@
                 var className = 'ascending'
                 if ($(this).hasClass('ascending')) {
                     className = 'descending';
-                }
+                }            
 
                 oWebDAV.Sort($(this).data('sort-column'), className == 'ascending');
             })
@@ -447,7 +447,10 @@
         },
 
         _OnPopState: function (oEvent) {
-            if (!oWebDAV.GetHashValue('search')) {
+            if (oWebDAV.GetHashValue('search')) {
+                oSearchForm.LoadFromHash();         
+            }
+            else {
                 var sUrl = oEvent.state && oEvent.state.Url || window.location.href.split("#")[0];
                 oWebDAV.NavigateFolder(sUrl);
             }
@@ -569,6 +572,11 @@
                 sPath = this.CurrentFolder.Href;
             }
 
+            //set upload url for uploader control
+            if (typeof WebDAVUploaderGridView !== 'undefined') {
+                WebDAVUploaderGridView.SetUploadUrl(sPath);
+            }
+
             if (sortColumn) {
                 this.CurrentSortColumn = sortColumn;
                 this.CurrentSortAscending = sortAscending;
@@ -634,7 +642,7 @@
         },
 
         NavigateSearch: function (sPhrase, bIsDynamic, pageNumber, updateUrlHash, fCallback) {
-            var pageSize = this.PageSize, currentPageNumber = 1;
+            var pageSize = this.PageSize, currentPageNumber = 1;         
 
             if (!this.CurrentFolder) {
                 fCallback && fCallback({ Items: [], TotalItems: 0 });
@@ -669,10 +677,10 @@
             // If ‘%’, ‘_’ or ‘\’ characters are used in search phrase they are escaped as ‘\%’, ‘\_’ and ‘\\’.
             var searchQuery = new ITHit.WebDAV.Client.SearchQuery();
             searchQuery.Phrase = sPhrase.replace(/\\/g, '\\\\').
-            replace(/\%/g, '\\%').
-            replace(/\_/g, '\\_').
-            replace(/\*/g, '%').
-            replace(/\?/g, '_') + '%';
+                replace(/\%/g, '\\%').
+                replace(/\_/g, '\\_').
+                replace(/\*/g, '%').
+                replace(/\?/g, '_') + '%';
             searchQuery.EnableContains = !bIsDynamic;  //Enable/disable search in file content.
 
             // Get following additional properties from server in search results: snippet - text around search phrase.
@@ -680,13 +688,28 @@
                 this.SnippetPropertyName
             ];
 
-            this.CurrentFolder.GetSearchPageByQueryAsync(searchQuery, (currentPageNumber - 1) * pageSize, pageSize, function (oResult) {
-                /** @type {ITHit.WebDAV.Client.AsyncResult} oResult */
+            function _getSearchPageByQuery() {
+                oWebDAV.CurrentFolder.GetSearchPageByQueryAsync(searchQuery, (currentPageNumber - 1) * pageSize, pageSize, function (oResult) {
+                    /** @type {ITHit.WebDAV.Client.AsyncResult} oResult */
 
-                /** @type {ITHit.WebDAV.Client.HierarchyItem[]} aItems */
+                    /** @type {ITHit.WebDAV.Client.HierarchyItem[]} aItems */
 
-                fCallback && fCallback(oResult);
-            });
+                    fCallback && fCallback(oResult);
+                });
+            }        
+
+            if (window.location.href.split("#")[0] != this.CurrentFolder.Href) {
+                this.WebDavSession.OpenFolderAsync(window.location.href.split("#")[0], [], function (oResponse) {
+                    oWebDAV.CurrentFolder = oResponse.Result;
+                    oBreadcrumbs.SetHierarchyItem(oWebDAV.CurrentFolder);
+                    _getSearchPageByQuery();
+                }); 
+            }
+            else {
+                _getSearchPageByQuery();
+            }
+
+          
         },
 
         Sort: function (columnName, sortAscending) {
@@ -708,18 +731,18 @@
         },
 
         /**
-         * Opens document with.
-         * @param {string} sDocumentUrl Must be full path including domain name: https://webdavserver.com/path/file.ext
-         */
+           * Opens document with.
+           * @param {string} sDocumentUrl Must be full path including domain name: https://webdavserver.com/path/file.ext
+           */
         OpenDocWith: function (sDocumentUrl) {
             ITHit.WebDAV.Client.DocManager.DavProtocolEditDocument(sDocumentUrl, this.GetMountUrl(), this._ProtocolInstallMessage.bind(this), null, webDavSettings.EditDocAuth.SearchIn,
                 webDavSettings.EditDocAuth.CookieNames, webDavSettings.EditDocAuth.LoginUrl, 'OpenWith');
         },
 
         /**
-         * Deletes document.
-         * @param {string} sDocumentUrl Must be full path including domain name: https://webdavserver.com/path/file.ext
-         */
+          * Deletes document.
+          * @param {string} sDocumentUrl Must be full path including domain name: https://webdavserver.com/path/file.ext
+          */
         DeleteHierarchyItem: function (oItem) {
             oConfirmModal.Confirm('Are you sure want to delete ' + oItem.DisplayName + '?', function () {
                 oItem.DeleteAsync(null);
@@ -749,12 +772,12 @@
             // Web Folders on Windows XP require port, even if it is a default port 80 or 443.
             var port = window.location.port || (window.location.protocol == 'http:' ? 80 : 443);
 
-            return window.location.protocol + '//' + window.location.hostname + ':' + port + webDavSettings.ApplicationPath;
+            return window.location.protocol + '//' + window.location.hostname + ':' + port + webDavSettings.ApplicationPath + '/';
         },
 
         /**
-         * Creates new folder in current folder.
-         */
+        * Creates new folder in current folder.
+        */
         CreateFolder: function (sFolderName, fCallback) {
             this.CurrentFolder.CreateFolderAsync(sFolderName, null, null, function (oAsyncResult) {
                 fCallback(oAsyncResult);
@@ -772,7 +795,7 @@
         },
 
         /**
-         * Sets values to hash
+         * Sets values to hash       
          */
         SetHashValues: function (arrayValues) {
             var hashValue = '';
@@ -799,7 +822,7 @@
         },
 
         /**
-         * Sets value to hash
+         * Sets value to hash       
          */
         SetHashValue: function (name, value) {
             this.SetHashValues([{ Name: name, Value: value }]);
@@ -810,7 +833,7 @@
          * @return {Array}
          */
         _addParameterToArray: function (name, value, arrayParams) {
-            var nameExist = false;
+            var nameExist = false;        
 
             for (var key in arrayParams) {
                 if (arrayParams.hasOwnProperty(key)) {
@@ -862,13 +885,13 @@
                     (ITHit.DetectBrowser.Browser ? ('#' + ITHit.DetectBrowser.Browser.toLowerCase()) : '') +
                     '">How to check that the web browser extension is enabled.</a><br/><br/>' +
                     'Select OK to download the protocol installer.', function () {
-                    // IT Hit WebDAV Ajax Library protocol installers path.
-                    // Used to open non-MS Office documents or if MS Office is
-                    // not installed as well as to open OS File Manager.
+                        // IT Hit WebDAV Ajax Library protocol installers path.
+                        // Used to open non-MS Office documents or if MS Office is
+                        // not installed as well as to open OS File Manager.      
 
-                    var installerFilePath = webDavSettings.ApplicationProtocolsPath + ITHit.WebDAV.Client.DocManager.GetInstallFileName();
-                    window.open(installerFilePath);
-                }, { size: 'lg' });
+                        var installerFilePath = webDavSettings.ApplicationProtocolsPath + ITHit.WebDAV.Client.DocManager.GetInstallFileName();
+                        window.open(installerFilePath);
+                    }, { size: 'lg' });
             }
         }
     };

@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     ///////////////////
     // Confirm Bootstrap Modal
     var ConfirmModal = function (selector) {
@@ -84,7 +84,7 @@
             $(input.HtmlElement).trigger('click');
         });
 
-        this.Uploader.SetUploadUrl(ITHit.WebDAV.Client.Encoder.Decode(window.location.href.split("#")[0]));
+        this.SetUploadUrl(ITHit.WebDAV.Client.Encoder.Decode(window.location.href.split("#")[0]));
         this.Uploader.Queue.AddListener('OnQueueChanged', '_QueueChange', this);
         this.Uploader.Queue.OnUploadItemsCreatedCallback = this._OnUploadItemsCreatedCallback.bind(this);
         var $table = this.$table = $(sSelector);
@@ -102,6 +102,10 @@
                 return warnMessage;
             }
         });
+    };
+
+    UploaderGridView.prototype.SetUploadUrl = function (url) {
+        this.Uploader.SetUploadUrl(url);
     };
 
     UploaderGridView.prototype._OnUploadItemsCreatedCallback = function (oUploadItemsCreated) {
@@ -254,16 +258,16 @@
     UploaderGridRow.prototype._RenderActions = function (oUploadItem) {
         var actions = [];
         actions.push($('<button class="btn btn-transparent" />').
-        html('<span class="fas fa-play text-primary"></span>').
-        click(this._StartClickHandler.bind(this)));
+            html('<span class="fas fa-play text-primary"></span>').
+            click(this._StartClickHandler.bind(this)));
 
         actions.push($('<button class="btn btn-transparent" />').
-        html('<span class="fas fa-pause text-primary"></span>').
-        click(this._PauseClickHandler.bind(this)));
+            html('<span class="fas fa-pause text-primary"></span>').
+            click(this._PauseClickHandler.bind(this)));
 
         actions.push($('<button class="btn btn-transparent .lnk-cancel" />').
-        html('<span class="fas fa-trash-alt text-primary"></span>').
-        click(this._CancelClickHandler.bind(this)));
+            html('<span class="fas fa-trash-alt text-primary"></span>').
+            click(this._CancelClickHandler.bind(this)));
 
         return actions;
     };
@@ -462,5 +466,5 @@
     };
 
     var oConfirmModal = new ConfirmModal('#ConfirmModal');
-    var oUploaderGrid = new UploaderGridView('.ithit-grid-uploads');
+    window.WebDAVUploaderGridView = new UploaderGridView('.ithit-grid-uploads');
 })();

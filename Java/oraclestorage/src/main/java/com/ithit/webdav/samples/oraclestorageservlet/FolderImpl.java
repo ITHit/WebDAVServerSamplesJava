@@ -45,10 +45,54 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      * @throws ServerException In case of an error.
      */
     public PageResults getChildren(List<Property> propNames, Long offset, Long nResults, List<OrderProperty> orderProps) throws ServerException {
-        List<HierarchyItemImpl> hierarchyItems = getDataAccess().readItems("SELECT ID, Parent, ItemType, Name, Created, Modified, LastChunkSaved, TotalContentLength"
-                + " FROM Repository"
-                + " WHERE Parent = ? AND ID != 0", getPath(), true, id);
-        return new PageResults(hierarchyItems, (long) hierarchyItems.size());
+        offset = offset == null ? 0 : offset;
+        nResults = nResults == null || nResults < 0 ? 10 : nResults;
+
+        String sqlBeforeOrder = "SELECT ID, Parent, ItemType, Name, Created, Modified, LastChunkSaved, " +
+                "TotalContentLength, row_number() over (ORDER BY ";
+
+        StringBuilder order = new StringBuilder();
+        if (orderProps != null && !orderProps.isEmpty()) {
+            for (OrderProperty orderProperty : orderProps) {
+                String sortPropertyName = orderProperty.getProperty().getName();
+                String sortPropertyVal = orderProperty.isAscending() ? " ASC " : " DESC ";
+                if ("is-directory".equals(sortPropertyName))
+                    order.append("ItemType").append(sortPropertyVal).append(", ");
+
+                else if ("quota-used-bytes".equals(sortPropertyName))
+                    order.append("TotalContentLength").append(sortPropertyVal).append(", ");
+
+                else if ("getlastmodified".equals(sortPropertyName))
+                    order.append("Modified").append(sortPropertyVal).append(", ");
+
+                else if ("displayname".equals(sortPropertyName))
+                    order.append("Name").append(sortPropertyVal).append(", ");
+
+                else if ("getcontenttype".equals(sortPropertyName))
+                    order.append("substr(Name, nullif(instr(Name,'.', -1) + 1, 1))")
+                            .append(sortPropertyVal).append(", ");
+            }
+
+            if (order.lastIndexOf(", ") == order.length() - 2) {
+                order = new StringBuilder(order.substring(0, order.length() - 2));
+            }
+        } else {
+            order.append("ID ASC");
+        }
+
+        String sqlAfterOrder = ") line_number FROM Repository ";
+
+        String whereQuery = " WHERE Parent = ? AND ID != 0 ";
+
+        List<HierarchyItemImpl> hierarchyItems = getDataAccess().readItems(
+                "SELECT * FROM (" + sqlBeforeOrder + order + sqlAfterOrder + whereQuery +
+                        ") WHERE line_number BETWEEN ? AND ? ORDER BY line_number",
+                getPath(), true, id, offset + 1, nResults + offset);
+
+        long hierarchyItemsSize = getDataAccess()
+                .executeInt("SELECT COUNT(ID) FROM Repository " + whereQuery, id);
+
+        return new PageResults(hierarchyItems, hierarchyItemsSize);
     }
 
     /**

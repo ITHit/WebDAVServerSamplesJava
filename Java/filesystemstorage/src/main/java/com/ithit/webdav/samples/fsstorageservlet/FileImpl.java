@@ -31,18 +31,27 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
     private int bufferSize = 1048576; // 1 Mb
 
     private String snippet;
+    
+    private OpenOption[] allowedOpenFileOptions;
 
     /**
      * Initializes a new instance of the {@link FileImpl} class.
      *
-     * @param name     Name of hierarchy item.
-     * @param path     Relative to WebDAV root folder path.
-     * @param created  Creation time of the hierarchy item.
-     * @param modified Modification time of the hierarchy item.
-     * @param engine   Instance of current {@link WebDavEngine}.
+     * @param name              Name of hierarchy item.
+     * @param path              Relative to WebDAV root folder path.
+     * @param created           Creation time of the hierarchy item.
+     * @param modified          Modification time of the hierarchy item.
+     * @param engine            Instance of current {@link WebDavEngine}.
      */
     private FileImpl(String name, String path, long created, long modified, WebDavEngine engine) {
         super(name, path, created, modified, engine);
+        
+        /* Mac OS X and Ubuntu doesn't work with ExtendedOpenOption.NOSHARE_DELETE */
+        String systemName = System.getProperty("os.name").toLowerCase();
+        this.allowedOpenFileOptions = (systemName.contains("mac") || systemName.contains("linux")) ?
+                (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ}) :
+                (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ,
+                        ExtendedOpenOption.NOSHARE_DELETE});
     }
 
     /**
@@ -244,7 +253,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
     public long write(InputStream content, String contentType, long startIndex, long totalFileLength)
             throws LockedException, ServerException, IOException {
         ensureHasToken();
-        SeekableByteChannel writer = Files.newByteChannel(getFullPath(), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, ExtendedOpenOption.NOSHARE_DELETE);
+        SeekableByteChannel writer = Files.newByteChannel(getFullPath(), this.allowedOpenFileOptions);
         if (startIndex == 0) {
             // If we override the file we must set position to 0 because writer could be at not 0 position.
             writer = writer.truncate(0);
@@ -263,6 +272,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
                 writer.write(byteBuffer);
                 totalWrittenBytes += readBytes;
             }
+
             try {
                 getEngine().getSearchFacade().getIndexer().indexFile(getName(), decode(getPath()), null, this);
             } catch (Exception ex){

@@ -1,6 +1,41 @@
-(function () {
-    var Formatters = {
+﻿(function () {
+    ///////////////////
+    // Confirm Bootstrap Modal
+    var ConfirmModal = function (selector) {
+        var self = this;
+        this.$el = $(selector);
+        this.$el.find('.btn-ok').click(function (e) {
+            if (self.successfulCallback) {
+                self.successfulCallback();
+            }
+            self.$el.modal('hide');
+        });
+    }
+    ConfirmModal.prototype = {
+        Confirm: function (message, successfulCallback, discardCallback) {
+            this.isConfirmed = false;
+            this.successfulCallback = successfulCallback || $.noop;
+            this.discardCallback = discardCallback || $.noop;
+            this.$el.find('.message').html(message);
+            this.$el.find('.modal-dialog').addClass('modal-lg');
+            this.$el.modal('show');
+        },
 
+        _onOkClickHandler: function (e) {
+            this.isConfirmed = true;
+            this.$el.modal('hide');
+        },
+
+        _onModalHideHandler: function () {
+            if (this.isConfirmed) {
+                this.successfulCallback();
+            } else {
+                this.discardCallback();
+            }
+        }
+    }
+
+    var Formatters = {
         /**
          *
          * @param {number} iSize
@@ -49,15 +84,78 @@
             $(input.HtmlElement).trigger('click');
         });
 
-        this.Uploader.SetUploadUrl(ITHit.WebDAV.Client.Encoder.Decode(window.location.toString()));
+        this.SetUploadUrl(ITHit.WebDAV.Client.Encoder.Decode(window.location.href.split("#")[0]));
         this.Uploader.Queue.AddListener('OnQueueChanged', '_QueueChange', this);
-        this.$table = $(sSelector);
+        this.Uploader.Queue.OnUploadItemsCreatedCallback = this._OnUploadItemsCreatedCallback.bind(this);
+        var $table = this.$table = $(sSelector);
         this.rows = [];
         this.fileLoadCompleted = function () {
             if (this.$table.find('td').length == 0)
                 this.$table.addClass('d-none');
             window.WebDAVController.Reload();
         }
+
+        window.addEventListener('beforeunload', function (event) {
+            if ($table.find('td').length != 0) {
+                var warnMessage = 'Uploader is running!';
+                (event || window.event).returnValue = warnMessage;
+                return warnMessage;
+            }
+        });
+    };
+
+    UploaderGridView.prototype.SetUploadUrl = function (url) {
+        this.Uploader.SetUploadUrl(url);
+    };
+
+    UploaderGridView.prototype._OnUploadItemsCreatedCallback = function (oUploadItemsCreated) {
+        this._GetExistsAsync(oUploadItemsCreated.Items, function (oAsyncResult) {
+            if (oAsyncResult.IsSuccess && oAsyncResult.Result.length) {
+                var sMessage = 'Do you want to rewrite this items?<br/><br/>';
+                var aExists = [];
+                oAsyncResult.Result.forEach(function (oElement) {
+                    sMessage += oElement.GetRelativePath() + '<br/>';
+                    aExists.push(oElement);
+                });
+
+                oConfirmModal.Confirm(sMessage,
+                    function () {
+                        oUploadItemsCreated.Overwrite(aExists);
+                        aExists.forEach(function (value) {
+                            value.CustomData.IsChecked = true;
+                        });
+                    },
+                    function () {
+                        oUploadItemsCreated.Skip(aExists);
+                    });
+            } else {
+                oUploadItemsCreated.UploadAll();
+            }
+        });
+    };
+
+    UploaderGridView.prototype._GetExistsAsync = function (aUploadItems, fCallback) {
+        var iCounter = aUploadItems.length;
+        var aExists = [];
+        if (iCounter == 0) {
+            fCallback(new ITHit.WebDAV.Client.AsyncResult([], true, null));
+            return;
+        }
+
+        aUploadItems.forEach(function (oElement) {
+            window.WebDAVController.WebDavSession.OpenItemAsync(ITHit.EncodeURI(oElement.GetUrl()),
+                [],
+                function (oAsyncResult) {
+                    iCounter--;
+                    if (oAsyncResult.IsSuccess) {
+                        aExists.push(oElement);
+                    }
+
+                    if (iCounter === 0) {
+                        fCallback(new ITHit.WebDAV.Client.AsyncResult(aExists, true, null));
+                    }
+                });
+        });
     };
 
     UploaderGridView.prototype._QueueChange = function (oQueueChanged) {
@@ -114,8 +212,13 @@
         this.UploadItem = oUploadItem;
         this.UploadItem.AddListener('OnProgressChanged', '_OnProgress', this);
         this.UploadItem.AddListener('OnStateChanged', '_OnStateChange', this);
+        this.UploadItem.OnUploadStartedCallback = this._OnUploadStartedCallback;
+        this.UploadItem.OnUploadErrorCallback = this._OnUploadErrorCallback.bind(this);
         this._Render(oUploadItem);
         this._RenderProgressRow(oUploadItem);
+        this._MaxRetry = 10;
+        this._CurrentRetry = 0;
+        this._RetryDelay = 10;
         this.fileLoadCompletedCallback = fileLoadCompletedCallback;
     };
 
@@ -155,16 +258,16 @@
     UploaderGridRow.prototype._RenderActions = function (oUploadItem) {
         var actions = [];
         actions.push($('<button class="btn btn-transparent" />').
-        html('<span class="fas fa-play text-primary"></span>').
-        click(this._StartClickHandler.bind(this)));
+            html('<span class="fas fa-play text-primary"></span>').
+            click(this._StartClickHandler.bind(this)));
 
         actions.push($('<button class="btn btn-transparent" />').
-        html('<span class="fas fa-pause text-primary"></span>').
-        click(this._PauseClickHandler.bind(this)));
+            html('<span class="fas fa-pause text-primary"></span>').
+            click(this._PauseClickHandler.bind(this)));
 
         actions.push($('<button class="btn btn-transparent .lnk-cancel" />').
-        html('<span class="fas fa-trash-alt text-primary"></span>').
-        click(this._CancelClickHandler.bind(this)));
+            html('<span class="fas fa-trash-alt text-primary"></span>').
+            click(this._CancelClickHandler.bind(this)));
 
         return actions;
     };
@@ -183,6 +286,7 @@
     UploaderGridRow.prototype._DataBind = function (oUploadItem) {
         var oProgress = oUploadItem.GetProgress();
         var $tr = this.$el;
+        var $errorInfoBtn = null;
         var columns = [
             '<span>' + oUploadItem.GetName() + '</span>',
             Formatters.FileSize(oUploadItem.GetSize()),
@@ -196,8 +300,14 @@
 
         columns.forEach(function (item, index) {
             $tr.children().eq(index).html(item);
+
+            if (index == 5) {
+                $errorInfoBtn = $('<button class="btn btn-transparent btn-info" title="Error Info"><span class="fas fa-info-circle"></span></button>').appendTo($tr.children().eq(index));
+                $errorInfoBtn.hide();
+            }
         });
 
+        this.$errorInfoBtn = $errorInfoBtn;
         this._DataBindActions(oUploadItem);
         var sCurrentState = oUploadItem.GetState();
         if (sCurrentState === 'Completed' || sCurrentState === 'Canceled') {
@@ -227,8 +337,12 @@
 
     UploaderGridRow.prototype._OnStateChange = function (oStateChanged) {
         this._EnableActions();
+        this._RemoveRetryMessage();
         this._DataBindProgressRow(oStateChanged.Sender);
         this._DataBind(oStateChanged.Sender);
+        if (oStateChanged.NewState === 'Failed') {
+            this._ShowError(oStateChanged.Sender.GetLastError());
+        }
     };
 
     UploaderGridRow.prototype._OnProgress = function (oProgressEvent) {
@@ -243,17 +357,21 @@
 
     UploaderGridRow.prototype._StartClickHandler = function () {
         this._DisableActions();
-        this.UploadItem.StartAsync();
+        this._CurrentRetry = 0;
+        this._HideError();
+        this.UploadItem.StartAsync(this._EnableActions.bind(this));
     };
 
     UploaderGridRow.prototype._PauseClickHandler = function () {
         this._DisableActions();
-        this.UploadItem.PauseAsync();
+        this._CancelRetry();
+        this.UploadItem.PauseAsync(this._EnableActions.bind(this));
     };
 
     UploaderGridRow.prototype._CancelClickHandler = function () {
+        this._CancelRetry();
         this._DisableActions();
-        this.UploadItem.CancelAsync();
+        this.UploadItem.CancelAsync(null, null, this._EnableActions.bind(this));
     };
 
     UploaderGridRow.prototype._DisableActions = function () {
@@ -264,6 +382,89 @@
         this.$el.children().last().children().slice(-3).removeAttr("disabled");
     };
 
+    UploaderGridRow.prototype._OnUploadStartedCallback = function (oBeforeUploadStart) {
+        var oItem = oBeforeUploadStart.Sender;
+        if (oItem.GetRewrite() || oItem.IsFolder() || oItem.CustomData.IsChecked) {
+            oBeforeUploadStart.Upload();
+            return;
+        }
+        var sHref = ITHit.EncodeURI(oItem.GetUrl());
+        window.WebDAVController.WebDavSession.OpenItemAsync(sHref,
+            [],
+            function (oAsyncResult) {
+                if (oAsyncResult.IsSuccess) {
+                    var sMessage = 'Do you want to rewrite this item?\n' + oItem.GetRelativePath();
 
-    var oUploaderGrid = new UploaderGridView('.ithit-grid-uploads');
+                    oConfirmModal.Confirm(sMessage,
+                        function () {
+                            oBeforeUploadStart.OverwriteAll();
+                        },
+                        function () {
+                            oBeforeUploadStart.SkipAll();
+                        });
+                } else {
+                    oBeforeUploadStart.Upload();
+                }
+            });
+    };
+
+    UploaderGridRow.prototype._SetRetryMessage = function (timeLeft) {
+        var sMessage = 'Retry in: ' + Formatters.TimeSpan(Math.ceil(timeLeft / 1000));
+        this.$el.children().eq(5).html(sMessage).addClass('text-danger');
+        this.$progressBarRow.find('.progress-bar').addClass('bg-danger');
+    };
+
+    UploaderGridRow.prototype._RemoveRetryMessage = function () {
+        this.$el.children().eq(5).removeClass('text-danger');
+        this.$progressBarRow.find('.progress-bar').removeClass('bg-danger');
+        this._DataBind(this.UploadItem);
+    };
+
+    UploaderGridRow.prototype._ShowError = function (oError) {
+        this.$progressBarRow.find('.progress-bar').addClass('bg-danger');
+        this.$errorInfoBtn.popover({
+            content: oError.Message,
+            placement: 'top'
+        });
+        this.$errorInfoBtn.show();
+    };
+
+    UploaderGridRow.prototype._HideError = function () {
+        this.$progressBarRow.find('.progress-bar').removeClass('bg-danger');
+        this.$errorInfoBtn.hide();
+    };
+
+    UploaderGridRow.prototype._CancelRetry = function () {
+        this._HideError();
+        if (this.CancelRetryCallback) this.CancelRetryCallback.call(this);
+    };
+    /**
+     * @param {ITHit.WebDAV.Client.Upload.Events.OnUploadError} oUploadError
+     */
+    UploaderGridRow.prototype._OnUploadErrorCallback = function (oUploadError) {
+        if (this._MaxRetry <= this._CurrentRetry) {
+            this._ShowError(oUploadError.Error);
+            oUploadError.Skip();
+            return;
+        }
+        var retryTime = (new Date()).getTime() + (this._RetryDelay * 1000);
+        var retryTimerId = setInterval(function () {
+            var timeLeft = retryTime - (new Date()).getTime();
+            if (timeLeft > 0) {
+                this._SetRetryMessage(timeLeft);
+                return;
+            }
+            clearInterval(retryTimerId);
+            this._CurrentRetry++;
+            this._RemoveRetryMessage();
+            oUploadError.Retry();
+        }.bind(this), 1000);
+        this.CancelRetryCallback = function () {
+            clearInterval(retryTimerId);
+            this._RemoveRetryMessage();
+        }
+    };
+
+    var oConfirmModal = new ConfirmModal('#ConfirmModal');
+    window.WebDAVUploaderGridView = new UploaderGridView('.ithit-grid-uploads');
 })();
