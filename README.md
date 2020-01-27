@@ -25,6 +25,9 @@ WebDAV server with Oracle back-end example is a Class 2 server that stores all d
 This example is a fully-functional WebDAV server that can be used to open, edit and save Microsoft Office documents as well as any other types of files directly to server, without download/upload steps. [more...](https://www.webdavsystem.com/javaserver/server_examples/sql_storage/)
 
 ## WebDAV Server with File System Back-end Example
+- [x] Generic Java Servlets implementation for any kind of web server.
+- [x] Spring Boot realization with non-root context folder.
+
 WebDAV server with file system back-end storage is a fully functional Class 2 server that stores all data in file system. It utilizes File Extended Attributes to store locks and custom properties. This sample is provided in Java and Kotlin languages and can be configured to use Basic or Digest authentication. [more...](https://www.webdavsystem.com/javaserver/server_examples/storage_file_system/)
 
 ## WebDAV Server with Versioning Example

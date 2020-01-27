@@ -3,7 +3,6 @@ package com.ithit.webdav.samples.fsstorageservlet
 import com.ithit.webdav.samples.fsstorageservlet.SearchFacade.Indexer.Companion.MAX_CONTENT_LENGTH
 import com.ithit.webdav.server.HierarchyItem
 import com.ithit.webdav.server.Logger
-import com.ithit.webdav.server.exceptions.ServerException
 import com.ithit.webdav.server.search.SearchOptions
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.lucene.analysis.standard.StandardAnalyzer
@@ -138,7 +137,7 @@ internal class SearchFacade(private val engine: WebDavEngine, private val logger
                 context += "/"
             }
             result.add(engine.getHierarchyItem(context)!!)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             logger.logDebug("Cannot add file to the list: " + f.absolutePath)
         }
     }
@@ -171,7 +170,7 @@ internal class SearchFacade(private val engine: WebDavEngine, private val logger
                 for (f in files) {
                     try {
                         indexFile(f.name, f.path, null, f)
-                    } catch (e: ServerException) {
+                    } catch (e: Throwable) {
                         logger.logDebug("Cannot find path for this file.")
                     }
                 }
@@ -219,7 +218,7 @@ internal class SearchFacade(private val engine: WebDavEngine, private val logger
         fun stop() {
             try {
                 indexWriter.close()
-            } catch (e: IOException) {
+            } catch (e: Throwable) {
                 logger.logError("Cannot release index resources", e)
             }
         }
@@ -232,7 +231,7 @@ internal class SearchFacade(private val engine: WebDavEngine, private val logger
         fun deleteIndex(file: HierarchyItem) {
             try {
                 indexWriter.deleteDocuments(Term(PATH, file.path))
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 logger.logError("Cannot delete index for the file.", e)
             }
         }
@@ -255,7 +254,7 @@ internal class SearchFacade(private val engine: WebDavEngine, private val logger
             override fun run() {
                 try {
                     indexWriter.commit()
-                } catch (e: IOException) {
+                } catch (e: Throwable) {
                     logger.logError("Cannot commit.", e)
                 }
             }
@@ -354,7 +353,7 @@ internal class SearchFacade(private val engine: WebDavEngine, private val logger
                         paths.putAll(searchName(localSearchLine, parent))
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 logger.logError("Error while doing index search.", e)
             }
             return paths

@@ -65,7 +65,7 @@ class SearchFacade {
             indexWriter.commit();
             new Indexer.CommitTask(indexWriter, logger).schedule(interval);
             searcher = new Searcher(indexFolder, standardAnalyzer, logger);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.logError("Cannot initialize Lucene", e);
         }
     }
@@ -175,7 +175,7 @@ class SearchFacade {
                 } else {
                     indexWriter.updateDocument(new Term(ID, oldId != null ? oldId.toString() : currentId.toString()), doc);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.logError("Error while indexing file: " + currentId, e);
             }
         }
@@ -196,7 +196,7 @@ class SearchFacade {
                     String content = tika.parseToString(stream, metadata, MAX_CONTENT_LENGTH);
                     doc.add(new TextField(CONTENTS, content, Field.Store.YES));
                 }
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 if (!(ex instanceof ZeroByteFileException)) {
                     logger.logError("Error while indexing content: " + currentId, ex);
                 }
@@ -204,7 +204,7 @@ class SearchFacade {
                 if (stream != null) {
                     try {
                         stream.close();
-                    } catch (IOException e) {
+                    } catch (Throwable e) {
                         logger.logError("Error closing stream while indexing: " + currentId, e);
                     }
                 }
@@ -217,7 +217,7 @@ class SearchFacade {
         void stop() {
             try {
                 indexWriter.close();
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 logger.logError("Cannot release index resources", e);
             }
         }
@@ -230,7 +230,7 @@ class SearchFacade {
         void deleteIndex(HierarchyItemImpl file) {
             try {
                 indexWriter.deleteDocuments(new Term(ID, String.valueOf(file.getId())));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.logDebug("Cannot delete index for the file: " + file.getId());
             }
         }
@@ -261,7 +261,7 @@ class SearchFacade {
             public void run() {
                 try {
                     indexWriter.commit();
-                } catch (IOException e) {
+                } catch (Throwable e) {
                     logger.logError("Cannot commit.", e);
                 }
             }
@@ -336,7 +336,7 @@ class SearchFacade {
                 if (options.isSearchContent()) {
                     paths.putAll(searchContent(searchLine, snippet, reader));
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.logError("Error while doing index search.", e);
             }
             return paths;
@@ -376,7 +376,7 @@ class SearchFacade {
             highlighter.setMaxDocCharsToAnalyze(Indexer.MAX_CONTENT_LENGTH);
             highlighter.setTextFragmenter(fragmenter);
 
-            ScoreDoc scoreDocs[] = indexSearcher.search(query, 100).scoreDocs;
+            ScoreDoc[] scoreDocs = indexSearcher.search(query, 100).scoreDocs;
             Map<String, String> result = new LinkedHashMap<>();
             for (ScoreDoc scoreDoc : scoreDocs) {
                 Document document = indexSearcher.doc(scoreDoc.doc);

@@ -2,7 +2,6 @@ package com.ithit.webdav.samples.fsstorageservlet;
 
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
-import com.ithit.webdav.server.exceptions.ServerException;
 import com.ithit.webdav.server.search.SearchOptions;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.lucene.analysis.TokenStream;
@@ -95,14 +94,14 @@ class SearchFacade {
          */
         @Override
         public void run() {
-            List<HierarchyItem> filesToIndex = new ArrayList<>();
-            File data = new File(dataFolder);
-            StandardAnalyzer standardAnalyzer = new StandardAnalyzer();
-            searcher = new Searcher(indexFolder, standardAnalyzer, logger);
-            getFilesToIndex(data.listFiles(), filesToIndex, dataFolder);
             ForkJoinPool forkJoinPool = new ForkJoinPool(4);
             Directory fsDir;
             try {
+                List<HierarchyItem> filesToIndex = new ArrayList<>();
+                File data = new File(dataFolder);
+                StandardAnalyzer standardAnalyzer = new StandardAnalyzer();
+                searcher = new Searcher(indexFolder, standardAnalyzer, logger);
+                getFilesToIndex(data.listFiles(), filesToIndex, dataFolder);
                 fsDir = FSDirectory.open(Paths.get(indexFolder));
                 IndexWriterConfig conf = new IndexWriterConfig(standardAnalyzer);
                 conf.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
@@ -164,7 +163,7 @@ class SearchFacade {
                 context += "/";
             }
             result.add(engine.getHierarchyItem(context));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.logDebug("Cannot add file to the list: " + f.getAbsolutePath());
         }
     }
@@ -217,7 +216,7 @@ class SearchFacade {
                 for (HierarchyItem f : files) {
                     try {
                         indexFile(f.getName(), f.getPath(), null, f);
-                    } catch (ServerException e) {
+                    } catch (Throwable e) {
                         logger.logDebug("Cannot find path for this file.");
                     }
                 }
@@ -280,7 +279,7 @@ class SearchFacade {
         void stop() {
             try {
                 indexWriter.close();
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 logger.logError("Cannot release index resources", e);
             }
         }
@@ -293,7 +292,7 @@ class SearchFacade {
         void deleteIndex(HierarchyItem file) {
             try {
                 indexWriter.deleteDocuments(new Term(PATH, file.getPath()));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.logError("Cannot delete index for the file.", e);
             }
         }
@@ -324,7 +323,7 @@ class SearchFacade {
             public void run() {
                 try {
                     indexWriter.commit();
-                } catch (IOException e) {
+                } catch (Throwable e) {
                     logger.logError("Cannot commit.", e);
                 }
             }
@@ -403,7 +402,7 @@ class SearchFacade {
                 if (options.isSearchName()) {
                     paths.putAll(searchName(searchLine, parent));
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.logError("Error while doing index search.", e);
             }
             return paths;
@@ -435,7 +434,7 @@ class SearchFacade {
             Highlighter highlighter = new Highlighter(htmlFormatter, queryScorer);
             highlighter.setTextFragmenter(fragmenter);
 
-            ScoreDoc scoreDocs[] = indexSearcher.search(query, 100).scoreDocs;
+            ScoreDoc[] scoreDocs = indexSearcher.search(query, 100).scoreDocs;
             Map<String, String> result = new LinkedHashMap<>();
             for (ScoreDoc scoreDoc : scoreDocs) {
                 Document document = indexSearcher.doc(scoreDoc.doc);
