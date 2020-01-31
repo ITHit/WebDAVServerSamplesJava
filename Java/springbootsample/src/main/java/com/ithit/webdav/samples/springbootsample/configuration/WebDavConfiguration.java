@@ -1,6 +1,6 @@
 package com.ithit.webdav.samples.springbootsample.configuration;
 
-import com.ithit.webdav.samples.springbootsample.SpringBootSampleApplication;
+import com.ithit.webdav.samples.springbootsample.common.ResourceReader;
 import com.ithit.webdav.samples.springbootsample.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.samples.springbootsample.impl.CustomFolderGetHandler;
 import com.ithit.webdav.samples.springbootsample.impl.WebDavEngine;
@@ -10,9 +10,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -25,10 +25,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +41,7 @@ import java.util.Collections;
 @Configuration
 public class WebDavConfiguration extends WebMvcConfigurerAdapter {
     final WebDavConfigurationProperties properties;
+    final ResourceReader resourceReader;
     private static String rootLocalPath = null;
     @Value("classpath:handler/MyCustomHandlerPage.html")
     Resource customGetHandler;
@@ -67,10 +69,16 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter {
     public WebDavEngine engine() {
         rootLocalPath = properties.getRootFolder();
         checkRootPath(properties.getRootFolder());
-        final WebDavEngine webDavEngine = new WebDavEngine(properties.getLicense(), rootLocalPath, properties.isShowExceptions());
+        String license;
+        try {
+            license = FileUtils.readFileToString(new File(properties.getLicense()), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            license = "";
+        }
+        final WebDavEngine webDavEngine = new WebDavEngine(license, rootLocalPath, properties.isShowExceptions());
         final boolean extendedAttributesSupported = ExtendedAttributesExtension.isExtendedAttributesSupported(rootLocalPath);
-        CustomFolderGetHandler handler = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), extendedAttributesSupported, customGetHandler(), errorPage());
-        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), extendedAttributesSupported, customGetHandler(), errorPage());
+        CustomFolderGetHandler handler = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), extendedAttributesSupported, customGetHandler(), errorPage(), properties.getRootContext());
+        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), extendedAttributesSupported, customGetHandler(), errorPage(), properties.getRootContext());
         handler.setPreviousHandler(webDavEngine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(webDavEngine.registerMethodHandler("HEAD", handlerHead));
         return webDavEngine;
@@ -94,10 +102,9 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter {
     }
 
     private void checkRootPath(String rootPath) {
-        String realPath = getRootFolder();
-        Path path = Paths.get(realPath);
+        String realPath = resourceReader.getRootFolder();
         if (StringUtil.isNullOrEmpty(rootPath)) {
-            rootLocalPath = path.toString();
+            createDefaultPath();
         } else {
             if (Files.exists(Paths.get(rootPath))) {
                 return;
@@ -106,16 +113,17 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter {
                 if (Files.exists(Paths.get(realPath, rootPath))) {
                     rootLocalPath = Paths.get(realPath, rootPath).toString();
                 } else {
-                    rootLocalPath = path.toString();
+                    resourceReader.readFiles();
+                    rootLocalPath = resourceReader.getDefaultPath();
                 }
             } catch (Exception ignored) {
-                rootLocalPath = path.toString();
+                createDefaultPath();
             }
         }
     }
 
-    private String getRootFolder() {
-        ApplicationHome home = new ApplicationHome(SpringBootSampleApplication.class);
-        return home.getDir().getAbsolutePath();
+    private void createDefaultPath() {
+        resourceReader.readFiles();
+        rootLocalPath = resourceReader.getDefaultPath();
     }
 }

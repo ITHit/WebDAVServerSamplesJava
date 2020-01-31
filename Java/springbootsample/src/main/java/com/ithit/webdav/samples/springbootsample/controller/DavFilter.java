@@ -1,5 +1,6 @@
 package com.ithit.webdav.samples.springbootsample.controller;
 
+import com.ithit.webdav.samples.springbootsample.configuration.WebDavConfigurationProperties;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -10,13 +11,16 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static com.ithit.webdav.samples.springbootsample.configuration.WebDavConfigurationProperties.WEBDAV_CONTEXT;
+import static com.ithit.webdav.samples.springbootsample.configuration.WebDavConfigurationProperties.ROOT_ATTRIBUTE;
+
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Component
 @Order(1)
 public class DavFilter implements Filter {
+
+    WebDavConfigurationProperties properties;
 
     @Override
     public void doFilter(
@@ -25,9 +29,11 @@ public class DavFilter implements Filter {
     FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
-        if ((req.getMethod().equalsIgnoreCase("PROPFIND") || req.getMethod().equalsIgnoreCase("OPTIONS")) && WEBDAV_CONTEXT.length() - 2 > req.getRequestURI().length()) {
-            request.setAttribute("root", true);
-            request.getRequestDispatcher(WEBDAV_CONTEXT).include(request, response);
+        if ((req.getMethod().equalsIgnoreCase("PROPFIND") || req.getMethod().equalsIgnoreCase("OPTIONS"))
+                && properties.getRootContext().contains(req.getRequestURI())
+                && properties.getRootContext().length() - 2 > req.getRequestURI().length()) {
+            request.setAttribute(ROOT_ATTRIBUTE, req.getRequestURI());
+            request.getRequestDispatcher(properties.getRootContext()).include(request, response);
         } else {
             chain.doFilter(request, response);
         }

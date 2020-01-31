@@ -2,6 +2,7 @@ package com.ithit.webdav.samples.springbootsample.controller;
 
 import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.integration.servlet.HttpServletDavResponse;
+import com.ithit.webdav.samples.springbootsample.configuration.WebDavConfigurationProperties;
 import com.ithit.webdav.samples.springbootsample.impl.WebDavEngine;
 import com.ithit.webdav.server.exceptions.DavException;
 import com.ithit.webdav.server.exceptions.WebDavStatus;
@@ -18,7 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import static com.ithit.webdav.samples.springbootsample.configuration.WebDavConfigurationProperties.WEBDAV_CONTEXT;
+import static com.ithit.webdav.samples.springbootsample.configuration.WebDavConfigurationProperties.ROOT_ATTRIBUTE;
+
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -26,30 +28,30 @@ import static com.ithit.webdav.samples.springbootsample.configuration.WebDavConf
 public class SamplesController {
 
     WebDavEngine engine;
+    WebDavConfigurationProperties properties;
 
-    @RequestMapping(value = WEBDAV_CONTEXT + "**", produces = MediaType.ALL_VALUE)
+    @RequestMapping(path = "${webdav.rootContext}**", produces = MediaType.ALL_VALUE)
     public void webdav(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         performDavRequest(httpServletRequest, httpServletResponse);
     }
 
-    @RequestMapping(value = WEBDAV_CONTEXT + "**", produces = MediaType.ALL_VALUE, method = {RequestMethod.OPTIONS})
+    @RequestMapping(path = "${webdav.rootContext}**", produces = MediaType.ALL_VALUE, method = {RequestMethod.OPTIONS})
     public void options(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         performDavRequest(httpServletRequest, httpServletResponse);
     }
 
     private void performDavRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        final Object rootAttribute = httpServletRequest.getAttribute("root");
-        boolean isRoot = rootAttribute != null && (boolean) rootAttribute;
+        final Object originalRequest = httpServletRequest.getAttribute(ROOT_ATTRIBUTE);
+        boolean isRoot = originalRequest != null;
         HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest) {
-
             @Override
             public String getServerPath() {
-                return isRoot ? "/" : WEBDAV_CONTEXT;
+                return isRoot ? originalRequest.toString() : properties.getRootContext();
             }
 
             @Override
             public String getRequestURI() {
-                return isRoot ? "/" : super.getRequestURI();
+                return isRoot ? originalRequest.toString() : super.getRequestURI();
             }
         };
         HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);

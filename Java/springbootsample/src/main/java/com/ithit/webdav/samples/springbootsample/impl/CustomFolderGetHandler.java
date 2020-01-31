@@ -21,13 +21,15 @@ public class CustomFolderGetHandler implements MethodHandler {
     private boolean customAttributeSupported;
     private String customPage;
     private String errorPage;
+    private String rootContext;
 
-    public CustomFolderGetHandler(String charset, String version, boolean customAttributeSupported, String customPage, String errorPage) {
+    public CustomFolderGetHandler(String charset, String version, boolean customAttributeSupported, String customPage, String errorPage, String rootContext) {
         this.charset = charset;
         this.version = version;
         this.customAttributeSupported = customAttributeSupported;
         this.customPage = customPage;
         this.errorPage = errorPage;
+        this.rootContext = rootContext;
     }
 
     @Override
@@ -43,6 +45,10 @@ public class CustomFolderGetHandler implements MethodHandler {
                 String versionNumber = "<%version%>";
                 if (customPage.contains(versionNumber)) {
                     customPage = customPage.replace(versionNumber, version);
+                }
+                String contextRoot = "<%context root%>";
+                if (customPage.contains(contextRoot)) {
+                    customPage = customPage.replace(contextRoot, rootContext);
                 }
                 String version = "<%startTime%>";
                 if (customPage.contains(version)) {
