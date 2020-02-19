@@ -3,7 +3,10 @@ package com.ithit.webdav.samples.springboot.configuration;
 import com.ithit.webdav.samples.springboot.common.ResourceReader;
 import com.ithit.webdav.samples.springboot.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.samples.springboot.impl.CustomFolderGetHandler;
+import com.ithit.webdav.samples.springboot.impl.SearchFacade;
 import com.ithit.webdav.samples.springboot.impl.WebDavEngine;
+import com.ithit.webdav.samples.springboot.websocket.SocketHandler;
+import com.ithit.webdav.samples.springboot.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.util.StringUtil;
 import lombok.AccessLevel;
@@ -24,12 +27,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,8 +45,9 @@ import java.util.Collections;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EnableConfigurationProperties(WebDavConfigurationProperties.class)
 @EnableWebMvc
+@EnableWebSocket
 @Configuration
-public class WebDavConfiguration extends WebMvcConfigurerAdapter {
+public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebSocketConfigurer {
     final WebDavConfigurationProperties properties;
     final ResourceReader resourceReader;
     private static String rootLocalPath = null;
@@ -47,6 +55,7 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter {
     Resource customGetHandler;
     @Value("classpath:handler/attributesErrorPage.html")
     Resource errorPage;
+    private final SocketHandler socketHandler = new SocketHandler();
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -65,6 +74,11 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter {
                 .addResourceLocations("classpath:/wwwroot/", "/wwwroot/");
     }
 
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(socketHandler, properties.getRootWebSocket()).setAllowedOrigins("*");
+    }
+
     @Bean
     public WebDavEngine engine() {
         rootLocalPath = properties.getRootFolder();
@@ -81,6 +95,13 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter {
         CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), extendedAttributesSupported, customGetHandler(), errorPage(), properties.getRootContext());
         handler.setPreviousHandler(webDavEngine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(webDavEngine.registerMethodHandler("HEAD", handlerHead));
+        String indexLocalPath = createIndexPath();
+        if (rootLocalPath != null && indexLocalPath != null) {
+            SearchFacade searchFacade = new SearchFacade(webDavEngine, webDavEngine.getLogger());
+            searchFacade.indexRootFolder(rootLocalPath, indexLocalPath, 2);
+            webDavEngine.setSearchFacade(searchFacade);
+        }
+        webDavEngine.setWebSocketServer(new WebSocketServer(socketHandler.getSessions()));
         return webDavEngine;
     }
 
@@ -113,8 +134,7 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter {
                 if (Files.exists(Paths.get(realPath, rootPath))) {
                     rootLocalPath = Paths.get(realPath, rootPath).toString();
                 } else {
-                    resourceReader.readFiles();
-                    rootLocalPath = resourceReader.getDefaultPath();
+                    createDefaultPath();
                 }
             } catch (Exception ignored) {
                 createDefaultPath();
@@ -125,5 +145,22 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter {
     private void createDefaultPath() {
         resourceReader.readFiles();
         rootLocalPath = resourceReader.getDefaultPath();
+    }
+
+    /**
+     * Creates index folder if not exists.
+     *
+     * @return Absolute location of index folder.
+     */
+    private String createIndexPath() {
+        Path indexLocalPath = Paths.get(resourceReader.getDefaultIndexFolder());
+        if (Files.notExists(indexLocalPath)) {
+            try {
+                Files.createDirectory(indexLocalPath);
+            } catch (IOException e) {
+                return null;
+            }
+        }
+        return indexLocalPath.toString();
     }
 }

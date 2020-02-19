@@ -11,8 +11,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static com.ithit.webdav.samples.springboot.configuration.WebDavConfigurationProperties.ROOT_ATTRIBUTE;
-
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -32,7 +30,6 @@ public class DavFilter implements Filter {
         if ((req.getMethod().equalsIgnoreCase("PROPFIND") || req.getMethod().equalsIgnoreCase("OPTIONS"))
                 && properties.getRootContext().contains(req.getRequestURI())
                 && properties.getRootContext().length() - 2 > req.getRequestURI().length()) {
-            request.setAttribute(ROOT_ATTRIBUTE, req.getRequestURI());
             request.getRequestDispatcher(properties.getRootContext()).include(request, response);
         } else {
             chain.doFilter(request, response);

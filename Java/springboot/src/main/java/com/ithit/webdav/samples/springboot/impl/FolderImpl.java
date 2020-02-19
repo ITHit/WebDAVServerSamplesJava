@@ -2,6 +2,7 @@ package com.ithit.webdav.samples.springboot.impl;
 
 import com.ithit.webdav.server.File;
 import com.ithit.webdav.server.Folder;
+import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Property;
 import com.ithit.webdav.server.exceptions.ConflictException;
 import com.ithit.webdav.server.exceptions.LockedException;
@@ -11,6 +12,8 @@ import com.ithit.webdav.server.paging.OrderProperty;
 import com.ithit.webdav.server.paging.PageResults;
 import com.ithit.webdav.server.quota.Quota;
 import com.ithit.webdav.server.resumableupload.ResumableUploadBase;
+import com.ithit.webdav.server.search.Search;
+import com.ithit.webdav.server.search.SearchOptions;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
@@ -20,10 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -31,7 +31,7 @@ import java.util.stream.StreamSupport;
 /**
  * Represents a folder in the File system repository.
  */
-class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUploadBase {
+class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, ResumableUploadBase {
 
 
     /**
@@ -96,7 +96,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
-    // <<<< createFileImpl
     @Override
     public FileImpl createFile(String name) throws LockedException, ServerException {
         ensureHasToken();
@@ -108,11 +107,11 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
             } catch (IOException e) {
                 throw new ServerException(e);
             }
+            getEngine().getWebSocketServer().notifyRefresh(getPath());
             return FileImpl.getFile(getPath() + encode(name), getEngine());
         }
         return null;
     }
-    // createFileImpl >>>>
 
     /**
      * Creates new {@link FolderImpl} folder with the specified name in this folder.
@@ -121,7 +120,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
-    // <<<< createFolderImpl
     @Override
     public void createFolder(String name) throws LockedException,
             ServerException {
@@ -131,12 +129,12 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
         if (!Files.exists(fullPath)) {
             try {
                 Files.createDirectory(fullPath);
+                getEngine().getWebSocketServer().notifyRefresh(getPath());
             } catch (IOException e) {
                 throw new ServerException(e);
             }
         }
     }
-    // createFolderImpl >>>>
 
     /**
      * Gets the array of this folder's children.
@@ -148,7 +146,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
      * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in a folder.
      * @throws ServerException In case of an error.
      */
-    // <<<< getChildren
     @Override
     public PageResults getChildren(List<Property> propNames, Long offset, Long nResults, List<OrderProperty> orderProps) throws ServerException {
         String decodedPath = HierarchyItemImpl.decodeAndConvertToPath(getPath());
@@ -173,22 +170,20 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
         }
         return new PageResults(children, total);
     }
-    // getChildren >>>>
 
-    // <<<< deleteFolderImpl
     @Override
     public void delete() throws LockedException,
             ServerException {
         ensureHasToken();
         try {
+            removeIndex(getFullPath(), this);
             FileUtils.deleteDirectory(getFullPath().toFile());
+            getEngine().getWebSocketServer().notifyDelete(getPath());
         } catch (IOException e) {
             throw new ServerException(e);
         }
     }
-    // deleteFolderImpl >>>>
 
-    // <<<< copyToFolderImpl
     @Override
     public void copyTo(Folder folder, String destName, boolean deep)
             throws LockedException, ServerException {
@@ -205,12 +200,13 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
             Path sourcePath = this.getFullPath();
             Path destinationFullPath = Paths.get(destinationFolder, destName);
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile());
+            getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
+            addIndex(destinationFullPath, folder.getPath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
         }
         setName(destName);
     }
-    // copyToFolderImpl >>>>
 
     /**
      * Check whether current folder is the parent to the destination.
@@ -285,7 +281,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
 
     }
 
-    // <<<< moveToFolderImpl
     @Override
     public void moveTo(Folder folder, String destName) throws LockedException,
             ConflictException, ServerException {
@@ -299,12 +294,59 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
         try {
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile());
             delete();
+            addIndex(destinationFullPath, folder.getPath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
         }
         setName(destName);
+        getEngine().getWebSocketServer().notifyDelete(getPath());
+        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
     }
-    // moveToFolderImpl >>>>
+
+    /**
+     * Returns list of items that correspond to search request.
+     *
+     * @param searchString A phrase to search.
+     * @param options      Search parameters.
+     * @param propNames    List of properties to retrieve with the children. They will be queried by the engine later.
+     * @param offset The number of items to skip before returning the remaining items.
+     * @param nResults The number of items to return.
+     * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in search results.
+     */
+    // <<<< searchImpl
+    @Override
+    public PageResults search(String searchString, SearchOptions options, List<Property> propNames, Long offset, Long nResults) {
+        List<HierarchyItem> results = new LinkedList<>();
+        SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
+        if (searcher == null) {
+            return new PageResults(results, (long) results.size());
+        }
+        boolean snippet = false;
+        if (propNames.stream().filter(x -> SNIPPET.equalsIgnoreCase(x.getName())).findFirst().orElse(null) != null) {
+            snippet = true;
+        }
+        Map<String, String> searchResult;
+        try {
+            String decodedPath = decode(getPath());
+            searchResult = searcher.search(searchString, options, decodedPath, snippet);
+            for (Map.Entry<String, String> entry : searchResult.entrySet()) {
+                try {
+                    HierarchyItem item = getEngine().getHierarchyItem(entry.getKey());
+                    if (item != null) {
+                        if (snippet && item instanceof FileImpl) {
+                            ((FileImpl) item).setSnippet(entry.getValue());
+                        }
+                        results.add(item);
+                    }
+                } catch (Exception ex) {
+                    getEngine().getLogger().logError("Error during search.", ex);
+                }
+            }
+        } catch (ServerException e) {
+            getEngine().getLogger().logError("Error during search.", e);
+        }
+        return new PageResults((offset != null && nResults != null) ? results.stream().skip(offset).limit(nResults).collect(Collectors.toList()) : results, (long) results.size());
+    }
 
     /**
      * Returns free bytes available to current user.
@@ -325,5 +367,31 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota, ResumableUp
     public long getUsedBytes() {
         long total = getFullPath().toFile().getTotalSpace();
         return total - getAvailableBytes();
+    }
+
+    private void removeIndex(Path sourcePath, FolderImpl itSelf) {
+        List<HierarchyItem> filesToDelete = new ArrayList<>();
+        getEngine().getSearchFacade().getFilesToIndex(sourcePath.toFile().listFiles(), filesToDelete, getRootFolder());
+        filesToDelete.add(itSelf);
+        for (HierarchyItem hi : filesToDelete) {
+            try {
+                getEngine().getSearchFacade().getIndexer().deleteIndex(hi);
+            } catch (Exception e) {
+                getEngine().getLogger().logError("Cannot delete index.", e);
+            }
+        }
+    }
+
+    private void addIndex(Path sourcePath, String path, String name) {
+        List<HierarchyItem> filesToIndex = new ArrayList<>();
+        getEngine().getSearchFacade().getFilesToIndex(sourcePath.toFile().listFiles(), filesToIndex, getRootFolder());
+        getEngine().getSearchFacade().getIndexer().indexFile(name, decode(path), null, null);
+        for (HierarchyItem hi : filesToIndex) {
+            try {
+                getEngine().getSearchFacade().getIndexer().indexFile(hi.getName(), decode(hi.getPath()), null, hi);
+            } catch (Exception e) {
+                getEngine().getLogger().logError("Cannot index.", e);
+            }
+        }
     }
 }

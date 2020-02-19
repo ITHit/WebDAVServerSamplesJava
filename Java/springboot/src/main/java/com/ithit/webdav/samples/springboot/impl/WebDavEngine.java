@@ -1,6 +1,7 @@
 package com.ithit.webdav.samples.springboot.impl;
 
 import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
+import com.ithit.webdav.samples.springboot.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
@@ -20,6 +21,8 @@ public class WebDavEngine extends Engine {
     private HttpServletDavRequest request;
     static String dataFolder;
     private boolean showExceptions;
+    private SearchFacade searchFacade;
+    private WebSocketServer webSocketServer;
 
     /**
      * Initializes a new instance of the WebDavEngine class.
@@ -106,5 +109,41 @@ public class WebDavEngine extends Engine {
      */
     public boolean isShowExceptions() {
         return showExceptions;
+    }
+
+    /**
+     * Returns SearchFacade instance
+     *
+     * @return SearchFacade instance
+     */
+    SearchFacade getSearchFacade() {
+        return searchFacade;
+    }
+
+    /**
+     * Sets SearchFacade instance
+     *
+     * @param searchFacade SearchFacade instance
+     */
+    public void setSearchFacade(SearchFacade searchFacade) {
+        this.searchFacade = searchFacade;
+    }
+
+    /**
+     * Sets web socket server instance
+     *
+     * @param webSocketServer web socket server instance
+     */
+    public void setWebSocketServer(WebSocketServer webSocketServer) {
+        this.webSocketServer = webSocketServer;
+    }
+
+    /**
+     * Returns web socket server instance
+     *
+     * @return web socket server instance
+     */
+    WebSocketServer getWebSocketServer() {
+        return webSocketServer;
     }
 }

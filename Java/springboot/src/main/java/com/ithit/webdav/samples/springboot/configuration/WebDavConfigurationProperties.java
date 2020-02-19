@@ -11,9 +11,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ConfigurationProperties(prefix = "webdav")
 public class WebDavConfigurationProperties {
-    public static final String ROOT_ATTRIBUTE = "originalRequest";
     String license;
     boolean showExceptions;
     String rootFolder;
     String rootContext;
+    String rootWebSocket;
 }

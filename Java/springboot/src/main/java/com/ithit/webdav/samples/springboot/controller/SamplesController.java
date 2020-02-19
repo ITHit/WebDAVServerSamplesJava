@@ -2,7 +2,6 @@ package com.ithit.webdav.samples.springboot.controller;
 
 import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.integration.servlet.HttpServletDavResponse;
-import com.ithit.webdav.samples.springboot.configuration.WebDavConfigurationProperties;
 import com.ithit.webdav.samples.springboot.impl.WebDavEngine;
 import com.ithit.webdav.server.exceptions.DavException;
 import com.ithit.webdav.server.exceptions.WebDavStatus;
@@ -19,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import static com.ithit.webdav.samples.springboot.configuration.WebDavConfigurationProperties.ROOT_ATTRIBUTE;
-
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -28,7 +25,6 @@ import static com.ithit.webdav.samples.springboot.configuration.WebDavConfigurat
 public class SamplesController {
 
     WebDavEngine engine;
-    WebDavConfigurationProperties properties;
 
     @RequestMapping(path = "${webdav.rootContext}**", produces = MediaType.ALL_VALUE)
     public void webdav(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
@@ -41,17 +37,10 @@ public class SamplesController {
     }
 
     private void performDavRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        final Object originalRequest = httpServletRequest.getAttribute(ROOT_ATTRIBUTE);
-        boolean isRoot = originalRequest != null;
         HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest) {
             @Override
             public String getServerPath() {
-                return isRoot ? originalRequest.toString() : properties.getRootContext();
-            }
-
-            @Override
-            public String getRequestURI() {
-                return isRoot ? originalRequest.toString() : super.getRequestURI();
+                return "/";
             }
         };
         HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
