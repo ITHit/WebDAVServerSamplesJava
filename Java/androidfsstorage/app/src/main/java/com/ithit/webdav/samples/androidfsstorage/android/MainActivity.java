@@ -29,10 +29,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        label = (TextView) findViewById(R.id.logOutput);
-        Button clearButton = (Button) findViewById(R.id.btn_clearLog);
+        label = findViewById(R.id.logOutput);
+        Button clearButton = findViewById(R.id.btn_clearLog);
         clearButton.setOnClickListener(this);
-        mapVideoButton = (Button) findViewById(R.id.btn_mapVideo);
+        mapVideoButton = findViewById(R.id.btn_mapVideo);
         mapVideoButton.setOnClickListener(this);
         nanoIntent = new Intent(this, NanoIntentService.class);
         startService(nanoIntent);
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run() {
                 label.append(message + "\n\n");
-                final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollOutput);
+                final ScrollView scrollView = findViewById(R.id.scrollOutput);
                 scrollView.post(new Runnable() {
                     @Override
                     public void run() {

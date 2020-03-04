@@ -20,7 +20,7 @@ import java.util.*;
  * Your file items must implement {@link com.ithit.webdav.server.File} interface, folder items - {@link Folder} interface.
  * </p>
  */
-public abstract class HierarchyItemImpl implements com.ithit.webdav.server.HierarchyItem, Lock {
+public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
 
     static final String SNIPPET = "snippet";
     final int id;
@@ -235,7 +235,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
      * Modifies and removes properties for this item.
      *
      * @param setProps Array of properties to be set.
-     * @param delProps Array of properties to be removed. {@link Property#value} field is ignored.
+     * @param delProps Array of properties to be removed. {@link Property#getValue()} field is ignored.
      *                 Specifying the removal of a property that does not exist is not an error.
      * @throws LockedException      this item was locked and client did not provide lock token.
      * @throws MultistatusException If update fails for a property, this exception shall be thrown and contain

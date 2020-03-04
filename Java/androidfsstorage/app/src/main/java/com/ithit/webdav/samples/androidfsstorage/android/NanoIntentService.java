@@ -129,7 +129,7 @@ public class NanoIntentService extends Service {
 
     private void initUserStorage(String path) {
         AssetManager assetManager = this.getAssets();
-        String assets[];
+        String[] assets;
         try {
             assets = assetManager.list(path);
             if (assets.length == 0) {
