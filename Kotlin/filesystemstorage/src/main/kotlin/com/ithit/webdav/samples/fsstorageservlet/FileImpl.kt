@@ -260,7 +260,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
 
     private fun incrementSerialNumber() {
         try {
-            val seNumber = Property("", "SerialNumber", "1")
+            val seNumber = Property.create("", "SerialNumber", "1")
             val sn = serialNumber
             if (sn != "0") {
                 seNumber.value = (Integer.valueOf(sn) + 1).toString()

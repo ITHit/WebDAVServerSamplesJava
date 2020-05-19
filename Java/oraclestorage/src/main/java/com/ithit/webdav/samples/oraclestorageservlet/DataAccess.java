@@ -243,7 +243,7 @@ public class DataAccess {
      * @throws ServerException in case of DB exception.
      */
     List<Property> readProperties(String sql, Object... args) throws ServerException {
-        ElementReader<Property> elementReader = rs -> new Property(rs.getString("Namespace"),
+        ElementReader<Property> elementReader = rs -> Property.create(rs.getString("Namespace"),
                 rs.getString("Name"),
                 rs.getString("PropVal"));
 

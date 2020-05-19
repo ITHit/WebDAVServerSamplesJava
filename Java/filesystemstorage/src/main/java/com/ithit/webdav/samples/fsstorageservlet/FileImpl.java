@@ -289,7 +289,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
 
     private void incrementSerialNumber() {
         try {
-            Property serialNumber = new Property("", "SerialNumber", "1");
+            Property serialNumber = Property.create("", "SerialNumber", "1");
             String sn = getSerialNumber();
             if (!Objects.equals(sn, "0")) {
                 serialNumber.setValue(String.valueOf((Integer.valueOf(sn) + 1)));

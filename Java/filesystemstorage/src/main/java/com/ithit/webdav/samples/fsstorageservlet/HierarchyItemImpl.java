@@ -227,7 +227,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         result = l.stream().filter(x -> propNames.contains(x.getName())).collect(Collectors.toList());
         Property snippet = Arrays.stream(props).filter(x -> propNames.contains(SNIPPET)).findFirst().orElse(null);
         if (snippet != null && this instanceof FileImpl) {
-            result.add(new Property(snippet.getNamespace(), snippet.getName(), ((FileImpl) this).getSnippet()));
+            result.add(Property.create(snippet.getNamespace(), snippet.getName(), ((FileImpl) this).getSnippet()));
         }
         return result;
     }

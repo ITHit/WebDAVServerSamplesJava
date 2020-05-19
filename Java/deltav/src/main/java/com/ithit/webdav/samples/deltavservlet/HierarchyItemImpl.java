@@ -210,7 +210,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
         for (Property lookForProp : props) {
             if (SNIPPET.equalsIgnoreCase(lookForProp.getName()) && this instanceof FileImpl) {
-                result.add(new Property(lookForProp.getNamespace(), lookForProp.getName(), ((FileImpl) this).getSnippet()));
+                result.add(Property.create(lookForProp.getNamespace(), lookForProp.getName(), ((FileImpl) this).getSnippet()));
                 continue;
             }
             for (Property foundProp : l) {

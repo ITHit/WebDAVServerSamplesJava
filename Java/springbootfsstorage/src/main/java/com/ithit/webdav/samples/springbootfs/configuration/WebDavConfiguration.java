@@ -81,7 +81,7 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
 
     @Bean
     public WebDavEngine engine() {
-        rootLocalPath = properties.getRootFolder();
+        rootLocalPath = Paths.get(properties.getRootFolder()).normalize().toString();
         checkRootPath(properties.getRootFolder());
         String license;
         try {

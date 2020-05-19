@@ -202,7 +202,7 @@ internal abstract class HierarchyItemImpl
         result = l.stream().filter { x -> propNames.contains(x.name) }.collect(Collectors.toList())
         val snippet = Arrays.stream(props).filter { x -> propNames.contains(SNIPPET) }.findFirst().orElse(null)
         if (snippet != null && this is FileImpl) {
-            result.add(Property(snippet.namespace, snippet.name, this.snippet))
+            result.add(Property.create(snippet.namespace, snippet.name, this.snippet))
         }
         return result
     }
