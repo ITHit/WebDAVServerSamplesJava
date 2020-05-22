@@ -308,12 +308,12 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             // in the Created and Modified fields in your storage
             // String basicAttributeNS = "urn:schemas-microsoft-com:";
             if (prop.getNamespace().equals(basicAttributeNS)) {
-                updateBasicProperties(prop.getValue(), prop.getName());
+                updateBasicProperties(prop.getXmlValueRaw(), prop.getName());
             } else {
                 properties = getProperties();
                 Property existingProp = properties.stream().filter(x -> x.getName().equals(prop.getName())).findFirst().orElse(null);
                 if (existingProp != null) {
-                    existingProp.setValue(prop.getValue());
+                    existingProp.setValue(prop.getXmlValueRaw());
                 } else {
                     properties.add(prop);
                 }

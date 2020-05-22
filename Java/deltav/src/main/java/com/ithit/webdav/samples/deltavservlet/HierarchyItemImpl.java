@@ -303,14 +303,14 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
             getDataAccess().executeUpdate("INSERT INTO Property"
                             + " (ItemID, Name, Namespace, PropVal)"
                             + " VALUES(?, ?, ?, ?)",
-                    getId(), prop.getName(), prop.getNamespace(), prop.getValue());
+                    getId(), prop.getName(), prop.getNamespace(), prop.getXmlValueRaw());
         } else // update
         {
             getDataAccess().executeUpdate("UPDATE Property"
                     + " SET PropVal = ?"
                     + " WHERE ItemID = ?"
                     + " AND Name = ?"
-                    + " AND Namespace = ?", prop.getValue(), getId(), prop.getName(), prop.getNamespace());
+                    + " AND Namespace = ?", prop.getXmlValueRaw(), getId(), prop.getName(), prop.getNamespace());
         }
     }
 

@@ -284,12 +284,12 @@ internal abstract class HierarchyItemImpl
             // in the Created and Modified fields in your storage
             // String basicAttributeNS = "urn:schemas-microsoft-com:";
             if (prop.namespace == basicAttributeNS) {
-                updateBasicProperties(prop.value, prop.name)
+                updateBasicProperties(prop.xmlValueRaw, prop.name)
             } else {
                 properties = getProperties()
                 val existingProp = properties!!.stream().filter { x -> x.name == prop.name }.findFirst().orElse(null)
                 if (existingProp != null) {
-                    existingProp.value = prop.value
+                    existingProp.value = prop.xmlValueRaw
                 } else {
                     properties!!.add(prop)
                 }

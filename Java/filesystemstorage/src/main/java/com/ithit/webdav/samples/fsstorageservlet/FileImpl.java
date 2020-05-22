@@ -304,7 +304,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         String serialJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), "SerialNumber");
         List<Property> properties = SerializationUtils.deserializeList(Property.class, serialJson);
         if (properties.size() == 1) {
-            return properties.get(0).getValue();
+            return properties.get(0).getXmlValueRaw();
         }
         return "0";
     }

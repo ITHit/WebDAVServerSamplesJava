@@ -286,7 +286,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * Modifies and removes properties for this item.
      *
      * @param setProps Array of properties to be set.
-     * @param delProps Array of properties to be removed. {@link Property#getValue()} field is ignored.
+     * @param delProps Array of properties to be removed. {@link Property#getXmlValueRaw()} field is ignored.
      *                 Specifying the removal of a property that does not exist is not an error.
      * @throws LockedException      this item was locked and client did not provide lock token.
      * @throws ServerException      In case of other error.
@@ -307,12 +307,12 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             // in the Created and Modified fields in your storage
             // String basicAttributeNS = "urn:schemas-microsoft-com:";
             if (prop.getNamespace().equals(basicAttributeNS)) {
-                updateBasicProperties(prop.getValue(), prop.getName());
+                updateBasicProperties(prop.getXmlValueRaw(), prop.getName());
             } else {
                 properties = getProperties();
                 Property existingProp = properties.stream().filter(x -> x.getName().equals(prop.getName())).findFirst().orElse(null);
                 if (existingProp != null) {
-                    existingProp.setValue(prop.getValue());
+                    existingProp.setValue(prop.getXmlValueRaw());
                 } else {
                     properties.add(prop);
                 }

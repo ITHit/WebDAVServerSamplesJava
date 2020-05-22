@@ -235,7 +235,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * Modifies and removes properties for this item.
      *
      * @param setProps Array of properties to be set.
-     * @param delProps Array of properties to be removed. {@link Property#getValue()} field is ignored.
+     * @param delProps Array of properties to be removed. {@link Property#getXmlValueRaw()} field is ignored.
      *                 Specifying the removal of a property that does not exist is not an error.
      * @throws LockedException      this item was locked and client did not provide lock token.
      * @throws MultistatusException If update fails for a property, this exception shall be thrown and contain
@@ -293,14 +293,14 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             getDataAccess().executeUpdate("INSERT INTO Properties"
                             + " (ItemID, Name, Namespace, PropVal)"
                             + " VALUES(?, ?, ?, ?)",
-                    getId(), prop.getName(), prop.getNamespace(), prop.getValue());
+                    getId(), prop.getName(), prop.getNamespace(), prop.getXmlValueRaw());
         } else // update
         {
             getDataAccess().executeUpdate("UPDATE Properties"
                     + " SET PropVal = ?"
                     + " WHERE ItemID = ?"
                     + " AND Name = ?"
-                    + " AND Namespace = ?", prop.getValue(), getId(), prop.getName(), prop.getNamespace());
+                    + " AND Namespace = ?", prop.getXmlValueRaw(), getId(), prop.getName(), prop.getNamespace());
         }
     }
 

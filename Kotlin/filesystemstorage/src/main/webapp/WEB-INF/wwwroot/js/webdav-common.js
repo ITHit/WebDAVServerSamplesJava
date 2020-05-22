@@ -3,7 +3,9 @@
  * @namespace WebdavCommon
  */
 window.WebdavCommon = (function () {
-    var sFileNameSpecialCharactersRestrictionFormat = "The name cannot contain any of the following characters:\n\t\t{0}";
+    var sGSuitePreviewErrorMessage = "Preview document with G Suite Online Tool error.";
+    var sGSuiteEditErrorMessage = "Edit document with G Suite Online Editor error.";
+    var sFileNameSpecialCharactersRestrictionFormat = "The name cannot contain any of the following characters: {0}";
     var sForbiddenNameChars = '\/:*?"<>|';
 
     var ns = {};
@@ -47,7 +49,7 @@ window.WebdavCommon = (function () {
                 html = html.replace(/<b>/g, safePrefix + '_0').replace(/<\/b>/g, safePrefix + '_1');
                 html = $('<div />').text(html).text();
                 html = html.replace(new RegExp(safePrefix + '_0', 'g'), '<b>').
-                    replace(new RegExp(safePrefix + '_1', 'g'), '</b>');
+                replace(new RegExp(safePrefix + '_1', 'g'), '</b>');
             }
             return $('<div />').addClass('snippet').html(html);
         },
@@ -60,6 +62,16 @@ window.WebdavCommon = (function () {
         GetFileExtension: function (fileName) {
             var index = fileName.lastIndexOf('.');
             return index !== -1 ? fileName.substr(index + 1).toLowerCase() : '';
+        },
+
+        /**
+         *
+         * @param {string} fileName
+         * @returns {string}
+         */
+        GetFileNameWithoutExtension: function (fileName) {
+            var index = fileName.lastIndexOf('.');
+            return index !== -1 ? fileName.slice(0, index) : '';
         },
 
         /**
@@ -125,7 +137,7 @@ window.WebdavCommon = (function () {
             }
         }
     };
-    
+
     ns.PasteFormat = function pasteFormat(sPhrase) {
         var callbackReplace = function(oArguments) {
             this._arguments = oArguments;
@@ -145,7 +157,7 @@ window.WebdavCommon = (function () {
         return sPhrase;
     };
 
-     /**
+    /**
      * This class provides method for display error modal window.
      * @param {string} selector - The selector of root element of modal window markup.
      * @class ErrorModal
@@ -159,9 +171,9 @@ window.WebdavCommon = (function () {
     /**@lends ErrorModal.prototype */
     ErrorModal.prototype = {
 
-        /** 
+        /**
          * Shows modal window with message and error details.
-         * @method 
+         * @method
          * @param {string} sMessage - The error message.
          * @param {ITHit.WebDAV.Client.Exceptions.WebDavHttpException | ClientError} oError - The error object to display.
          * @param {function()} [fCallback] - The callback to be called on close.
@@ -211,6 +223,143 @@ window.WebdavCommon = (function () {
     };
 
     ns.ErrorModal = new ErrorModal('#ErrorModal');
+    // function Spliter(selectorLeftPanel, selectorRightPanel) {
+    //     // add spliter button
+    //     Split([selectorLeftPanel, selectorRightPanel], {
+    //         elementStyle: function (dimension, size, gutterSize) {
+    //             $(window).trigger('resize');
+    //             if (size < 1) {
+    //                 return { 'flex-basis': '0px', 'height': '0px' };
+    //             }
+    //             else {
+    //                 return { 'flex-basis': 'calc(' + size + '% - ' + gutterSize + 'px)', 'height': '' };
+    //             }
+    //         },
+    //         gutterStyle: function (dimension, gutterSize) {
+    //             return { 'flex-basis': gutterSize + 'px' };
+    //         },
+    //         sizes: [60, 40],
+    //         minSize: [400, 0],
+    //         expandToMin: true,
+    //         gutterSize: 30,
+    //         cursor: 'col-resize',
+    //         onDragEnd: function (sizes) {
+    //             $(selectorRightPanel).removeClass('disable-iframe-events');
+    //         },
+    //         onDragStart: function (sizes) {
+    //             $(selectorRightPanel).addClass('disable-iframe-events');
+    //         }
+    //     });
+    //
+    //     // handle resize window event
+    //     $(window).resize(function () {
+    //         // settimeout because resize event is triggered before applying 'flex-basis' css rule
+    //         this.setTimeout(function () {
+    //             var $pnl = $('#leftPanel');
+    //             var classAttr = 'col';
+    //             if ($pnl.width() <= 566) {
+    //                 classAttr += ' medium-point';
+    //             }
+    //             else if ($pnl.width() <= 692) {
+    //                 classAttr += ' large-point';
+    //             }
+    //             $pnl.attr('class', classAttr);
+    //         }, 10);
+    //     });
+    // };
 
+    // ns.Spliter = new Spliter('#leftPanel', '#rightPanel');
+
+    function GSuiteEditor(selectorGSuite) {
+        this.$gSuiteTabs = $(selectorGSuite + ' #gSuiteTabs');
+        this.$gSuitePreviewPanel = $(selectorGSuite + ' #gSuitePreview');
+        this.$gSuitePreviewBackground = $(selectorGSuite + ' #gSuitePreviewBackground');
+        this.$gSuiteEditPanel = $(selectorGSuite + ' #gSuiteEdit');
+        this.$gSuiteEditBackground = $(selectorGSuite + ' #gSuiteEditBackground');
+        this.$fileName = $(selectorGSuite + ' #fileName');
+    }
+
+    GSuiteEditor.prototype = {
+        Render: function (oItem) {
+            var self = this;
+            this.isEditorLoaded = false;
+            this.isPreviewLoaded = false;
+            this.$gSuitePreviewPanel.empty();
+            this.$gSuiteEditPanel.empty();
+            this.$gSuiteEditContainer = $('<div class="inner-container"/>').appendTo(this.$gSuiteEditPanel);
+            this.$gSuitePreviewContainer = $('<div class="inner-container"/>').appendTo(this.$gSuitePreviewPanel);
+
+            // display file name
+            this.$fileName.text(oItem.DisplayName);
+
+            if (WebDAVController.OptionsInfo.Features & ITHit.WebDAV.Client.Features.GSuite) {
+                if (self.activeSelectedTab == 'edit') {
+                    this._RenderEditor(oItem);
+                    this.$gSuiteTabs.find('#edit-tab').tab('show');
+                }
+                else {
+                    this._RenderPreview(oItem);
+                    this.$gSuiteTabs.find('#preview-tab').tab('show');
+                }
+
+                // add handler for preview tab
+                this.$gSuiteTabs.find('#preview-tab').unbind().on('shown.bs.tab', function () {
+                    self._RenderPreview(oItem);
+                });
+
+                // add handler for edit tab
+                this.$gSuiteTabs.find('#edit-tab').unbind().on('shown.bs.tab', function () {
+                    self._RenderEditor(oItem);
+                });
+            }
+            else if (!(WebDAVController.OptionsInfo.Features & ITHit.WebDAV.Client.Features.GSuite)) {
+                this.$gSuitePreviewBackground.text('GSuite preview and edit is not supported.');
+            }
+        },
+
+        _RenderEditor: function (oItem) {
+            var self = this;
+            this.activeSelectedTab = 'edit';
+
+            if (ITHit.WebDAV.Client.DocManager.IsGSuiteDocument(oItem.Href)) {
+                if (!this.isEditorLoaded) {
+                    this.$gSuiteEditBackground.text('Loading ...');
+                    WebDAVController.GSuiteEditDoc(oItem.Href, this.$gSuiteEditContainer[0], function (e) {
+                        self.$gSuiteEditPanel.empty();
+                        self.$gSuiteEditBackground.text('Select a document to edit.');
+                        if (e instanceof ITHit.WebDAV.Client.Exceptions.LockedException) {
+                            WebdavCommon.ErrorModal.Show("The document is locked exclusively.<br/>" +
+                                "You can not edit the document in G Suite in case of an exclusive lock.", e);
+                        }
+                        else {
+                            WebdavCommon.ErrorModal.Show(sGSuiteEditErrorMessage, e);
+                        }
+
+                    });
+                    this.isEditorLoaded = true;
+                }
+            }
+            else {
+                this.$gSuiteEditBackground.text('GSuite editor for this type of document is not available.');
+            }
+        },
+
+        _RenderPreview: function (oItem) {
+            var self = this;
+            this.activeSelectedTab = 'preview';
+
+            if (!this.isPreviewLoaded) {
+                this.$gSuitePreviewBackground.text('Loading preview...');
+                WebDAVController.GSuitePreviewDoc(oItem.Href, this.$gSuitePreviewContainer[0], function (e) {
+                    self.$gSuitePreviewPanel.empty();
+                    self.$gSuitePreviewBackground.text('Select a document to preview.');
+                    WebdavCommon.ErrorModal.Show(sGSuitePreviewErrorMessage, e);
+                });
+                isPreviewLoaded = true;
+            }
+        }
+    };
+
+    ns.GSuiteEditor = new GSuiteEditor('.gsuite-container');
     return ns;
 })();

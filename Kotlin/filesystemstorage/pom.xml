@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>kotlinfs</artifactId>
-    <version>4.5.3962</version>
+    <version>4.5.3974</version>
     <packaging>war</packaging>
 
     <properties>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.5.3962</version>
+            <version>4.5.3974</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.5.3962</version>
+            <version>4.5.3974</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -240,7 +240,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/kotlinfs-4.5.3962</warSourceDirectory>
+                    <warSourceDirectory>target/kotlinfs-4.5.3974</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>

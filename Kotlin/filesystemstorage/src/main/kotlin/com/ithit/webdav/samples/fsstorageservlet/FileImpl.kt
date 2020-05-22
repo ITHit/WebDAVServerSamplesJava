@@ -52,7 +52,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
             val serialJson = ExtendedAttributesExtension.getExtendedAttribute(fullPath.toString(), "SerialNumber")
             val properties = SerializationUtils.deserializeList(Property::class.java, serialJson)
             return if (properties.size == 1) {
-                properties[0].value
+                properties[0].xmlValueRaw
             } else "0"
         }
 
