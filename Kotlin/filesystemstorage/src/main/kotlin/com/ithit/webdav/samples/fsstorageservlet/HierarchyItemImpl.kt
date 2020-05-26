@@ -289,7 +289,7 @@ internal abstract class HierarchyItemImpl
                 properties = getProperties()
                 val existingProp = properties!!.stream().filter { x -> x.name == prop.name }.findFirst().orElse(null)
                 if (existingProp != null) {
-                    existingProp.value = prop.xmlValueRaw
+                    existingProp.xmlValueRaw = prop.xmlValueRaw
                 } else {
                     properties!!.add(prop)
                 }

@@ -313,7 +313,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
                 properties = getProperties();
                 Property existingProp = properties.stream().filter(x -> x.getName().equals(prop.getName())).findFirst().orElse(null);
                 if (existingProp != null) {
-                    existingProp.setValue(prop.getXmlValueRaw());
+                    existingProp.setXmlValueRaw(prop.getXmlValueRaw());
                 } else {
                     properties.add(prop);
                 }
