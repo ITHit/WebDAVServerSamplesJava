@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>4.6.4062</version>
+    <version>4.5.4062</version>
     <packaging>war</packaging>
 
     <properties>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.6.4062</version>
+            <version>4.5.4062</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.6.4062</version>
+            <version>4.5.4062</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -228,7 +228,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-4.6.4062</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-4.5.4062</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>

@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springbootoraclestorage</artifactId>
-    <version>4.6.4062</version>
+    <version>4.5.4062</version>
     <name>springbootoraclestorage</name>
     <description>Demo project for Spring Boot</description>
 
@@ -53,12 +53,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.6.4062</version>
+            <version>4.5.4062</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.6.4062</version>
+            <version>4.5.4062</version>
         </dependency>
 
         <!-- Oracle dependencies -->
