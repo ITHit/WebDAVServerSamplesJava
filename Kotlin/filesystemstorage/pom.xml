@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>kotlinfs</artifactId>
-    <version>4.5.4062</version>
+    <version>4.5.4195</version>
     <packaging>war</packaging>
 
     <properties>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.5.4062</version>
+            <version>4.5.4195</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -55,9 +55,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.hynnet</groupId>
-            <artifactId>oracle-driver-ojdbc6</artifactId>
-            <version>12.1.0.1</version>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc7</artifactId>
+            <version>12.1.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.5.4062</version>
+            <version>4.5.4195</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -170,7 +170,7 @@
     </repositories>
 
     <build>
-        <sourceDirectory>C:\Java\Release\WebdavJavaRepo\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
+        <sourceDirectory>D:\myproj\Java\ithit\webdav-server-for-java\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -240,7 +240,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/kotlinfs-4.5.4062</warSourceDirectory>
+                    <warSourceDirectory>target/kotlinfs-4.5.4195</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>

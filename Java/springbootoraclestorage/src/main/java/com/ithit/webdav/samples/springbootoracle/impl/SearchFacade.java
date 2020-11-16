@@ -36,11 +36,20 @@ public class SearchFacade {
     private Indexer indexer;
     private final DataAccess dataAccess;
     private Searcher searcher;
-    private Logger logger;
+    private final Logger logger;
+    private static SearchFacade INSTANCE;
+    private volatile boolean indexed = false;
 
     public SearchFacade(DataAccess dataAccess, Logger logger) {
         this.dataAccess = dataAccess;
         this.logger = logger;
+    }
+
+    public synchronized static SearchFacade getInstance(DataAccess dataAccess, Logger logger) {
+        if (INSTANCE == null) {
+            INSTANCE = new SearchFacade(dataAccess, logger);
+        }
+        return INSTANCE;
     }
 
     /**
@@ -50,23 +59,26 @@ public class SearchFacade {
      * @param interval    Daemon commit interval.
      */
     public void indexRootFolder(String indexFolder, Integer interval) {
-        ForkJoinPool forkJoinPool = new ForkJoinPool(4);
-        Directory fsDir;
-        try {
-            fsDir = FSDirectory.open(Paths.get(indexFolder));
-            StandardAnalyzer standardAnalyzer = new StandardAnalyzer();
-            IndexWriterConfig conf = new IndexWriterConfig(standardAnalyzer);
-            conf.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-            IndexWriter indexWriter = new IndexWriter(fsDir, conf);
-            Tika tika = new Tika();
-            tika.setMaxStringLength(Indexer.MAX_CONTENT_LENGTH);
-            indexer = new Indexer(indexWriter, getFilesToIndex(), logger, tika);
-            forkJoinPool.invoke(getIndexer());
-            indexWriter.commit();
-            new Indexer.CommitTask(indexWriter, logger).schedule(interval);
-            searcher = new Searcher(indexFolder, standardAnalyzer, logger);
-        } catch (IOException e) {
-            logger.logError("Cannot initialize Lucene", e);
+        if (!indexed) {
+            indexed = true;
+            ForkJoinPool forkJoinPool = new ForkJoinPool(4);
+            Directory fsDir;
+            try {
+                fsDir = FSDirectory.open(Paths.get(indexFolder));
+                StandardAnalyzer standardAnalyzer = new StandardAnalyzer();
+                IndexWriterConfig conf = new IndexWriterConfig(standardAnalyzer);
+                conf.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+                IndexWriter indexWriter = new IndexWriter(fsDir, conf);
+                Tika tika = new Tika();
+                tika.setMaxStringLength(Indexer.MAX_CONTENT_LENGTH);
+                indexer = new Indexer(indexWriter, getFilesToIndex(), logger, tika);
+                forkJoinPool.invoke(getIndexer());
+                indexWriter.commit();
+                new Indexer.CommitTask(indexWriter, logger).schedule(interval);
+                searcher = new Searcher(indexFolder, standardAnalyzer, logger);
+            } catch (IOException e) {
+                logger.logError("Cannot initialize Lucene", e);
+            }
         }
     }
 

@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -79,6 +80,7 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
         registry.addHandler(socketHandler, properties.getRootWebSocket()).setAllowedOrigins("*");
     }
 
+    @RequestScope
     @Bean
     public WebDavEngine engine() {
         rootLocalPath = Paths.get(properties.getRootFolder()).normalize().toString();
@@ -97,7 +99,7 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
         handlerHead.setPreviousHandler(webDavEngine.registerMethodHandler("HEAD", handlerHead));
         String indexLocalPath = createIndexPath();
         if (rootLocalPath != null && indexLocalPath != null) {
-            SearchFacade searchFacade = new SearchFacade(webDavEngine, webDavEngine.getLogger());
+            SearchFacade searchFacade = SearchFacade.getInstance(webDavEngine, webDavEngine.getLogger());
             searchFacade.indexRootFolder(rootLocalPath, indexLocalPath, 2);
             webDavEngine.setSearchFacade(searchFacade);
         }

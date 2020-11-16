@@ -39,10 +39,19 @@ public class SearchFacade {
     private Searcher searcher;
     private WebDavEngine engine;
     private Logger logger;
+    private static SearchFacade INSTANCE;
+    private volatile boolean indexed = false;
 
-    public SearchFacade(WebDavEngine webDavEngine, Logger logger) {
+    private SearchFacade(WebDavEngine webDavEngine, Logger logger) {
         engine = webDavEngine;
         this.logger = logger;
+    }
+
+    public synchronized static SearchFacade getInstance(WebDavEngine webDavEngine, Logger logger) {
+        if (INSTANCE == null) {
+            INSTANCE = new SearchFacade(webDavEngine, logger);
+        }
+        return INSTANCE;
     }
 
     /**
@@ -129,7 +138,10 @@ public class SearchFacade {
      * @param interval    Daemon commit interval.
      */
     public void indexRootFolder(String dataFolder, String indexFolder, Integer interval) {
-        new IndexTask(dataFolder, indexFolder, interval).schedule();
+        if (!indexed) {
+            indexed = true;
+            new IndexTask(dataFolder, indexFolder, interval).schedule();
+        }
     }
 
     /**
