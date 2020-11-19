@@ -60,7 +60,6 @@ public class AndroidWebDavServer extends NanoHTTPD {
         CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), engine.getVersion(), config);
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
-        engine.setServletRequest(davRequest);
 
         try {
             engine.service(davRequest, davResponse);

@@ -1,6 +1,5 @@
 package com.ithit.webdav.samples.springbootfs.impl;
 
-import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.samples.springbootfs.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
@@ -18,7 +17,6 @@ public class WebDavEngine extends Engine {
 
     private final Logger logger;
     private final String license;
-    private HttpServletDavRequest request;
     static String dataFolder;
     private boolean showExceptions;
     private SearchFacade searchFacade;
@@ -83,24 +81,6 @@ public class WebDavEngine extends Engine {
     @Override
     public String getLicense() {
         return license;
-    }
-
-    /**
-     * Returns original servlet request.
-     *
-     * @return Original servlet request.
-     */
-    HttpServletDavRequest getRequest() {
-        return request;
-    }
-
-    /**
-     * Set original servlet request.
-     *
-     * @param httpServletRequest Original servlet request.
-     */
-    public void setServletRequest(HttpServletDavRequest httpServletRequest) {
-        this.request = httpServletRequest;
     }
 
     /**

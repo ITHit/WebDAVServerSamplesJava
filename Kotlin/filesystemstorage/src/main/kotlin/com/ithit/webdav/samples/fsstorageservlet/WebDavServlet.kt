@@ -134,7 +134,6 @@ class WebDavServlet : HttpServlet() {
         val handlerHead = CustomFolderGetHandler(engine.responseCharacterEncoding, Engine.getVersion())
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler))
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead))
-        engine.setServletRequest(davRequest)
         engine.searchFacade = searchFacade
 
         val session = httpServletRequest.session

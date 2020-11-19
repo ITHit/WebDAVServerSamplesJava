@@ -133,7 +133,6 @@ public class WebDavServlet extends HttpServlet {
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
 
-        engine.setServletRequest(davRequest);
         engine.setSearchFacade(searchFacade);
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("engine", engine);

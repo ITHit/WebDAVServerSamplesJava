@@ -1,6 +1,5 @@
 package com.ithit.webdav.samples.fsstorageservlet
 
-import com.ithit.webdav.integration.servlet.HttpServletDavRequest
 import com.ithit.webdav.samples.fsstorageservlet.websocket.WebSocketServer
 import com.ithit.webdav.server.Engine
 import com.ithit.webdav.server.HierarchyItem
@@ -23,13 +22,6 @@ internal constructor(private val logger: Logger?, private val license: String?) 
     internal var webSocketServer: WebSocketServer? = null
         get() = if (field == null) _FAKED_WEB_SOCKET else field
     private val _FAKED_WEB_SOCKET = WebSocketServer()
-    /**
-     * Returns original servlet request.
-     *
-     * @return Original servlet request.
-     */
-    internal var request: HttpServletDavRequest? = null
-        private set
     /**
      * Returns SearchFacade instance
      *
@@ -87,14 +79,5 @@ internal constructor(private val logger: Logger?, private val license: String?) 
      */
     override fun getLicense(): String? {
         return license
-    }
-
-    /**
-     * Set original servlet request.
-     *
-     * @param httpServletRequest Original servlet request.
-     */
-    internal fun setServletRequest(httpServletRequest: HttpServletDavRequest) {
-        this.request = httpServletRequest
     }
 }

@@ -50,7 +50,6 @@ public class SamplesController {
         DataAccess dataAccess = new DataAccess(engine, dataSource);
         try {
             engine.setDataAccess(dataAccess);
-            engine.setServletRequest(davRequest);
             engine.service(davRequest, davResponse);
             dataAccess.commit();
         } catch (DavException e) {

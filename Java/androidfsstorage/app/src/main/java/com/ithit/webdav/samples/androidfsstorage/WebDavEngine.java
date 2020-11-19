@@ -1,6 +1,5 @@
 package com.ithit.webdav.samples.androidfsstorage;
 
-import com.ithit.webdav.integration.android.AndroidDavRequest;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
@@ -15,7 +14,6 @@ public class WebDavEngine extends Engine {
 
     private final Logger logger;
     private final String license;
-    private AndroidDavRequest request;
 
     /**
      * Initializes a new instance of the WebDavEngine class.
@@ -75,23 +73,4 @@ public class WebDavEngine extends Engine {
     public String getLicense() {
         return license;
     }
-
-    /**
-     * Returns original servlet request.
-     *
-     * @return Original servlet request.
-     */
-    AndroidDavRequest getRequest() {
-        return request;
-    }
-
-    /**
-     * Set original servlet request.
-     *
-     * @param httpServletRequest Original servlet request.
-     */
-    void setServletRequest(AndroidDavRequest httpServletRequest) {
-        this.request = httpServletRequest;
-    }
-
 }

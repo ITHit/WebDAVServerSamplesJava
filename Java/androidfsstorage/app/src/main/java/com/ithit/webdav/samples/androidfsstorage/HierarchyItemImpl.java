@@ -13,6 +13,7 @@ import com.ithit.webdav.server.exceptions.LockedException;
 import com.ithit.webdav.server.exceptions.MultistatusException;
 import com.ithit.webdav.server.exceptions.PreconditionFailedException;
 import com.ithit.webdav.server.exceptions.ServerException;
+import com.ithit.webdav.server.util.DavContext;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -278,7 +279,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         if (activeLocks.size() == 0) {
             return true;
         }
-        List<String> clientLockTokens = getEngine().getRequest().getClientLockTokens();
+        List<String> clientLockTokens = DavContext.currentRequest().getClientLockTokens();
         for (LockInfo lockInfo: activeLocks) {
             if (clientLockTokens.contains(lockInfo.getToken())) {
                 return true;

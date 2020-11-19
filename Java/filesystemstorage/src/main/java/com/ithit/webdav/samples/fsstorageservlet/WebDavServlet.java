@@ -180,7 +180,6 @@ public class WebDavServlet extends HttpServlet {
         CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), Engine.getVersion());
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
-        engine.setServletRequest(davRequest);
         engine.setSearchFacade(searchFacade);
 
         HttpSession session = httpServletRequest.getSession();

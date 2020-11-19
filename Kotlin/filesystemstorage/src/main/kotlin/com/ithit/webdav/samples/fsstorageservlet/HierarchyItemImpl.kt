@@ -3,6 +3,7 @@ package com.ithit.webdav.samples.fsstorageservlet
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension
 import com.ithit.webdav.server.*
 import com.ithit.webdav.server.exceptions.*
+import com.ithit.webdav.server.util.DavContext
 import com.ithit.webdav.server.util.StringUtil
 
 import java.io.File
@@ -55,7 +56,7 @@ internal abstract class HierarchyItemImpl
         get() {
             var fullPath = ""
             try {
-                fullPath = rootFolder!! + HierarchyItemImpl.decodeAndConvertToPath(getPath())
+                fullPath = rootFolder!! + decodeAndConvertToPath(getPath())
             } catch (ignored: ServerException) {
             }
 
@@ -198,9 +199,9 @@ internal abstract class HierarchyItemImpl
         if (props == null) {
             return l
         }
-        val propNames = Arrays.stream(props).map<String>( { it.getName() }).collect(Collectors.toSet())
+        val propNames = Arrays.stream(props).map<String> { it.name }.collect(Collectors.toSet())
         result = l.stream().filter { x -> propNames.contains(x.name) }.collect(Collectors.toList())
-        val snippet = Arrays.stream(props).filter { x -> propNames.contains(SNIPPET) }.findFirst().orElse(null)
+        val snippet = Arrays.stream(props).filter { propNames.contains(SNIPPET) }.findFirst().orElse(null)
         if (snippet != null && this is FileImpl) {
             result.add(Property.create(snippet.namespace, snippet.name, this.snippet))
         }
@@ -255,8 +256,8 @@ internal abstract class HierarchyItemImpl
         if (activeLocks!!.size == 0) {
             return true
         }
-        val clientLockTokens = engine.request!!.clientLockTokens
-        return !activeLocks!!.stream().filter { x -> clientLockTokens.contains(x.token) }.collect(Collectors.toList()).isEmpty()
+        val clientLockTokens = DavContext.currentRequest()!!.clientLockTokens
+        return activeLocks!!.stream().filter { x -> clientLockTokens.contains(x.token) }.collect(Collectors.toList()).isNotEmpty()
     }
 
     /**
@@ -376,7 +377,7 @@ internal abstract class HierarchyItemImpl
     @Throws(ServerException::class)
     private fun hasLock(skipShared: Boolean): Boolean {
         getActiveLocks()
-        return !activeLocks!!.isEmpty() && !(skipShared && activeLocks!![0].isShared)
+        return activeLocks!!.isNotEmpty() && !(skipShared && activeLocks!![0].isShared)
     }
 
     /**
@@ -387,11 +388,11 @@ internal abstract class HierarchyItemImpl
      */
     @Throws(ServerException::class)
     override fun getActiveLocks(): List<LockInfo> {
-        if (activeLocks == null) {
+        activeLocks = if (activeLocks == null) {
             val activeLocksJson = ExtendedAttributesExtension.getExtendedAttribute(fullPath.toString(), activeLocksAttribute)
-            activeLocks = SerializationUtils.deserializeList(LockInfo::class.java, activeLocksJson).stream().filter { x -> System.currentTimeMillis() < x.timeout }.collect(Collectors.toList())
+            SerializationUtils.deserializeList(LockInfo::class.java, activeLocksJson).stream().filter { x -> System.currentTimeMillis() < x.timeout }.collect(Collectors.toList())
         } else {
-            activeLocks = LinkedList()
+            LinkedList()
         }
         return activeLocks!!.toList()
     }
@@ -409,7 +410,7 @@ internal abstract class HierarchyItemImpl
         val lock = activeLocks!!.stream().filter { x -> x.token == lockToken }.findFirst().orElse(null)
         if (lock != null) {
             activeLocks!!.remove(lock)
-            if (!activeLocks!!.isEmpty()) {
+            if (activeLocks!!.isNotEmpty()) {
                 ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), activeLocksAttribute, SerializationUtils.serialize<List<LockInfo>>(activeLocks!!))
             } else {
                 ExtendedAttributesExtension.deleteExtendedAttribute(fullPath.toString(), activeLocksAttribute)
@@ -451,10 +452,10 @@ internal abstract class HierarchyItemImpl
     fun getParent(path: String): String {
         var parentPath = StringUtil.trimEnd(StringUtil.trimStart(path, "/"), "/")
         val index = parentPath.lastIndexOf("/")
-        if (index > -1) {
-            parentPath = parentPath.substring(0, index)
+        parentPath = if (index > -1) {
+            parentPath.substring(0, index)
         } else {
-            parentPath = ""
+            ""
         }
         return parentPath
     }

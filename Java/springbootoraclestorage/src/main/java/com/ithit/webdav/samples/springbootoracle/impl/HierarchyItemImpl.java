@@ -2,6 +2,7 @@ package com.ithit.webdav.samples.springbootoracle.impl;
 
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
+import com.ithit.webdav.server.util.DavContext;
 import com.ithit.webdav.server.util.StringUtil;
 
 import java.math.BigDecimal;
@@ -379,7 +380,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         List<LockInfo> itemLocks = getActiveLocks();
         if (itemLocks.size() == 0)
             return true;
-        List<String> clientLockTokens = getEngine().getRequest().getClientLockTokens();
+        List<String> clientLockTokens = DavContext.currentRequest().getClientLockTokens();
         for (String clientLockToken : clientLockTokens)
             for (LockInfo itemLock : itemLocks)
                 if (clientLockToken.equals(itemLock.getToken()))

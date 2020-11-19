@@ -3,6 +3,7 @@ package com.ithit.webdav.samples.fsstorageservlet;
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
+import com.ithit.webdav.server.util.DavContext;
 import com.ithit.webdav.server.util.StringUtil;
 
 import java.io.File;
@@ -278,7 +279,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         if (activeLocks.size() == 0) {
             return true;
         }
-        List<String> clientLockTokens = getEngine().getRequest().getClientLockTokens();
+        List<String> clientLockTokens = DavContext.currentRequest().getClientLockTokens();
         return !activeLocks.stream().filter(x -> clientLockTokens.contains(x.getToken())).collect(Collectors.toList()).isEmpty();
     }
 

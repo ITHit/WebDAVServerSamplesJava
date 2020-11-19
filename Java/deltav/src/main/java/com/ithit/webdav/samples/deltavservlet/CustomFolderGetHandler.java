@@ -4,8 +4,8 @@ import com.ithit.webdav.server.Folder;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.MethodHandler;
 import com.ithit.webdav.server.exceptions.DavException;
-import com.ithit.webdav.server.http.DavRequest;
-import com.ithit.webdav.server.http.DavResponse;
+import com.ithit.webdav.server.DavRequest;
+import com.ithit.webdav.server.DavResponse;
 
 import java.io.IOException;
 import java.io.PrintStream;

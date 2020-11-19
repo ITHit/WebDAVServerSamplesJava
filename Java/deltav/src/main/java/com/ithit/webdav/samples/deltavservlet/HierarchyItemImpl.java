@@ -2,6 +2,7 @@ package com.ithit.webdav.samples.deltavservlet;
 
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
+import com.ithit.webdav.server.util.DavContext;
 import com.ithit.webdav.server.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -388,7 +389,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
         List<LockInfo> itemLocks = getActiveLocks();
         if (itemLocks.size() == 0)
             return true;
-        List<String> clientLockTokens = getEngine().getRequest().getClientLockTokens();
+        List<String> clientLockTokens = DavContext.currentRequest().getClientLockTokens();
         for (String clientLockToken : clientLockTokens)
             for (LockInfo itemLock : itemLocks)
                 if (clientLockToken.equals(itemLock.getToken()))
@@ -746,8 +747,8 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
      * @return Returns User name performing request.
      */
     String getUserName() {
-        if (((HttpServletRequest)getEngine().getRequest().getOriginalRequest()).getUserPrincipal() != null) {
-            return ((HttpServletRequest)getEngine().getRequest().getOriginalRequest()).getUserPrincipal().getName();
+        if (((HttpServletRequest)DavContext.currentRequest().getOriginalRequest()).getUserPrincipal() != null) {
+            return ((HttpServletRequest)DavContext.currentRequest().getOriginalRequest()).getUserPrincipal().getName();
         }
 
         return "Anonymous";

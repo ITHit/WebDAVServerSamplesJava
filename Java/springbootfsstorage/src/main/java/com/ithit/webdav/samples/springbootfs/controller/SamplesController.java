@@ -45,7 +45,6 @@ public class SamplesController {
         };
         HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
         try {
-            engine.setServletRequest(davRequest);
             engine.service(davRequest, davResponse);
         } catch (DavException e) {
             if (e.getStatus() == WebDavStatus.INTERNAL_ERROR) {

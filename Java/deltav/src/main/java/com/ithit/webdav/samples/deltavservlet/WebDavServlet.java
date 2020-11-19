@@ -146,7 +146,6 @@ public class WebDavServlet extends HttpServlet {
 
         engine.setAutoPutUnderVersionControl(autoputUnderVersionControl);
         engine.setAutoVersionMode(autoVersionMode);
-        engine.setServletRequest(davRequest);
         engine.setSearchFacade(searchFacade);
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("engine", engine);

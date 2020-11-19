@@ -1,13 +1,10 @@
 package com.ithit.webdav.samples.oraclestorageservlet;
 
-import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.samples.oraclestorageservlet.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.ServerException;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Implementation if {@link Engine}.
@@ -17,7 +14,6 @@ public class WebDavEngine extends Engine {
 
     private static final WebSocketServer _FAKED_WEB_SOCKET = new WebSocketServer();
     private WebSocketServer webSocketServer;
-    private HttpServletDavRequest request;
     private final Logger logger;
     private final String license;
     private DataAccess dataAccess;
@@ -32,15 +28,6 @@ public class WebDavEngine extends Engine {
     WebDavEngine(Logger logger, String license) {
         this.logger = logger;
         this.license = license;
-    }
-
-    /**
-     * Set original servlet request.
-     *
-     * @param httpServletRequest Original servlet request.
-     */
-    void setServletRequest(HttpServletDavRequest httpServletRequest) {
-        this.request = httpServletRequest;
     }
 
     /**
@@ -95,15 +82,6 @@ public class WebDavEngine extends Engine {
      */
     void setDataAccess(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
-    }
-
-    /**
-     * Returns original {@link HttpServletRequest}.
-     *
-     * @return Returns original {@link HttpServletRequest}.
-     */
-    HttpServletDavRequest getRequest() {
-        return request;
     }
 
     /**

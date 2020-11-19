@@ -1,6 +1,5 @@
 package com.ithit.webdav.samples.deltavservlet;
 
-import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.samples.deltavservlet.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
@@ -8,7 +7,6 @@ import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.deltav.AutoVersion;
 import com.ithit.webdav.server.exceptions.ServerException;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +19,6 @@ public class WebDavEngine extends Engine {
 
     private static final WebSocketServer _FAKED_WEB_SOCKET = new WebSocketServer();
     private WebSocketServer webSocketServer;
-    private HttpServletDavRequest request;
     private final Logger logger;
     private final String license;
     private DataAccess dataAccess;
@@ -38,15 +35,6 @@ public class WebDavEngine extends Engine {
     WebDavEngine(Logger logger, String license) {
         this.logger = logger;
         this.license = license;
-    }
-
-    /**
-     * Set original servlet request.
-     *
-     * @param httpServletRequest Original servlet request.
-     */
-    void setServletRequest(HttpServletDavRequest httpServletRequest) {
-        this.request = httpServletRequest;
     }
 
     /**
@@ -168,15 +156,6 @@ public class WebDavEngine extends Engine {
      */
     void setDataAccess(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
-    }
-
-    /**
-     * Returns original {@link HttpServletRequest}.
-     *
-     * @return Returns original {@link HttpServletRequest}.
-     */
-    HttpServletDavRequest getRequest() {
-        return request;
     }
 
     /**
