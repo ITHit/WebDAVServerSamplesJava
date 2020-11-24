@@ -13,7 +13,7 @@ import com.ithit.webdav.server.exceptions.LockedException;
 import com.ithit.webdav.server.exceptions.MultistatusException;
 import com.ithit.webdav.server.exceptions.PreconditionFailedException;
 import com.ithit.webdav.server.exceptions.ServerException;
-import com.ithit.webdav.server.util.DavContext;
+import com.ithit.webdav.server.DavContext;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

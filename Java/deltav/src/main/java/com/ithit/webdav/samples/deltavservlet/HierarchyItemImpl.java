@@ -2,7 +2,7 @@ package com.ithit.webdav.samples.deltavservlet;
 
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
-import com.ithit.webdav.server.util.DavContext;
+import com.ithit.webdav.server.DavContext;
 import com.ithit.webdav.server.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
