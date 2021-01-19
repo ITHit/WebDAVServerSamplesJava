@@ -28,10 +28,9 @@ import java.util.Locale;
  */
 public class DataAccess {
 
-    private WebDavEngine engine;
+    private final WebDavEngine engine;
     private Connection currentConnection;
     private String defaultTableSpace;
-    private long totalBytes;
 
     /**
      * Initialize {@link DataAccess} with {@link WebDavEngine}.
@@ -40,12 +39,7 @@ public class DataAccess {
      */
     DataAccess(WebDavEngine engine) {
         this.engine = engine;
-        try {
-            defaultTableSpace = executeScalar("SELECT DEFAULT_TABLESPACE FROM DBA_USERS WHERE USERNAME = (SELECT USER FROM dual)");
-            totalBytes = getTotalBytesDB();
-        } catch (Exception e) {
-            engine.getLogger().logError(e.getMessage(), e);
-        }
+        engine.setDataAccess(this);
     }
 
     private long getTotalBytesDB() {
@@ -92,6 +86,13 @@ public class DataAccess {
      * @return Default table space in which DB is stored.
      */
     String getDefaultTableSpace() {
+        if (defaultTableSpace == null) {
+            try {
+                defaultTableSpace = executeScalar("SELECT DEFAULT_TABLESPACE FROM DBA_USERS WHERE USERNAME = (SELECT USER FROM dual)");
+            } catch (Exception e) {
+                engine.getLogger().logError("Cannot acquire defaultTableSpace", e);
+            }
+        }
         return defaultTableSpace;
     }
 
@@ -101,7 +102,12 @@ public class DataAccess {
      * @return Total bytes used by DB.
      */
     long getTotalBytes() {
-        return totalBytes;
+        try {
+            return getTotalBytesDB();
+        } catch (Exception e) {
+            engine.getLogger().logError("Cannot acquire totalBytes", e);
+        }
+        return 0;
     }
 
     /**
@@ -112,6 +118,19 @@ public class DataAccess {
             if (currentConnection != null) {
                 currentConnection.close();
                 currentConnection = null;
+            }
+        } catch (SQLException e) {
+            engine.getLogger().logError("Failed to close connection", e);
+        }
+    }
+
+    /**
+     * Rollbacks transaction.
+     */
+    void rollback() {
+        try {
+            if (currentConnection != null) {
+                currentConnection.rollback();
             }
         } catch (SQLException e) {
             engine.getLogger().logError("Failed to rollback connection", e);

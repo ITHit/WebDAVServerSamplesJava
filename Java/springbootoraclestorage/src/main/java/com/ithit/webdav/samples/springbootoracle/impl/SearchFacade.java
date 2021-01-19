@@ -40,7 +40,7 @@ public class SearchFacade {
     private static SearchFacade INSTANCE;
     private volatile boolean indexed = false;
 
-    public SearchFacade(DataAccess dataAccess, Logger logger) {
+    private SearchFacade(DataAccess dataAccess, Logger logger) {
         this.dataAccess = dataAccess;
         this.logger = logger;
     }
@@ -50,6 +50,14 @@ public class SearchFacade {
             INSTANCE = new SearchFacade(dataAccess, logger);
         }
         return INSTANCE;
+    }
+
+    /**
+     * Checks if the searcher already ran overall indexing.
+     * @return true if yes.
+     */
+    public synchronized boolean indexed() {
+        return indexed;
     }
 
     /**
@@ -116,10 +124,10 @@ public class SearchFacade {
         static final String ID = "id";
         static final String NAME = "name";
         static final String CONTENTS = "contents";
-        private IndexWriter indexWriter;
-        private List<HierarchyItemImpl> files;
-        private Logger logger;
-        private Tika tika;
+        private final IndexWriter indexWriter;
+        private final List<HierarchyItemImpl> files;
+        private final Logger logger;
+        private final Tika tika;
         private final static int BATCH_SIZE = 100;
 
         /**
@@ -141,7 +149,7 @@ public class SearchFacade {
         protected void compute() {
             if (files.size() > BATCH_SIZE) {
                 List<Indexer> tasks = new ArrayList<>();
-                List<List<HierarchyItemImpl>> partitioned = chopped(files, BATCH_SIZE);
+                List<List<HierarchyItemImpl>> partitioned = chopped(files);
                 for (List<HierarchyItemImpl> sublist : partitioned) {
                     tasks.add(new Indexer(indexWriter, sublist, logger, tika));
                 }
@@ -153,12 +161,12 @@ public class SearchFacade {
             }
         }
 
-        private static <T> List<List<T>> chopped(List<T> list, final int L) {
+        private static <T> List<List<T>> chopped(List<T> list) {
             List<List<T>> parts = new ArrayList<>();
             final int N = list.size();
-            for (int i = 0; i < N; i += L) {
+            for (int i = 0; i < N; i += Indexer.BATCH_SIZE) {
                 parts.add(new ArrayList<>(
-                        list.subList(i, Math.min(N, i + L)))
+                        list.subList(i, Math.min(N, i + Indexer.BATCH_SIZE)))
                 );
             }
             return parts;
@@ -252,8 +260,8 @@ public class SearchFacade {
          */
         static class CommitTask extends TimerTask {
 
-            private IndexWriter indexWriter;
-            private Logger logger;
+            private final IndexWriter indexWriter;
+            private final Logger logger;
 
             /**
              * Creates instance of {@link CommitTask}.
@@ -295,10 +303,10 @@ public class SearchFacade {
      */
     static class Searcher {
 
-        private String indexFolder;
-        private QueryParser nameParser;
-        private QueryParser contentParser;
-        private Logger logger;
+        private final String indexFolder;
+        private final QueryParser nameParser;
+        private final QueryParser contentParser;
+        private final Logger logger;
         private IndexSearcher indexSearcher;
 
         /**

@@ -83,39 +83,37 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
     @RequestScope
     @Bean
     public WebDavEngine engine() {
+        final WebDavEngine webDavEngine = buildEngine(getLicense());
+        String indexLocalPath = createIndexPath();
+        DataAccess dataAccess = new DataAccess(webDavEngine, dataSource);
+        SearchFacade searchFacade = SearchFacade.getInstance(dataAccess, webDavEngine.getLogger());
+        webDavEngine.setSearchFacade(searchFacade);
+        if (indexLocalPath != null && !searchFacade.indexed()) {
+            searchFacade.indexRootFolder(indexLocalPath, 2);
+        }
+        webDavEngine.setWebSocketServer(getWebSocketServer());
+        return webDavEngine;
+    }
+
+    @Bean
+    WebSocketServer getWebSocketServer() {
+        return new WebSocketServer(socketHandler.getSessions());
+    }
+
+    @Bean
+    String getLicense() {
         String license;
         try {
             license = FileUtils.readFileToString(new File(properties.getLicense()), StandardCharsets.UTF_8);
         } catch (IOException e) {
             license = "";
         }
-        final WebDavEngine webDavEngine = new WebDavEngine(license, properties.isShowExceptions());
-        CustomFolderGetHandler handler = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), customGetHandler(), properties.getRootContext(), properties.getRootWebSocket());
-        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), customGetHandler(), properties.getRootContext(), properties.getRootWebSocket());
-        handler.setPreviousHandler(webDavEngine.registerMethodHandler("GET", handler));
-        handlerHead.setPreviousHandler(webDavEngine.registerMethodHandler("HEAD", handlerHead));
-        String indexLocalPath = createIndexPath();
-        DataAccess dataAccess = new DataAccess(webDavEngine, dataSource);
-        webDavEngine.setDataAccess(dataAccess);
-        if (indexLocalPath != null) {
-            SearchFacade searchFacade = SearchFacade.getInstance(dataAccess, webDavEngine.getLogger());
-            searchFacade.indexRootFolder(indexLocalPath, 2);
-            webDavEngine.setSearchFacade(searchFacade);
-        }
-        webDavEngine.setWebSocketServer(new WebSocketServer(socketHandler.getSessions()));
-        return webDavEngine;
+        return license;
     }
 
     @Bean
-    public String customGetHandler() {
+    String customGetHandler() {
         return getStreamAsString(customGetHandler);
-    }
-
-    @SneakyThrows
-    private String getStreamAsString(Resource customGetHandler) {
-        try (InputStream is = customGetHandler.getInputStream()) {
-            return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
-        }
     }
 
     /**
@@ -123,7 +121,8 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
      *
      * @return Absolute location of index folder.
      */
-    private String createIndexPath() {
+    @Bean
+    String createIndexPath() {
         Path indexLocalPath = Paths.get(getDefaultIndexFolder());
         if (Files.notExists(indexLocalPath)) {
             try {
@@ -135,8 +134,24 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
         return indexLocalPath.toString();
     }
 
-    public String getDefaultIndexFolder() {
+    private String getDefaultIndexFolder() {
         ApplicationTemp temp = new ApplicationTemp(SpringBootOracleSampleApplication.class);
         return temp.getDir(INDEX_FOLDER).getAbsolutePath();
+    }
+
+    private WebDavEngine buildEngine(String license) {
+        final WebDavEngine webDavEngine = new WebDavEngine(license, properties.isShowExceptions());
+        CustomFolderGetHandler handler = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), customGetHandler(), properties.getRootContext(), properties.getRootWebSocket());
+        CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), customGetHandler(), properties.getRootContext(), properties.getRootWebSocket());
+        handler.setPreviousHandler(webDavEngine.registerMethodHandler("GET", handler));
+        handlerHead.setPreviousHandler(webDavEngine.registerMethodHandler("HEAD", handlerHead));
+        return webDavEngine;
+    }
+
+    @SneakyThrows
+    private String getStreamAsString(Resource customGetHandler) {
+        try (InputStream is = customGetHandler.getInputStream()) {
+            return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+        }
     }
 }

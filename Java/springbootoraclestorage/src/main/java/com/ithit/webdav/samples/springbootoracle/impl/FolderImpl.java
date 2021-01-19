@@ -407,6 +407,9 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                         "   FROM REPOSITORY where id = (select min(id) from REPOSITORY) " +
                         "   START WITH id = ? " +
                         "   CONNECT BY id = PRIOR parent and parent!= prior id)", entry.getKey());
+                if (path == null) {
+                    continue;
+                }
                 String[] pathParts = path.split("/");
                 pathParts = Arrays.copyOf(pathParts, pathParts.length - 1);
                 StringBuilder pathBuilder = new StringBuilder();

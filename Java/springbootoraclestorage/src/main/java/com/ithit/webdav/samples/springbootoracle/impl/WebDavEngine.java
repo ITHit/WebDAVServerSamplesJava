@@ -17,7 +17,7 @@ public class WebDavEngine extends Engine {
 
     private final Logger logger;
     private final String license;
-    private boolean showExceptions;
+    private final boolean showExceptions;
     private SearchFacade searchFacade;
     private WebSocketServer webSocketServer;
     private DataAccess dataAccess;
@@ -83,7 +83,7 @@ public class WebDavEngine extends Engine {
      *
      * @param dataAccess DataAccess to set.
      */
-    public void setDataAccess(DataAccess dataAccess) {
+    void setDataAccess(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 

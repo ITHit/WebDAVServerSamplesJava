@@ -25,39 +25,20 @@ import java.util.Locale;
  */
 public class DataAccess {
 
-    private WebDavEngine engine;
-    private DataSource dataSource;
+    private final WebDavEngine engine;
+    private final DataSource dataSource;
     private Connection currentConnection;
     private String defaultTableSpace;
-    private long totalBytes;
 
     /**
      * Initialize {@link DataAccess} with {@link WebDavEngine}.
      *
      * @param engine {@link WebDavEngine}.
      */
-    public DataAccess(WebDavEngine engine, DataSource dataSource) {
-        this.engine = engine;
+    public DataAccess(WebDavEngine webDavEngine, DataSource dataSource) {
+        this.engine = webDavEngine;
         this.dataSource = dataSource;
-        try {
-            defaultTableSpace = executeScalar("SELECT DEFAULT_TABLESPACE FROM DBA_USERS WHERE USERNAME = (SELECT USER FROM dual)");
-            totalBytes = getTotalBytesDB();
-        } catch (Exception e) {
-            engine.getLogger().logError(e.getMessage(), e);
-        }
-    }
-
-    private long getTotalBytesDB() {
-        try {
-            BigDecimal bytes = executeScalar("SELECT sum(bytes)" +
-                    "FROM dba_data_files " +
-                    "where tablespace_name=? " +
-                    "GROUP BY tablespace_name", defaultTableSpace);
-            return bytes.longValue();
-        } catch (Exception e) {
-            engine.getLogger().logError(e.getMessage(), e);
-            return 0;
-        }
+        webDavEngine.setDataAccess(this);
     }
 
     /**
@@ -72,6 +53,7 @@ public class DataAccess {
                 Locale.setDefault(Locale.US);
 
                 currentConnection = dataSource.getConnection();
+                // Will open new transaction and will keep it until you commit it or rollback.
                 currentConnection.setAutoCommit(false);
 
             } catch (SQLException e) {
@@ -88,6 +70,13 @@ public class DataAccess {
      * @return Default table space in which DB is stored.
      */
     String getDefaultTableSpace() {
+        if (defaultTableSpace == null) {
+            try {
+                defaultTableSpace = executeScalar("SELECT DEFAULT_TABLESPACE FROM DBA_USERS WHERE USERNAME = (SELECT USER FROM dual)");
+            } catch (Exception e) {
+                engine.getLogger().logError("Cannot acquire defaultTableSpace", e);
+            }
+        }
         return defaultTableSpace;
     }
 
@@ -97,7 +86,12 @@ public class DataAccess {
      * @return Total bytes used by DB.
      */
     long getTotalBytes() {
-        return totalBytes;
+        try {
+            return getTotalBytesDB();
+        } catch (Exception e) {
+            engine.getLogger().logError("Cannot acquire totalBytes", e);
+        }
+        return 0;
     }
 
     /**
@@ -108,6 +102,19 @@ public class DataAccess {
             if (currentConnection != null) {
                 currentConnection.close();
                 currentConnection = null;
+            }
+        } catch (SQLException e) {
+            engine.getLogger().logError("Failed to close connection", e);
+        }
+    }
+
+    /**
+     * Rollbacks transaction.
+     */
+    public void rollback() {
+        try {
+            if (currentConnection != null) {
+                currentConnection.rollback();
             }
         } catch (SQLException e) {
             engine.getLogger().logError("Failed to rollback connection", e);
@@ -121,8 +128,9 @@ public class DataAccess {
      */
     public void commit() throws ServerException {
         try {
-            if (currentConnection != null)
+            if (currentConnection != null) {
                 currentConnection.commit();
+            }
         } catch (SQLException ex) {
             throw new ServerException(ex);
         }
@@ -464,5 +472,18 @@ public class DataAccess {
             engine.getLogger().logError(e.getMessage(), e);
         }
         return result;
+    }
+
+    private long getTotalBytesDB() {
+        try {
+            BigDecimal bytes = executeScalar("SELECT sum(bytes)" +
+                    "FROM dba_data_files " +
+                    "where tablespace_name=? " +
+                    "GROUP BY tablespace_name", defaultTableSpace);
+            return bytes.longValue();
+        } catch (Exception e) {
+            engine.getLogger().logError(e.getMessage(), e);
+            return 0;
+        }
     }
 }

@@ -18,6 +18,10 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ENGINE"/>
     </logger>
+    <logger name="com.zaxxer.hikari.pool.HikariPool" level="debug" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ENGINE"/>
+    </logger>
     <root>
         <level value="ERROR"/>
         <appender-ref ref="CONSOLE"/>

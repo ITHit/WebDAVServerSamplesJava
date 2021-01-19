@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>oraclestorage</artifactId>
-    <version>4.6.4296</version>
+    <version>4.6.4354</version>
     <packaging>war</packaging>
 
     <properties>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.6.4296</version>
+            <version>4.6.4354</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.6.4296</version>
+            <version>4.6.4354</version>
         </dependency>
 
         <dependency>
@@ -165,7 +165,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/oraclestorage-4.6.4296/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/oraclestorage-4.6.4354/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -244,7 +244,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/oraclestorage-4.6.4296</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-4.6.4354</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>

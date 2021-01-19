@@ -103,7 +103,6 @@ public class WebDavServlet extends HttpServlet {
         license = getContents(licenseFile);
         WebDavEngine engine = new WebDavEngine(logger, license);
         DataAccess dataAccess = new DataAccess(engine);
-        engine.setDataAccess(dataAccess);
         String indexLocalPath = createIndexPath();
         String indexInterval = servletConfig.getInitParameter("index-interval");
         Integer interval = null;
@@ -150,11 +149,11 @@ public class WebDavServlet extends HttpServlet {
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("engine", engine);
         DataAccess dataAccess = new DataAccess(engine);
-        engine.setDataAccess(dataAccess);
         try {
             engine.service(davRequest, davResponse);
             dataAccess.commit();
         } catch (DavException e) {
+            dataAccess.rollback();
             if (e.getStatus() == WebDavStatus.INTERNAL_ERROR) {
                 logger.logError("Exception during request processing", e);
                 if (showExceptions)
