@@ -1,4 +1,4 @@
-﻿/*Start Common styles*/
+/*Start Common styles*/
 .ellipsis {
     position: relative;
 }
@@ -80,7 +80,7 @@ a.disabled {
 }
 
 .custom-checkbox input:checked ~ .checkmark {
-    background-image: url(/wwwroot/images/check-square.svg);
+    background-image: url(../images/check-square.svg);
     border: none;
     width: 22px;
     height: 22px;
@@ -129,7 +129,7 @@ p.error-message {
 .btn-label {
     display: inline-block;
     padding: 4px 9px;
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0,0,0,0.15);
     border-radius: 6px 0 0 6px;
 }
 
@@ -152,7 +152,7 @@ p.error-message {
 }
 
 .table-hover tbody tr.active {
-    background-color: rgba(0, 0, 0, .075);
+    background-color: rgba(0,0,0,.075);
 }
 
 .split {
@@ -366,10 +366,6 @@ header .versions {
     cursor: pointer;
 }
 
-.modal-open .navbar-toggler.burger-button {
-    margin-right: 0px !important;
-}
-
 .navbar-brand.ellipsis span {
     left: 45px;
     top: 5px;
@@ -418,16 +414,17 @@ header .versions {
 .header-content a.btn {
     text-decoration: none;
 }
-
 /*End Header styles*/
 
 /*Start Main layout styles*/
 .breadcrumb {
     background: none;
+    padding: 10px 7px;
+    margin-bottom: 15px;
 }
 
 ol.breadcrumb li .icon-home {
-    background-image: url('/wwwroot/images/home.svg');
+    background-image: url('../images/home.svg');
     display: inline-block;
     height: 16px;
     width: 14px;
@@ -483,7 +480,6 @@ ol.breadcrumb li .icon-home {
     overflow: hidden;
     text-align: center;
 }
-
 /*End Right Panel styles*/
 
 /*Start Left Panel styles*/
@@ -492,6 +488,10 @@ ol.breadcrumb li .icon-home {
 .ithit-grid-toolbar {
     margin-top: 7px;
     padding: 0 10px;
+}
+
+.ithit-grid-toolbar .first-section {
+    padding-left: 5px;
 }
 
 .ithit-grid-toolbar button {
@@ -532,35 +532,39 @@ ol.breadcrumb li .icon-home {
 }
 
 .ithit-grid-toolbar button.btn-create-folder:before {
-    background-image: url(/wwwroot/images/create-folder.svg);
+    background-image: url(../images/create-folder.svg);
 }
 
 .ithit-grid-toolbar button.btn-copy-items:before {
     margin: 0 4px;
-    background-image: url(/wwwroot/images/copy.svg);
+    background-image: url(../images/copy.svg);
 }
 
 .ithit-grid-toolbar button.btn-cut-items:before {
     margin: 0 4px;
-    background-image: url(/wwwroot/images/cut.svg);
+    background-image: url(../images/cut.svg);
 }
 
 .ithit-grid-toolbar button.btn-paste-items:before {
     margin: 0 4px;
-    background-image: url(/wwwroot/images/paste.svg);
+    background-image: url(../images/paste.svg);
 }
 
 .ithit-grid-toolbar button.btn-reload-items:before {
     margin: 0 4px;
-    background-image: url(/wwwroot/images/reload.svg);
+    background-image: url(../images/reload.svg);
+}
+
+.ithit-grid-toolbar button.btn-rename-item:before {
+    background-image: url(../images/rename.svg);
 }
 
 .ithit-grid-toolbar button.btn-print-items:before {
-    background-image: url(/wwwroot/images/print.svg);
+    background-image: url(../images/print.svg);
 }
 
 .ithit-grid-toolbar button.btn-delete-items:before {
-    background-image: url(/wwwroot/images/delete.svg);
+    background-image: url(../images/delete.svg);
 }
 
 .ithit-grid-toolbar button:hover:before, .ithit-grid-toolbar button:focus:before {
@@ -586,10 +590,10 @@ ol.breadcrumb li .icon-home {
 
 .ithit-search-container .twitter-typeahead:before {
     position: absolute;
-    top: 10px;
-    left: 16px;
+    top: 9px;
+    left: 7px;
     content: "";
-    background-image: url(/wwwroot/images/search.svg);
+    background-image: url(../images/search.svg);
     display: block;
     width: 20px;
     height: 20px;
@@ -650,6 +654,7 @@ ol.breadcrumb li .icon-home {
 }
 
 
+
 .tt-suggestion .snippet b, .ithit-grid-container .snippet b {
     color: #555;
 }
@@ -702,18 +707,12 @@ table tr.tr-snippet-url td > div:last-child {
 /*Grid Items*/
 .ithit-grid-container {
     width: 100%;
-    margin-top: 35px;
+    margin-top: 20px;
     overflow-y: hidden;
 }
 
-@media (max-width: 767px) {
-    .ithit-grid-container {
-        margin-top: 20px;
-    }
-}
-
 .ithit-grid-container .icon-folder {
-    background-image: url(/wwwroot/images/folder.svg);
+    background-image: url(../images/folder.svg);
     display: inline-block;
     height: 14px;
     width: 16px;
@@ -722,7 +721,7 @@ table tr.tr-snippet-url td > div:last-child {
 .ithit-grid-container .icon-open-folder, .ithit-grid-container .icon-edit,
 .ithit-grid-container .icon-microsoft-edit, .icon-gsuite-edit,
 .ithit-grid-container .icon-edit-associated {
-    background-image: url(/wwwroot/images/open-folder.svg);
+    background-image: url(../images/open-folder.svg);
     background-repeat: no-repeat;
     display: inline-block;
     height: 19px;
@@ -732,22 +731,22 @@ table tr.tr-snippet-url td > div:last-child {
 }
 
 .ithit-grid-container .icon-edit {
-    background-image: url(/wwwroot/images/edit.svg);
+    background-image: url(../images/edit.svg);
     top: 2px;
 }
 
 .ithit-grid-container .icon-microsoft-edit, .ithit-grid-container .icon-gsuite-edit {
     background: none;
-    -webkit-mask-image: url(/wwwroot/images/menu-microsoft-edit.svg);
-    mask-image: url(/wwwroot/images/menu-microsoft-edit.svg);
+    -webkit-mask-image: url(../images/menu-microsoft-edit.svg);
+    mask-image: url(../images/menu-microsoft-edit.svg);
     background-color: white;
     -webkit-mask-size: cover;
     top: 2px;
 }
 
 .ithit-grid-container .icon-gsuite-edit {
-    -webkit-mask-image: url(/wwwroot/images/menu-gsuit-edit.svg);
-    mask-image: url(/wwwroot/images/menu-gsuit-edit.svg);
+    -webkit-mask-image: url(../images/menu-gsuit-edit.svg);
+    mask-image: url(../images/menu-gsuit-edit.svg);
 }
 
 .ithit-grid-container th.sort {
@@ -874,7 +873,7 @@ table.ithit-grid-container > tbody > tr > td button.btn-delete .btn-label {
 }
 
 .ithit-grid-icon-locked {
-    background-image: url(/wwwroot/images/locked.svg);
+    background-image: url(../images/locked.svg);
     width: 17px;
     height: 22px;
     display: inline-block;
@@ -897,7 +896,7 @@ table.ithit-grid-container > tbody > tr > td button.btn-delete .btn-label {
 .ithit-grid-container .actions .icon-gsuite-edit,
 .ithit-grid-container .actions .icon-edit-associated {
     display: inline-block;
-    background-image: url(/wwwroot/images/menu-edit.svg);
+    background-image: url(../images/menu-edit.svg);
     width: 28px;
     height: 24px;
     vertical-align: middle;
@@ -906,7 +905,7 @@ table.ithit-grid-container > tbody > tr > td button.btn-delete .btn-label {
 }
 
 .ithit-grid-container .actions .icon-edit-associated {
-    background-image: url(/wwwroot/images/edit-associated.svg);
+    background-image: url(../images/edit-associated.svg);
     width: 27px;
     height: 30px;
     margin-top: -17px;
@@ -932,14 +931,14 @@ table.ithit-grid-container > tbody > tr > td button.btn-delete .btn-label {
 }
 
 .ithit-grid-container .actions .icon-microsoft-edit, .ithit-grid-container .actions .icon-gsuite-edit {
-    background-image: url(/wwwroot/images/menu-microsoft-edit.svg);
+    background-image: url(../images/menu-microsoft-edit.svg);
     width: 25px;
     height: 26px;
     margin-top: -9px;
 }
 
 .ithit-grid-container .actions .icon-gsuite-edit {
-    background-image: url(/wwwroot/images/menu-gsuit-edit.svg);
+    background-image: url(../images/menu-gsuit-edit.svg);
 }
 
 table tr.hover {
@@ -971,7 +970,6 @@ table tr.hover {
     vertical-align: middle;
     white-space: nowrap;
 }
-
 /*Size and Uploaded columns*/
 .ithit-grid-uploads > tbody > tr > td:nth-child(2),
 .ithit-grid-uploads > tbody > tr > td:nth-child(3) {
@@ -1047,5 +1045,3 @@ table tr.hover {
     padding-left: 15px;
     display: none;
 }
-
-/*End Main layout styles*/

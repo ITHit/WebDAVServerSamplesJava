@@ -1,5 +1,4 @@
-﻿
-(function (WebdavCommon) {
+﻿(function (WebdavCommon) {
     var sOverwriteDialogueFormat = 'The following item(s) exist on the server:<br/><br/>{0}<br/><br/>Overwrite?';
     var sFailedCheckExistsMessage = "Check for already exists item failed with error.";
     var sRetryMessageFormat = 'Retry in: {0}';

@@ -129,7 +129,7 @@ p.error-message {
 .btn-label {
     display: inline-block;
     padding: 4px 9px;
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0,0,0,0.15);
     border-radius: 6px 0 0 6px;
 }
 
@@ -152,7 +152,7 @@ p.error-message {
 }
 
 .table-hover tbody tr.active {
-    background-color: rgba(0, 0, 0, .075);
+    background-color: rgba(0,0,0,.075);
 }
 
 .split {
@@ -366,10 +366,6 @@ header .versions {
     cursor: pointer;
 }
 
-.modal-open .navbar-toggler.burger-button {
-    margin-right: 0px !important;
-}
-
 .navbar-brand.ellipsis span {
     left: 45px;
     top: 5px;
@@ -418,12 +414,13 @@ header .versions {
 .header-content a.btn {
     text-decoration: none;
 }
-
 /*End Header styles*/
 
 /*Start Main layout styles*/
 .breadcrumb {
     background: none;
+    padding: 10px 7px;
+    margin-bottom: 15px;
 }
 
 ol.breadcrumb li .icon-home {
@@ -483,7 +480,6 @@ ol.breadcrumb li .icon-home {
     overflow: hidden;
     text-align: center;
 }
-
 /*End Right Panel styles*/
 
 /*Start Left Panel styles*/
@@ -492,6 +488,10 @@ ol.breadcrumb li .icon-home {
 .ithit-grid-toolbar {
     margin-top: 7px;
     padding: 0 10px;
+}
+
+.ithit-grid-toolbar .first-section {
+    padding-left: 5px;
 }
 
 .ithit-grid-toolbar button {
@@ -555,6 +555,10 @@ ol.breadcrumb li .icon-home {
     background-image: url(../images/reload.svg);
 }
 
+.ithit-grid-toolbar button.btn-rename-item:before {
+    background-image: url(../images/rename.svg);
+}
+
 .ithit-grid-toolbar button.btn-print-items:before {
     background-image: url(../images/print.svg);
 }
@@ -586,8 +590,8 @@ ol.breadcrumb li .icon-home {
 
 .ithit-search-container .twitter-typeahead:before {
     position: absolute;
-    top: 10px;
-    left: 16px;
+    top: 9px;
+    left: 7px;
     content: "";
     background-image: url(../images/search.svg);
     display: block;
@@ -650,6 +654,7 @@ ol.breadcrumb li .icon-home {
 }
 
 
+
 .tt-suggestion .snippet b, .ithit-grid-container .snippet b {
     color: #555;
 }
@@ -702,14 +707,8 @@ table tr.tr-snippet-url td > div:last-child {
 /*Grid Items*/
 .ithit-grid-container {
     width: 100%;
-    margin-top: 35px;
+    margin-top: 20px;
     overflow-y: hidden;
-}
-
-@media (max-width: 767px) {
-    .ithit-grid-container {
-        margin-top: 20px;
-    }
 }
 
 .ithit-grid-container .icon-folder {
@@ -971,7 +970,6 @@ table tr.hover {
     vertical-align: middle;
     white-space: nowrap;
 }
-
 /*Size and Uploaded columns*/
 .ithit-grid-uploads > tbody > tr > td:nth-child(2),
 .ithit-grid-uploads > tbody > tr > td:nth-child(3) {
@@ -1047,5 +1045,3 @@ table tr.hover {
     padding-left: 15px;
     display: none;
 }
-
-/*End Main layout styles*/
