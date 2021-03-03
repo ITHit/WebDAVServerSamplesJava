@@ -41,7 +41,7 @@ public class CustomFolderGetHandler implements MethodHandler {
             response.setContentType("text/html");
             if (!WebDavServlet.isSupportsUserDefinedAttributes()) {
                 Path path = Paths.get(WebDavServlet.getRealPath(), pathToErrorHTML);
-                String lines = FileUtils.readFileToString(path.toFile(), Charset.defaultCharset());
+                String lines = FileUtils.readFileToString(path.toFile(), StandardCharsets.UTF_8);
                 stream.println(lines);
             } else {
                 Path path = Paths.get(WebDavServlet.getRealPath(), pathToHTML);

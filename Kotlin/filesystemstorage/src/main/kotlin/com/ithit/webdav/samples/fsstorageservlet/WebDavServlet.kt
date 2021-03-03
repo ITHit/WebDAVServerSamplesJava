@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.IOException
 import java.io.PrintStream
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 import javax.servlet.ServletConfig
@@ -46,7 +47,7 @@ class WebDavServlet : HttpServlet() {
         val licenseFile = servletConfig.getInitParameter("license")
         showExceptions = java.lang.Boolean.parseBoolean(servletConfig.getInitParameter("showExceptions"))
         license = try {
-            FileUtils.readFileToString(File(licenseFile))
+            FileUtils.readFileToString(File(licenseFile), StandardCharsets.UTF_8)
         } catch (e: IOException) {
             ""
         }

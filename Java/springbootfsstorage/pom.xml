@@ -4,16 +4,17 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.4.RELEASE</version>
+        <version>2.3.8.RELEASE</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springbootfsstorage</artifactId>
-    <version>4.6.4478</version>
+    <version>4.7.4551</version>
     <name>springbootfsstorage</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
+        <azure.version>3.1.0</azure.version>
         <java.version>1.8</java.version>
         <lucene-core.version>7.5.0</lucene-core.version>
         <tika-core.version>1.23</tika-core.version>
@@ -38,24 +39,32 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.azure.spring</groupId>
+            <artifactId>azure-spring-boot-starter-active-directory</artifactId>
+        </dependency>
 
         <!-- WebDav dependencies -->
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>4.6.4478</version>
+            <version>4.7.4551</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>4.6.4478</version>
+            <version>4.7.4551</version>
         </dependency>
 
         <!-- JNA dependencies -->
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>5.4.0</version>
+            <version>4.5.1</version>
         </dependency>
 
         <!-- Gson -->
@@ -193,4 +202,15 @@
         </plugins>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.azure.spring</groupId>
+                <artifactId>azure-spring-boot-bom</artifactId>
+                <version>${azure.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

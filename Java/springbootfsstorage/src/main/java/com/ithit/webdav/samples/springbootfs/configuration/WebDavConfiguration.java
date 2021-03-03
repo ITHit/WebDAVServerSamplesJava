@@ -25,7 +25,6 @@ import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -45,7 +44,6 @@ import java.util.Collections;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EnableConfigurationProperties(WebDavConfigurationProperties.class)
-@EnableWebMvc
 @EnableWebSocket
 @Configuration
 public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebSocketConfigurer {
@@ -70,7 +68,7 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        registry.setOrder(Ordered.LOWEST_PRECEDENCE);
         registry.addResourceHandler("/wwwroot/**")
                 .addResourceLocations("classpath:/wwwroot/", "/wwwroot/");
     }

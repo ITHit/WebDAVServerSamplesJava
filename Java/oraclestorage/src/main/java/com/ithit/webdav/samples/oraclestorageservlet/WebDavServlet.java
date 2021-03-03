@@ -7,6 +7,7 @@ import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.DavException;
 import com.ithit.webdav.server.exceptions.WebDavStatus;
+import org.apache.commons.io.FileUtils;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -14,10 +15,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,27 +33,6 @@ public class WebDavServlet extends HttpServlet {
     private String license;
     private SearchFacade searchFacade;
     static final String START_TIME = "" + System.currentTimeMillis();
-
-    /**
-     * Reads license file content.
-     *
-     * @param fileName License file location.
-     * @return String license content.
-     */
-    private static String getContents(String fileName) {
-        StringBuilder contents = new StringBuilder();
-
-        try (BufferedReader input = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = input.readLine()) != null) {
-                contents.append(line);
-                contents.append(System.getProperty("line.separator"));
-            }
-        } catch (IOException ignored) {
-       }
-
-        return contents.toString();
-    }
 
     /**
      * Return path of servlet location in file system to load resources.
@@ -86,7 +64,11 @@ public class WebDavServlet extends HttpServlet {
 
         String licenseFile = servletConfig.getInitParameter("license");
         showExceptions = "true".equals(servletConfig.getInitParameter("showExceptions"));
-        license = getContents(licenseFile);
+        try {
+            license = FileUtils.readFileToString(new File(licenseFile), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            license = "";
+        }
         realPath = servletConfig.getServletContext().getRealPath("");
         servletContext = servletConfig.getServletContext().getContextPath();
         logger = new HttpServletLoggerImpl(servletConfig.getServletContext());

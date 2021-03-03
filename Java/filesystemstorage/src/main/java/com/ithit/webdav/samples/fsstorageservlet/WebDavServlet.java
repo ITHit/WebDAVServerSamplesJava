@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -92,7 +93,7 @@ public class WebDavServlet extends HttpServlet {
         String licenseFile = servletConfig.getInitParameter("license");
         showExceptions = Boolean.parseBoolean(servletConfig.getInitParameter("showExceptions"));
         try {
-            license = FileUtils.readFileToString(new File(licenseFile));
+            license = FileUtils.readFileToString(new File(licenseFile), StandardCharsets.UTF_8);
         } catch (IOException e) {
             license = "";
         }

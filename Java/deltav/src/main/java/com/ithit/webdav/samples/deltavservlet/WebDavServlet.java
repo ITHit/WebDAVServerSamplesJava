@@ -8,6 +8,7 @@ import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.deltav.AutoVersion;
 import com.ithit.webdav.server.exceptions.DavException;
 import com.ithit.webdav.server.exceptions.WebDavStatus;
+import org.apache.commons.io.FileUtils;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -15,10 +16,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,27 +36,6 @@ public class WebDavServlet extends HttpServlet {
     private static final String DEFAULT_INDEX_PATH = "WEB-INF/Index";
     private SearchFacade searchFacade;
     static final String START_TIME = "" + System.currentTimeMillis();
-
-    /**
-     * Reads license file content.
-     *
-     * @param fileName License file location.
-     * @return String license content.
-     */
-    private static String getContents(String fileName) {
-        StringBuilder contents = new StringBuilder();
-
-        try (BufferedReader input = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = input.readLine()) != null) {
-                contents.append(line);
-                contents.append(System.getProperty("line.separator"));
-            }
-        } catch (IOException ignored) {
-        }
-
-        return contents.toString();
-    }
 
     /**
      * Return path of servlet location in file system to load resources.
@@ -100,7 +78,11 @@ public class WebDavServlet extends HttpServlet {
         autoputUnderVersionControl = "true".equals(servletConfig.getInitParameter("autoPutUnderVersionControl"));
         realPath = servletConfig.getServletContext().getRealPath("");
         servletContext = servletConfig.getServletContext().getContextPath();
-        license = getContents(licenseFile);
+        try {
+            license = FileUtils.readFileToString(new File(licenseFile), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            license = "";
+        }
         WebDavEngine engine = new WebDavEngine(logger, license);
         DataAccess dataAccess = new DataAccess(engine);
         String indexLocalPath = createIndexPath();

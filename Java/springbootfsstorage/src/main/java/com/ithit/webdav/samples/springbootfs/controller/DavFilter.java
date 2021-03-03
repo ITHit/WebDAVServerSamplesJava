@@ -4,6 +4,7 @@ import com.ithit.webdav.samples.springbootfs.configuration.WebDavConfigurationPr
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Component
-@Order(1)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DavFilter implements Filter {
 
     WebDavConfigurationProperties properties;
