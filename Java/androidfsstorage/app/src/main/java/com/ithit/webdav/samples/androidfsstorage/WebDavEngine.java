@@ -33,7 +33,6 @@ public class WebDavEngine extends Engine {
      * @return Instance of corresponding {@link HierarchyItem} or null if item is not found.
      * @throws ServerException in case if cannot read file attributes.
      */
-    // <<<< getHierarchyItemEngine
     @Override
     public HierarchyItem getHierarchyItem(String contextPath) throws ServerException {
         int i = contextPath.indexOf("?");
@@ -52,7 +51,6 @@ public class WebDavEngine extends Engine {
         getLogger().logDebug("Could not find item that corresponds to path: " + contextPath);
         return null; // no hierarchy item that corresponds to path parameter was found in the repository
     }
-    // getHierarchyItemEngine >>>>
 
     /**
      * Returns logger that will be used by engine.

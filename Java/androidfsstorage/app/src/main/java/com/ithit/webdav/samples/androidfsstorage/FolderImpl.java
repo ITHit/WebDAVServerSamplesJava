@@ -83,7 +83,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
-    // <<<< createFileImpl
     @Override
     public FileImpl createFile(String name) throws LockedException, ServerException {
         ensureHasToken();
@@ -99,7 +98,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
         }
         return null;
     }
-    // createFileImpl >>>>
 
     /**
      * Creates new {@link FolderImpl} folder with the specified name in this folder.
@@ -108,7 +106,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
-    // <<<< createFolderImpl
     @Override
     public void createFolder(String name) throws LockedException,
             ServerException {
@@ -119,7 +116,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
             fullPath.mkdir();
         }
     }
-    // createFolderImpl >>>>
 
     /**
      * Gets the array of this folder's children.
@@ -131,7 +127,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
      * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in a folder.
      * @throws ServerException In case of an error.
      */
-    // <<<< getChildren
     @Override
     public PageResults getChildren(List<Property> propNames, Long offset, Long nResults, List<OrderProperty> orderProps) throws ServerException {
         String decodedPath = HierarchyItemImpl.decodeAndConvertToPath(getPath());
@@ -148,9 +143,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
         }
         return new PageResults(children, null);
     }
-    // getChildren >>>>
 
-    // <<<< deleteFolderImpl
     @Override
     public void delete() throws LockedException, MultistatusException,
             ServerException {
@@ -161,9 +154,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
             throw new ServerException(e);
         }
     }
-    // deleteFolderImpl >>>>
 
-    // <<<< copyToFolderImpl
     @Override
     public void copyTo(Folder folder, String destName, boolean deep)
             throws LockedException, MultistatusException, ServerException {
@@ -185,7 +176,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
         }
         setName(destName);
     }
-    // copyToFolderImpl >>>>
 
     /**
      * Check whether current folder is the parent to the destination.
@@ -198,7 +188,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
         return destFolder.startsWith(getPath().replace("/", java.io.File.separator));
     }
 
-    // <<<< moveToFolderImpl
     @Override
     public void moveTo(Folder folder, String destName) throws LockedException,
             ConflictException, MultistatusException, ServerException {
@@ -217,7 +206,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
         }
         setName(destName);
     }
-    // moveToFolderImpl >>>>
 
     /**
      * Returns free bytes available to current user.

@@ -313,7 +313,6 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
      * @param nResults The number of items to return.
      * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in search results.
      */
-    // <<<< searchImpl
     @Override
     public PageResults search(String searchString, SearchOptions options, List<Property> propNames, Long offset, Long nResults) {
         List<HierarchyItem> results = new LinkedList<>();

@@ -208,7 +208,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return List of properties with values set. If property cannot be found it shall be omitted from the result.
      * @throws ServerException In case of an error.
      */
-    // <<<< getPropertiesImpl
     @Override
     public List<Property> getProperties(Property[] props) throws ServerException {
         List<Property> l = getPropertyNames();
@@ -228,7 +227,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         }
         return result;
     }
-    // getPropertiesImpl >>>>
 
 
     private List<Property> getProperties() throws ServerException {
@@ -245,7 +243,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return List of all property names for this item.
      * @throws ServerException In case of an error.
      */
-    // <<<< getPropertyNamesImpl
     @Override
     public List<Property> getPropertyNames() throws ServerException {
         if (ExtendedAttributesExtension.hasExtendedAttribute(getFullPath(), propertiesAttribute)) {
@@ -254,7 +251,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         }
         return new LinkedList<>();
     }
-    // getPropertyNamesImpl >>>>
 
     /**
      * Check whether client is the lock owner.
@@ -299,7 +295,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      *                              result of the operation for each property.
      * @throws ServerException      In case of other error.
      */
-    // <<<< updatePropertiesImpl
     @Override
     public void updateProperties(Property[] setProps, Property[] delProps)
             throws LockedException, MultistatusException, ServerException {
@@ -345,7 +340,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         }
         ExtendedAttributesExtension.setExtendedAttribute(getFullPath(), propertiesAttribute, SerializationUtils.serialize(propToLeft));
     }
-    // updatePropertiesImpl >>>>
 
     /**
      * Updates basic file times in the following format - Thu, 28 Mar 2013 20:15:34 GMT.
@@ -392,7 +386,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @throws MultistatusException Errors have occurred during processing of the subtree.
      * @throws ServerException      In case of an error.
      */
-    // <<<< lockImpl
     @Override
     public LockResult lock(boolean shared, boolean deep, long timeout, String owner)
             throws LockedException, MultistatusException, ServerException {
@@ -411,7 +404,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         ExtendedAttributesExtension.setExtendedAttribute(getFullPath(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
         return new LockResult(token, timeout);
     }
-    // lockImpl >>>>
 
     /**
      * Checks whether {@link HierarchyItemImpl} has a lock and whether it is shared.
@@ -431,7 +423,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return Array of locks.
      * @throws ServerException In case of an error.
      */
-    // <<<< getActiveLocksImpl
     @Override
     public List<LockInfo> getActiveLocks() throws ServerException {
         if (activeLocks == null) {
@@ -448,7 +439,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         }
         return activeLocks;
     }
-    // getActiveLocksImpl >>>>
 
     /**
      * Removes lock with the specified token from this item.
@@ -457,7 +447,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @throws PreconditionFailedException Included lock token was not enforceable on this item.
      * @throws ServerException             In case of an error.
      */
-    // <<<< unlockImpl
     @Override
     public void unlock(String lockToken) throws PreconditionFailedException,
             ServerException {
@@ -480,7 +469,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             throw new PreconditionFailedException();
         }
     }
-    // unlockImpl >>>>
 
     /**
      * Updates lock timeout information on this item.
@@ -491,7 +479,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @throws PreconditionFailedException Included lock token was not enforceable on this item.
      * @throws ServerException             In case of an error.
      */
-    // <<<< refreshLockImpl
     @Override
     public RefreshLockResult refreshLock(String token, long timeout)
             throws PreconditionFailedException, ServerException {
@@ -517,6 +504,5 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());
     }
-    // refreshLockImpl >>>>
 
 }

@@ -197,7 +197,6 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
      * @param count      Number of bytes to be written to the output stream.
      * @throws ServerException In case of an error.
      */
-    // <<<< readFileImpl
     @Override
     public void read(OutputStream out, long startIndex, long count) throws ServerException {
         java.io.File fullPath = FileUtils.getFile(this.getFullPath());
@@ -222,7 +221,6 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             IOUtils.closeQuietly(in);
         }
     }
-    // readFileImpl >>>>
 
     /**
      * Saves the content of the file from the specified stream to the File System repository.
@@ -236,7 +234,6 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
      * @throws ServerException In case of an error.
      * @throws IOException     I/O error.
      */
-    // <<<< writeFileImpl
     @Override
     public long write(InputStream content, String contentType, long startIndex, long totalFileLength)
             throws LockedException, ServerException, IOException {
@@ -257,7 +254,6 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             IOUtils.closeQuietly(fos);
         }
     }
-    // writeFileImpl >>>>
 
     private void incrementSerialNumber() {
         try {

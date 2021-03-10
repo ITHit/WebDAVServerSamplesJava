@@ -8,7 +8,6 @@ import com.ithit.webdav.server.exceptions.MultistatusException;
 import com.ithit.webdav.server.exceptions.ServerException;
 import com.ithit.webdav.server.resumableupload.ResumableUpload;
 import com.ithit.webdav.server.resumableupload.UploadProgress;
-import com.sun.nio.file.ExtendedOpenOption;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,7 +50,20 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         this.allowedOpenFileOptions = (systemName.contains("mac") || systemName.contains("linux")) ?
                 (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ}) :
                 (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ,
-                        ExtendedOpenOption.NOSHARE_DELETE});
+                        noShareDeleteOption()});
+    }
+
+    /**
+     * Load ExtendedOpenOption with reflection without direct reference - because most of Linux/MacOS jdks don't have it and not required.
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private OpenOption noShareDeleteOption() {
+        try {
+            Class enumClass = Class.forName("com.sun.nio.file.ExtendedOpenOption");
+            return (OpenOption) Enum.valueOf(enumClass, "NOSHARE_DELETE");
+        } catch (ClassNotFoundException e) {
+            return StandardOpenOption.READ;
+        }
     }
 
     /**

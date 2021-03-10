@@ -8,7 +8,6 @@ import com.ithit.webdav.server.exceptions.MultistatusException;
 import com.ithit.webdav.server.exceptions.ServerException;
 import com.ithit.webdav.server.resumableupload.ResumableUpload;
 import com.ithit.webdav.server.resumableupload.UploadProgress;
-import com.sun.nio.file.ExtendedOpenOption;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,9 +50,21 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         this.allowedOpenFileOptions = (systemName.contains("mac") || systemName.contains("linux")) ?
                 (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ}) :
                 (new OpenOption[]{StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ,
-                        ExtendedOpenOption.NOSHARE_DELETE});
+                        noShareDeleteOption()});
     }
 
+    /**
+     * Load ExtendedOpenOption with reflection without direct reference - because most of Linux/MacOS jdks don't have it and not required.
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private OpenOption noShareDeleteOption() {
+        try {
+            Class enumClass = Class.forName("com.sun.nio.file.ExtendedOpenOption");
+            return (OpenOption) Enum.valueOf(enumClass, "NOSHARE_DELETE");
+        } catch (ClassNotFoundException e) {
+            return StandardOpenOption.READ;
+        }
+    }
     /**
      * Returns file that corresponds to path.
      *
@@ -216,7 +227,6 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
      * @param count      Number of bytes to be written to the output stream.
      * @throws ServerException In case of an error.
      */
-    // <<<< readFileImpl
     @Override
     public void read(OutputStream out, long startIndex, long count) throws ServerException {
         Path fullPath = this.getFullPath();
@@ -237,7 +247,6 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             throw new ServerException(x);
         }
     }
-    // readFileImpl >>>>
 
     /**
      * Saves the content of the file from the specified stream to the File System repository.
@@ -251,7 +260,6 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
      * @throws ServerException In case of an error.
      * @throws IOException     I/O error.
      */
-    // <<<< writeFileImpl
     @Override
     public long write(InputStream content, String contentType, long startIndex, long totalFileLength)
             throws LockedException, ServerException, IOException {
@@ -289,7 +297,6 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         return totalWrittenBytes;
     }
-    // writeFileImpl >>>>
 
     private void incrementSerialNumber() {
         try {
