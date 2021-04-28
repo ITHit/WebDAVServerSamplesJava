@@ -1,0 +1,25 @@
+<HTML><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <title>IT Hit WebDAV Server Engine</title>
+
+    <style type="text/css">
+        body { font-family: Verdana,sans-serif; font-size:smaller; }
+        li { padding-bottom: 7px; }
+    </style>
+</head>
+<body onload="init()">
+<h1>Your file system doesn't support User Defined Attributes or they are not enabled</h1>
+<p>Information below will help you to find whether your file system supports User Defined Attributes:</p>
+<ul>
+    <li>In <b>Linux</b>, the <b>ext2</b>, <b>ext3</b>, <b>ext4</b>, <b>JFS</b>, <b>Squashfs</b>, <b>Yaffs2</b>, <b>ReiserFS</b>, <b>XFS</b>, <b>Btrfs</b>, <b>OrangeFS</b>, <b>Lustre</b>, <b>OCFS2</b> 1.6 and <b>F2FS</b>
+        support User Defined Attributes.
+        <p><i>Enabling extended attributes on Linux</i></p>
+        <p>Go to /etc/fstab and add "user_xattr" to the options section of the line regarding the file-system you'd like to enable extended attributes on. Such a line might look like:</p>
+        <p><i>/dev/sda1  /               ext4    errors=remount-ro,user_xattr   0       1</i></p>
+    </li>
+    <li>In Windows only <b>NTFS</b> supports User Defined Attributes</li>
+    <li>In FreeBSD only <b>UFS2</b> supports User Defined Attributes</li>
+    <li>In Mac OS <b>HFS+</b> supports User Defined Attributes</li>
+    <li>Solaris version 9 and later allows files to have "extended attributes"</li>
+</ul>
+</body>
+</html>
