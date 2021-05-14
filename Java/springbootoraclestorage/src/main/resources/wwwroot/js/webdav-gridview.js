@@ -11,6 +11,7 @@
         var self = this;
         this.$el = $(selectorTableContainer);
         this.selectedItems = [];
+
         //Copied or cut items
         this.storedItems = [];
         this.isCopiedItems = false;
@@ -639,6 +640,7 @@
     var WebDAVController = function () {
         this.PageSize = 10; // set size items of page
         this.CurrentFolder = null;
+        this.AllowReloadGrid = true;
         this.WebDavSession = new ITHit.WebDAV.Client.WebDavSession();
         this.SnippetPropertyName = new ITHit.WebDAV.Client.PropertyName('snippet', 'ithit');
     };
@@ -646,7 +648,7 @@
     WebDAVController.prototype = {
 
         Reload: function () {
-            if (this.CurrentFolder) {
+            if (this.CurrentFolder && this.AllowReloadGrid) {
                 if (this.GetHashValue('search')) {
                     oSearchForm.LoadFromHash();
                 }
@@ -841,15 +843,9 @@
          * @param {string} sDocumentUrl Must be full path including domain name: https://webdavserver.com/path/file.ext
          */
         EditDoc: function (sDocumentUrl) {
-            if (['cookies', 'ms-ofba'].indexOf(webDavSettings.EditDocAuth.Authentication.toLowerCase()) != -1) {
-                if (webDavSettings.EditDocAuth.Authentication.toLowerCase() == 'ms-ofba' &&
-                    ITHit.WebDAV.Client.DocManager.IsMicrosoftOfficeDocument(sDocumentUrl)) {
-                    ITHit.WebDAV.Client.DocManager.EditDocument(sDocumentUrl, this.GetMountUrl(), this._ProtocolInstallMessage.bind(this));
-                }
-                else {
-                    ITHit.WebDAV.Client.DocManager.DavProtocolEditDocument(sDocumentUrl, this.GetMountUrl(), this._ProtocolInstallMessage.bind(this), null, webDavSettings.EditDocAuth.SearchIn,
-                        webDavSettings.EditDocAuth.CookieNames, webDavSettings.EditDocAuth.LoginUrl);
-                }
+            if (webDavSettings.EditDocAuth.Authentication.toLowerCase() == 'cookies') {
+                ITHit.WebDAV.Client.DocManager.DavProtocolEditDocument(sDocumentUrl, this.GetMountUrl(), this._ProtocolInstallMessage.bind(this), null, webDavSettings.EditDocAuth.SearchIn,
+                    webDavSettings.EditDocAuth.CookieNames, webDavSettings.EditDocAuth.LoginUrl);
             }
             else {
                 ITHit.WebDAV.Client.DocManager.EditDocument(sDocumentUrl, this.GetMountUrl(), this._ProtocolInstallMessage.bind(this));
@@ -959,7 +955,7 @@
          * Returns url of app installer
          */
         GetInstallerFileUrl: function () {
-            return webDavSettings.ApplicationProtocolsPath + ITHit.WebDAV.Client.DocManager.GetProtocolInstallFileNames()[0];
+            return webDavSettings.ApplicationProtocolsPath + ITHit.WebDAV.Client.DocManager.GetInstallFileName();
         },
 
         /**

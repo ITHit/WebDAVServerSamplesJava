@@ -263,7 +263,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock,
             throw new ServerException(e);
         }
         // Locks should not be copied, delete them
-//        getEngine().getDataClient().setMetaData(destPath, activeLocksAttribute, null);
+        getEngine().getDataClient().setMetadata(destPath, activeLocksAttribute, null);
         getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
     }
 
@@ -285,7 +285,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock,
         }
         setName(destName);
         // Locks should not be copied, delete them
-//        getEngine().getDataClient().setMetaData(newPath.toString(), activeLocksAttribute, null);
+        getEngine().getDataClient().setMetadata(destPath, activeLocksAttribute, null);
         getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
         getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
     }

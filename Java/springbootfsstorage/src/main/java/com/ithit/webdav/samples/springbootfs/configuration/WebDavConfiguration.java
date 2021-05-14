@@ -49,7 +49,6 @@ import java.util.Collections;
 public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebSocketConfigurer {
     final WebDavConfigurationProperties properties;
     final ResourceReader resourceReader;
-    private static String rootLocalPath = null;
     @Value("classpath:handler/MyCustomHandlerPage.html")
     Resource customGetHandler;
     @Value("classpath:handler/attributesErrorPage.html")
@@ -81,8 +80,7 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
     @RequestScope
     @Bean
     public WebDavEngine engine() {
-        rootLocalPath = Paths.get(properties.getRootFolder()).normalize().toString();
-        checkRootPath(properties.getRootFolder());
+        String rootLocalPath = rootLocalPath();
         String license;
         try {
             license = FileUtils.readFileToString(new File(properties.getLicense()), StandardCharsets.UTF_8);
@@ -106,6 +104,11 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
     }
 
     @Bean
+    public String rootLocalPath() {
+        return checkRootPath(properties.getRootFolder(), Paths.get(properties.getRootFolder()).normalize().toString());
+    }
+
+    @Bean
     public String customGetHandler() {
         return getStreamAsString(customGetHandler);
     }
@@ -122,29 +125,30 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
         }
     }
 
-    private void checkRootPath(String rootPath) {
+    private String checkRootPath(String rootPath, String path) {
         String realPath = resourceReader.getRootFolder();
         if (StringUtil.isNullOrEmpty(rootPath)) {
-            createDefaultPath();
+            path = createDefaultPath();
         } else {
             if (Files.exists(Paths.get(rootPath))) {
-                return;
+                return path;
             }
             try {
                 if (Files.exists(Paths.get(realPath, rootPath))) {
-                    rootLocalPath = Paths.get(realPath, rootPath).toString();
+                    path = Paths.get(realPath, rootPath).toString();
                 } else {
-                    createDefaultPath();
+                    path = createDefaultPath();
                 }
             } catch (Exception ignored) {
-                createDefaultPath();
+                path = createDefaultPath();
             }
         }
+        return path;
     }
 
-    private void createDefaultPath() {
+    private String createDefaultPath() {
         resourceReader.readFiles();
-        rootLocalPath = resourceReader.getDefaultPath();
+        return resourceReader.getDefaultPath();
     }
 
     /**

@@ -15,6 +15,7 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.BasicFileAttributeView
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.*
@@ -239,8 +240,8 @@ private constructor(name: String, path: String, created: Long, modified: Long,
         val sourcePath = this.fullPath
         val destinationFullPath = Paths.get(destinationFolder, destName)
         try {
-            FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile())
-            delete()
+            removeIndex(fullPath, this);
+            Files.move(sourcePath, destinationFullPath, StandardCopyOption.REPLACE_EXISTING);
             addIndex(destinationFullPath, folder.path + destName, destName)
         } catch (e: IOException) {
             throw ServerException(e)

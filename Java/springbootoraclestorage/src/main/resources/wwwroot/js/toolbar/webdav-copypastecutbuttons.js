@@ -80,7 +80,7 @@ HerarhyItemsCopyPasteController.prototype = {
 
     _ExecuteCopy: function (oItem) {
         var self = this;
-        self._DoCopy(oItem, self._GetCopySuffix(oItem.DisplayName));
+        self._DoCopy(oItem, self._GetCopySuffix(oItem.DisplayName, false));
     },
 
     /**
@@ -91,8 +91,9 @@ HerarhyItemsCopyPasteController.prototype = {
         self.Copy(oItem, oItemName, function (oAsyncResult) {
             if (!oAsyncResult.IsSuccess) {
                 if (
-                    oAsyncResult.Error instanceof ITHit.WebDAV.Client.Exceptions.PreconditionFailedException) {
-                    self._DoCopy(oItem, self._GetCopySuffix(oItemName));
+                    oAsyncResult.Error instanceof ITHit.WebDAV.Client.Exceptions.PreconditionFailedException ||
+                    oAsyncResult.Error instanceof window.ITHit.WebDAV.Client.Exceptions.ForbiddenException) {
+                    self._DoCopy(oItem, self._GetCopySuffix(oItemName, true));
                 }
                 else {
                     WebdavCommon.ErrorModal.Show(sCopyItemsErrorMessage, oAsyncResult.Error);
@@ -104,7 +105,7 @@ HerarhyItemsCopyPasteController.prototype = {
     /**
     * Gets 'Copy' suffix.
     */
-    _GetCopySuffix: function (oItemName) {
+    _GetCopySuffix: function (oItemName, bWithCopySuffix) {
         var sCopyPrefixName = 'Copy';
 
         var aExtensionMatches = /\.[^\.]+$/.exec(oItemName);
@@ -115,13 +116,16 @@ HerarhyItemsCopyPasteController.prototype = {
         var oSuffixPattern = new RegExp('- ' + sLangCopy + '( \\(([0-9]+)\\))?$', 'i');
 
         var aSuffixMatches = oSuffixPattern.exec(sName);
-        if (aSuffixMatches === null) {
-            sName += ' - ' + sLangCopy;
-        } else if (!aSuffixMatches[1]) {
-            sName += ' (2)';
-        } else {
+        if (aSuffixMatches === null && bWithCopySuffix) {
+            sName += " - " + sLangCopy;
+        } else if (aSuffixMatches !== null && !aSuffixMatches[1]) {
+            sName += " (2)";
+        } else if (aSuffixMatches !== null) {
             var iNextNumber = parseInt(aSuffixMatches[2]) + 1;
-            sName = sName.replace(oSuffixPattern, '- ' + sLangCopy + ' (' + iNextNumber + ')');
+            sName = sName.replace(
+                oSuffixPattern,
+                "- " + sLangCopy + " (" + iNextNumber + ")"
+            );
         }
 
         oItemName = sName + sDotAndExtension;
@@ -137,7 +141,7 @@ function CopyPasteButtonsControl(toolbar) {
 
     var oHerarhyItemsCopyPasteController = new HerarhyItemsCopyPasteController(toolbar, this.storedItems);
 
-    this.Create = function(tolbarSection){
+    this.Create = function (tolbarSection) {
 
         this.CopyButton.Create(tolbarSection);
         this.CutButton.Create(tolbarSection);
@@ -155,7 +159,7 @@ function CopyPasteButtonsControl(toolbar) {
         this.PasteButton.Activate();
     }
 
-    this.Render = function(){
+    this.Render = function () {
         this.CopyButton.$Button.on('click', function () {
             oHerarhyItemsCopyPasteController.isCopiedItems = true;
             oHerarhyItemsCopyPasteController._PushStoreItems();
@@ -169,7 +173,7 @@ function CopyPasteButtonsControl(toolbar) {
         this.PasteButton.$Button.on('click', function () {
             oHerarhyItemsCopyPasteController._MoveOrPasteItems();
         })
-    } 
+    }
 
 
 }

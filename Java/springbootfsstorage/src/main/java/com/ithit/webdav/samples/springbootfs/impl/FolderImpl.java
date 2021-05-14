@@ -17,10 +17,7 @@ import com.ithit.webdav.server.search.SearchOptions;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -292,8 +289,8 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
         Path sourcePath = this.getFullPath();
         Path destinationFullPath = Paths.get(destinationFolder, destName);
         try {
-            FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile());
-            delete();
+            removeIndex(getFullPath(), this);
+            FileUtils.moveDirectory(sourcePath.toFile(), destinationFullPath.toFile());
             addIndex(destinationFullPath, folder.getPath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);

@@ -154,20 +154,15 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, ResumableUp
             throws LockedException, ServerException {
         ((FolderImpl) folder).ensureHasToken();
 
-        // TODO: Finish implementation of the folder copy.
         String relUrl = decodeAndConvertToPath(folder.getPath());
         if (isRecursive(relUrl)) {
             throw new ServerException("Cannot copy to subfolder", WebDavStatus.FORBIDDEN);
         }
-        String destinationFolder = folder.getPath() + destName;
-        final HierarchyItem dFolder = getEngine().getDataClient().locateObject(destinationFolder, getEngine());
-        if (dFolder == null)
-            throw new ServerException();
-
+        final Folder destFolder = getDestinationFolder(folder, destName);
         try {
             for (HierarchyItem hierarchyItem : getChildren(null, null, null, null).getPage()) {
                 try {
-                    hierarchyItem.copyTo(folder, hierarchyItem.getName(), deep);
+                    hierarchyItem.copyTo(destFolder, hierarchyItem.getName(), deep);
                 } catch (Exception e) {
                     throw new ServerException();
                 }
@@ -186,16 +181,12 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, ResumableUp
         if (isRecursive(relUrl)) {
             throw new ServerException("Cannot move to subfolder", WebDavStatus.FORBIDDEN);
         }
-        // TODO: Finish implementation of the folder move.
-        String destinationFolder = folder.getPath() + destName;
-        final HierarchyItem dFolder = getEngine().getDataClient().locateObject(destinationFolder, getEngine());
-        if (dFolder == null)
-            throw new ServerException();
+        final Folder destFolder = getDestinationFolder(folder, destName);
 
         try {
             for (HierarchyItem hierarchyItem : getChildren(null, null, null, null).getPage()) {
                 try {
-                    hierarchyItem.moveTo(folder, hierarchyItem.getName());
+                    hierarchyItem.moveTo(destFolder, hierarchyItem.getName());
                     hierarchyItem.delete();
                 } catch (Exception e) {
                     throw new ServerException();
@@ -204,6 +195,20 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, ResumableUp
         } catch (SdkException e) {
             throw new ServerException(e);
         }
+    }
+
+    /**
+     * Checks if destination parent folder exists and creates destination folder.
+     */
+    private Folder getDestinationFolder(Folder folder, String destName) throws ServerException, LockedException {
+        final HierarchyItem dFolder = getEngine().getDataClient().locateObject(folder.getPath(), getEngine());
+        if (!(dFolder instanceof Folder))
+            throw new ServerException();
+        ((Folder) dFolder).createFolder(destName);
+        final HierarchyItem destFolder = getEngine().getDataClient().locateObject(folder.getPath() + destName + "/", getEngine());
+        if (!(destFolder instanceof Folder))
+            throw new ServerException();
+        return (Folder) destFolder;
     }
 
     /**

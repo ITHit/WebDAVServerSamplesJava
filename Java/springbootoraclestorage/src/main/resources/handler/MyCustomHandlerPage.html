@@ -6,14 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<%context root%>wwwroot/css/webdav-layout.css" rel="stylesheet"/>
+    <link href="/wwwroot/css/webdav-layout.css" rel="stylesheet"/>
 </head>
 <body>
 <header>
     <div class="navbar navbar-dark bg-dark shadow-sm">
         <div class="container-fluid d-flex justify-content-between" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-brand d-flex align-items-center ellipsis">
-                    <img src="<%context root%>wwwroot/images/logo.svg" alt="IT Hit logo" class="logo"/>
+                    <img src="/wwwroot/images/logo.svg" alt="IT Hit logo" class="logo"/>
                     <span>IT Hit Java WebDAV Server Engine v<%version%></span>
                 </span>
             <button class="navbar-toggler burger-button collapsed" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,15 +32,15 @@
                         </p>
                     </div>
                 </div>
-                <div class="row blocks">
-                    <div class="col-12 col-lg-4 d-flex flex-column">
+                <div class="row">
+                    <div class="col-12 col-lg-4">
                         <h3>Test Your Server</h3>
                         <p>
                             To test your WebDAV server you can run Ajax integration tests right from this page.
                         </p>
                         <a href="javascript:void(0)" onclick="OpenTestsWindow()" class="align-self-start btn btn-primary" role="button">Run Integration Tests</a>
                     </div>
-                    <div class="col-12 col-lg-4 d-flex flex-column">
+                    <div class="col-12 col-lg-4">
                         <h3>Manage Docs with Ajax File Browser</h3>
                         <p>
                             Use the <a href="https://www.webdavsystem.com/ajaxfilebrowser/programming/">IT Hit Ajax File Browser</a> to browse your documents, open for editing from a web page and
@@ -48,7 +48,7 @@
                         </p>
                         <a href="javascript:void(0)" onclick="OpenAjaxFileBrowserWindow()" class="align-self-start btn btn-primary" role="button">Browse Using Ajax File Browser</a>
                     </div>
-                    <div class="col-12 col-lg-4 d-flex flex-column">
+                    <div class="col-12 col-lg-4">
                         <h3>Connect with WebDAV Client</h3>
                         <p>
                             Use a WebDAV client provided with almost any OS. Refer to <a href="https://www.webdavsystem.com/server/access">Accessing WebDAV Server</a> page for
@@ -315,11 +315,11 @@
                                                 <span class="current-os"></span>
                                                 <a href="javascript:void(0)" class="more-lnk"><span>+</span>Other OS:</a>
                                                 <p class="more-pnl">
-                                                        <span class="window">Windows:&nbsp;&nbsp;<a target="_blank" href="<%context root%>wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.msi">ITHitEditDocumentOpener.msi</a><br />
+                                                        <span class="window">Windows:&nbsp;&nbsp;<a target="_blank" href="/wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.msi">ITHitEditDocumentOpener.msi</a><br />
                                                         </span>
-                                                    <span class="linux">Linux:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="<%context root%>wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.deb">ITHitEditDocumentOpener.deb</a><br />
+                                                    <span class="linux">Linux:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="/wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.deb">ITHitEditDocumentOpener.deb</a><br />
                                                         </span>
-                                                    <span class="mac-os">Mac OS:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="<%context root%>wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.pkg">ITHitEditDocumentOpener.pkg</a><br />
+                                                    <span class="mac-os">Mac OS:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="/wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.pkg">ITHitEditDocumentOpener.pkg</a><br />
                                                         </span>
                                                 </p>
                                             </li>
@@ -357,8 +357,8 @@
 <script>
     var webDavSettings = {
         ApplicationPath: '<%context root%>',
-        WebSocketPath: '<%ws root%>',
-        ApplicationProtocolsPath: '<%context root%>wwwroot/js/node_modules/webdav.client/Plugins/',
+        WebSocketPath: '',
+        ApplicationProtocolsPath: '/wwwroot/js/node_modules/webdav.client/Plugins/',
         EditDocAuth: {
             Authentication: 'anonymous',                       // Authentication to use when opening documents for editing: 'anonymous', 'challenge', 'ms-ofba', 'cookies'
             CookieNames: null,                                 // Coma separated list of cookie names to search for.
@@ -368,13 +368,13 @@
     }
 
     function OpenAjaxFileBrowserWindow() {
-        window.open("<%context root%>wwwroot/AjaxFileBrowser.html", "", "menubar=1,location=1,status=1,scrollbars=1,resizable=1,width=900,height=600");
+        window.open("/wwwroot/AjaxFileBrowser.html", "", "menubar=1,location=1,status=1,scrollbars=1,resizable=1,width=900,height=600");
     }
 
     function OpenTestsWindow() {
         var width = Math.round(screen.width * 0.5);
         var height = Math.round(screen.height * 0.8);
-        window.open("<%context root%>wwwroot/AjaxIntegrationTests.html", "", "menubar=1,location=1,status=1,scrollbars=1,resizable=1,width=" + width + ",height=" + height);
+        window.open("/wwwroot/AjaxIntegrationTests.html", "", "menubar=1,location=1,status=1,scrollbars=1,resizable=1,width=" + width + ",height=" + height);
     }
 </script>
 <!--
@@ -382,24 +382,24 @@ JavaScript file required to run WebDAV Ajax library is loaded from Node.js Packa
 To load files from your website download them here: https://www.webdavsystem.com/ajax/download,
 deploy them to your website and replace the path below in this file.
 -->
-<script src="<%context root%>wwwroot/js/node_modules/webdav.client/ITHitWebDAVClient.js?version=<%startTime%>"></script>
+<script src="/wwwroot/js/node_modules/webdav.client/ITHitWebDAVClient.js?version=<%startTime%>"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.3.5/split.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-<script src="<%context root%>wwwroot/js/webdav-common.js"></script>
-<script src="<%context root%>wwwroot/js/toolbar/webdav-basebutton.js"></script>
-<script src="<%context root%>wwwroot/js/toolbar/webdav-deletebutton.js"></script>
-<script src="<%context root%>wwwroot/js/toolbar/webdav-copypastecutbuttons.js"></script>
-<script src="<%context root%>wwwroot/js/toolbar/webdav-printbutton.js"></script>
-<script src="<%context root%>wwwroot/js/toolbar/webdav-reloadbutton.js"></script>
-<script src="<%context root%>wwwroot/js/toolbar/webdav-renamebutton.js"></script>
-<script src="<%context root%>wwwroot/js/toolbar/webdav-createfolderbutton.js"></script>
-<script src="<%context root%>wwwroot/js/toolbar/webdav-toolbar.js"></script>
-<script src="<%context root%>wwwroot/js/webdav-gridview.js"></script>
-<script src="<%context root%>wwwroot/js/webdav-uploader.js"></script>
-<script src="<%context root%>wwwroot/js/webdav-websocket.js"></script>
+<script src="/wwwroot/js/webdav-common.js"></script>
+<script src="/wwwroot/js/toolbar/webdav-basebutton.js"></script>
+<script src="/wwwroot/js/toolbar/webdav-deletebutton.js"></script>
+<script src="/wwwroot/js/toolbar/webdav-copypastecutbuttons.js"></script>
+<script src="/wwwroot/js/toolbar/webdav-printbutton.js"></script>
+<script src="/wwwroot/js/toolbar/webdav-reloadbutton.js"></script>
+<script src="/wwwroot/js/toolbar/webdav-renamebutton.js"></script>
+<script src="/wwwroot/js/toolbar/webdav-createfolderbutton.js"></script>
+<script src="/wwwroot/js/toolbar/webdav-toolbar.js"></script>
+<script src="/wwwroot/js/webdav-gridview.js"></script>
+<script src="/wwwroot/js/webdav-uploader.js"></script>
+<script src="/wwwroot/js/webdav-websocket.js"></script>
 </body>
 </html>
