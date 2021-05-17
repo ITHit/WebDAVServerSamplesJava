@@ -96,42 +96,5 @@ The sample provides&nbsp;DeltaV WebDAV server implementation that can be hosted 
 </p>
 </a>
 </li>
-<li>
-<a class="link-header" href="https://www.webdavsystem.com/javaserver/server_examples/running_webdav_samples/">
-<h2>Running the WebDAV Samples</h2>
-</a>
-
-<a href="https://www.webdavsystem.com/javaserver/server_examples/running_webdav_samples/">
-<p>
-Once your&nbsp;sample is configured&nbsp;and running you will see the following web page (note that&nbsp;the port that the sample is using may be different from the one on the screenshots):
-
-This web page is a MyCustomHandlerPage.html&nbsp;included in&nbsp;each sample&nbsp;and di                                            <span>...</span>
-</p>
-</a>
-</li>
-<li>
-<a class="link-header" href="https://www.webdavsystem.com/javaserver/server_examples/search/">
-<h2>Configuring Full-Text Search for Files Stored in File System or in Oracle Database</h2>
-</a>
-
-<a href="https://www.webdavsystem.com/javaserver/server_examples/search/">
-<p>
-The&nbsp;samples provided with SDK&nbsp;use Apache Lucene&nbsp;as indexing engine and Apache Tika&nbsp;as content analysis toolkit.
-The server implementation searches both file names and file content including content of Microsoft Office documents as well as any other d                                            <span>...</span>
-</p>
-</a>
-</li>
-<li>
-<a class="link-header" href="https://www.webdavsystem.com/javaserver/server_examples/troubleshooting/">
-<h2>WebDAV Server Samples Problems and Troubleshooting</h2>
-</a>
-
-<a href="https://www.webdavsystem.com/javaserver/server_examples/troubleshooting/">
-<p>
-Examining Logs
-If things are not going as planned and you run into issues the first place to look would be the log file&nbsp;&amp;lt;Your Tomcat location&amp;gt;\Tomcat x.x\logs\localhost.xxxx-xx-xx.log&nbsp;. The logs will reflect as to what is going on and it will h                                            <span>...</span>
-</p>
-</a>
-</li>
 </ul>
 
