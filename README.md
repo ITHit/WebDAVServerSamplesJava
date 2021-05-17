@@ -1,6 +1,22 @@
 
 <h1>WebDAV Server Examples, Java</h1>
-<div class="description"><p>IT Hit WebDAV Server Library for Java is provided with several examples that demonstrate how to build a WebDAV server with SQL back-end or with file system storage. You can adapt these samples to utilize almost any back-end storage including storing data in CMS/DMS/CRM, Azure or Amazon storage.</p></div>
+<div class="description"><p style="line-height: 22px; font-size: 15px; font-weight: normal;">IT Hit WebDAV Server Library for Java is provided with several examples that demonstrate how to build a WebDAV server with SQL back-end or with file system storage. You can adapt these samples to utilize almost any back-end storage including storing data in CMS/DMS/CRM, Azure or Amazon storage.</p>
+<p style="line-height: 22px; font-size: 15px; font-weight: normal;">A sample HTML page included with samples demonstrates how to use <a title="IT Hit WebDAV Ajax Libray" href="https://www.webdavsystem.com/ajax/" target="_blank">IT Hit WebDAV Ajax Libray</a>&nbsp;to open documents from a web page for editing, list documents and navigate folder structure as well as build search capabilities.</p>
+<h2>Online Demo Server</h2>
+<p style="line-height: 22px; font-size: 15px; font-weight: normal;"><a title="https://www.WebDAVServer.com" href="https://www.WebDAVServer.com" target="_blank">https://www.WebDAVServer.com</a></p>
+<h2>&nbsp;Requirements</h2>
+<p style="line-height: 22px; font-size: 15px; font-weight: normal;">The samples are tested with <strong><span>Java 1.8</span></strong> in the following environments:</p>
+<ul>
+<li style="margin-bottom: 16px;">Tomcat 7 or later</li>
+<li style="margin-bottom: 16px;">Glassfish 4.1.1 or later</li>
+<li style="margin-bottom: 16px;">JBoss Wildfly 9 or later or respective EAP</li>
+<li style="margin-bottom: 16px;">WebLogic 12c or later</li>
+<li style="margin-bottom: 16px;">WebSphere 8.5.5.11 or later</li>
+<li style="margin-bottom: 16px;">Jetty 9.3.13 or later</li>
+</ul>
+<h2>Full-text Search and indexing</h2>
+<p style="line-height: 22px; font-size: 15px; font-weight: normal;">The samples are provided with full-text search and indexing based on use Apache Lucene as indexing engine and Apache Tika as content analysis toolkit.</p>
+<p style="line-height: 22px; font-size: 15px; font-weight: normal;">The server implementation searches both file names and file content including content of Microsoft Office documents as well as any other documents which format is supported by Apache Tika, such as LibreOffice, OpenOffice, PDF, etc.</p></div>
 <ul class="list">
 <li>
 <a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springbootfsstorage">
