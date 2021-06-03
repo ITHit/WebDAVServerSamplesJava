@@ -170,7 +170,7 @@
     </repositories>
 
     <build>
-        <sourceDirectory>C:\Java\Release\WebdavJavaRepo\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
+        <sourceDirectory>D:\myproj\Java\ithit\webdav-server-for-java\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
