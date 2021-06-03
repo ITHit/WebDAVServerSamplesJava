@@ -18,7 +18,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.system.ApplicationTemp;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.context.annotation.RequestScope;
@@ -27,7 +26,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
@@ -51,7 +50,7 @@ import static com.ithit.webdav.samples.springbootoracle.configuration.WebDavConf
 @EnableWebMvc
 @EnableWebSocket
 @Configuration
-public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebSocketConfigurer {
+public class WebDavConfiguration extends WebMvcConfigurationSupport implements WebSocketConfigurer {
     final WebDavConfigurationProperties properties;
     final DataSource dataSource;
     @Value("classpath:handler/MyCustomHandlerPage.html")
@@ -70,7 +69,8 @@ public class WebDavConfiguration extends WebMvcConfigurerAdapter implements WebS
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        // -1 will allow to process static resources if main controller is running on the root.
+        registry.setOrder(-1);
         registry.addResourceHandler("/wwwroot/**")
                 .addResourceLocations("classpath:/wwwroot/", "/wwwroot/");
     }

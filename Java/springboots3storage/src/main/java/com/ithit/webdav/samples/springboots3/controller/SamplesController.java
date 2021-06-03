@@ -28,12 +28,12 @@ public class SamplesController {
 
     WebDavEngine engine;
 
-    @RequestMapping(path = "${webdav.rootContext}**", produces = MediaType.ALL_VALUE)
+    @RequestMapping(path = "${webdav.rootContext}**", produces = MediaType.ALL_VALUE, headers = "Connection!=Upgrade")
     public void webdav(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         performDavRequest(httpServletRequest, httpServletResponse);
     }
 
-    @RequestMapping(path = "${webdav.rootContext}**", produces = MediaType.ALL_VALUE, method = {RequestMethod.OPTIONS})
+    @RequestMapping(path = "${webdav.rootContext}**", produces = MediaType.ALL_VALUE, method = {RequestMethod.OPTIONS}, headers = "Connection!=Upgrade")
     public void options(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         performDavRequest(httpServletRequest, httpServletResponse);
     }
