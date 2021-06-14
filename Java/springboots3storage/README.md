@@ -1,5 +1,5 @@
 
-<h1 class="d-xl-block d-none">Spring Boot WebDAV Server Example with Amazon S3 Back-end, Java (Beta)</h1>
+<h1 class="d-xl-block d-none">Spring Boot WebDAV Server Example with Amazon S3 Back-end, Java</h1>
 <p>This sample&nbsp;is a fully functional Class 2 WebDAV server that runs on the Spring Boot framework and stores all data in the Amazon S3 bucket.&nbsp;The WebDAV requests are processed on a /DAV/ context, while the rest of the website processes regular HTTP requests, serving web pages. Documents are being published from the Amazon S3 bucket with locks and custom attributed being stored in S3 Metadata.&nbsp;</p>
 <p>This sample can be downloaded in the <a title="Download" href="https://www.webdavsystem.com/javaserver/download/">product download area</a> as well as it is published on&nbsp;<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springboots3storage">GitHub</a>.</p>
 <p><span>This sample is using&nbsp;</span><a title="AJAX Library" href="https://www.webdavsystem.com/ajax/">IT Hit WebDAV Ajax Library</a><span>&nbsp;to display and browse server content on a default web page as well as to open documents for editing from a web page and save back directly to the server.</span><span></span></p>
@@ -21,17 +21,19 @@ The IT Hit Java WebDAV Server Library is fully functional and does not have any 
 </li>
 <li>
 <p><strong>Configure the Amazon S3 project settings.</strong>&nbsp;In&nbsp;<span class="code">application.properties</span>&nbsp;set the following properties:</p>
-<pre class="brush:xml;auto-links:false;toolbar:false"># Amazon S3 region
+<pre class="brush:html;auto-links:false;toolbar:false">
+## Amazon S3 region
 webdav.s3.region=
 
-# Amazon S3 access key
+## Amazon S3 access key
 webdav.s3.access-key=
 
-# Amazon S3 secret access key
+## Amazon S3 secret access key
 webdav.s3.secret-access-key=
 
-# Amazon S3 bucket name
-webdav.s3.bucket=</pre>
+## Amazon S3 bucket name
+webdav.s3.bucket=
+</pre>
 </li>
 <li>
 <p><strong>Configure the application server</strong>.&nbsp;Here we will configure the WebDAV server to run on the website non-root context (<span class="code">https://server/DAV/</span>). This setting is located in the <span class="code">webdav.rootContext</span>&nbsp;section in the&nbsp;<em><span class="code">\springboot\src\main\resources\application.properties</span>.</em></p>
