@@ -21,14 +21,14 @@ The IT Hit Java WebDAV Server Library is fully functional and does not have any 
 </li>
 <li>
 <p><strong>Configure the Amazon S3 project settings.</strong>&nbsp;In&nbsp;<span class="code">application.properties</span>&nbsp;set the following properties:</p>
-<pre class="brush:html;auto-links:false;toolbar:false">
-## Amazon S3 region
+<pre class="brush:xml;auto-links:false;toolbar:false">
+# Amazon S3 region
 webdav.s3.region=
-## Amazon S3 access key
+# Amazon S3 access key
 webdav.s3.access-key=
-## Amazon S3 secret access key
+# Amazon S3 secret access key
 webdav.s3.secret-access-key=
-## Amazon S3 bucket name
+# Amazon S3 bucket name
 webdav.s3.bucket=
 </pre>
 </li>
