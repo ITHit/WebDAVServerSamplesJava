@@ -2,7 +2,7 @@
 (function (WebdavCommon) {
     var sSearchErrorMessage = "Search is not supported.";
     var sSupportedFeaturesErrorMessage = "Supported Features error.";
-    var sProfindErrorMessage = "Profind request error.";
+    var sProfindErrorMessage = "PROPFIND request error.";
 
 
     ///////////////////
@@ -41,7 +41,7 @@
                 self.$el.find('td input[type="checkbox"]').prop('checked', true).change();
             }
             else {
-                self.ResetToolbar();
+                oToolbar.ResetToolbar();
                 self.$el.find('td input[type="checkbox"]').prop('checked', false);
             }
         });
@@ -418,8 +418,9 @@
 
     ///////////////////
     // Breadcrumbs View
-    var BreadcrumbsView = function (selector) {
+    var BreadcrumbsView = function (selector, upOneLevelBtn) {
         this.$el = $(selector);
+        this.$upOneLevelBtn = $(upOneLevelBtn);
     };
     BreadcrumbsView.prototype = {
 
@@ -443,6 +444,18 @@
                         $('<a />').attr('href', location.protocol + '//' + aParts.slice(0, i + 1).join('/') + '/').html(oLabel)
                 );
             }));
+
+            if (this.$upOneLevelBtn) {
+                var $lastLnk = this.$el.find('a').last();
+                if ($lastLnk.length) {
+                    this.$upOneLevelBtn.attr('href', $lastLnk.attr('href'));
+                    this.$upOneLevelBtn.removeClass('disabled');
+                } else {
+                    this.$upOneLevelBtn.attr('href', 'javascript.void()');
+                    this.$upOneLevelBtn.addClass('disabled');
+                }
+
+            }
         }
     };
 
@@ -843,9 +856,15 @@
          * @param {string} sDocumentUrl Must be full path including domain name: https://webdavserver.com/path/file.ext
          */
         EditDoc: function (sDocumentUrl) {
-            if (webDavSettings.EditDocAuth.Authentication.toLowerCase() == 'cookies') {
-                ITHit.WebDAV.Client.DocManager.DavProtocolEditDocument(sDocumentUrl, this.GetMountUrl(), this._ProtocolInstallMessage.bind(this), null, webDavSettings.EditDocAuth.SearchIn,
-                    webDavSettings.EditDocAuth.CookieNames, webDavSettings.EditDocAuth.LoginUrl);
+            if (['cookies', 'ms-ofba'].indexOf(webDavSettings.EditDocAuth.Authentication.toLowerCase()) != -1) {
+                if (webDavSettings.EditDocAuth.Authentication.toLowerCase() == 'ms-ofba' &&
+                    ITHit.WebDAV.Client.DocManager.IsMicrosoftOfficeDocument(sDocumentUrl)) {
+                    ITHit.WebDAV.Client.DocManager.EditDocument(sDocumentUrl, this.GetMountUrl(), this._ProtocolInstallMessage.bind(this));
+                }
+                else {
+                    ITHit.WebDAV.Client.DocManager.DavProtocolEditDocument(sDocumentUrl, this.GetMountUrl(), this._ProtocolInstallMessage.bind(this), null, webDavSettings.EditDocAuth.SearchIn,
+                        webDavSettings.EditDocAuth.CookieNames, webDavSettings.EditDocAuth.LoginUrl);
+                }
             }
             else {
                 ITHit.WebDAV.Client.DocManager.EditDocument(sDocumentUrl, this.GetMountUrl(), this._ProtocolInstallMessage.bind(this));
@@ -955,7 +974,7 @@
          * Returns url of app installer
          */
         GetInstallerFileUrl: function () {
-            return webDavSettings.ApplicationProtocolsPath + ITHit.WebDAV.Client.DocManager.GetInstallFileName();
+            return webDavSettings.ApplicationProtocolsPath + ITHit.WebDAV.Client.DocManager.GetProtocolInstallFileNames()[0];
         },
 
         /**
@@ -1059,7 +1078,7 @@
     var oFolderGrid = new FolderGridView('.ithit-grid-container', '.ithit-grid-toolbar');
     var oToolbar = new Toolbar('.ithit-grid-toolbar', oFolderGrid, oConfirmModal, oWebDAV);
     var oSearchForm = new SearchFormView('.ithit-search-container');
-    var oBreadcrumbs = new BreadcrumbsView('.ithit-breadcrumb-container');
+    var oBreadcrumbs = new BreadcrumbsView('.ithit-breadcrumb-container .breadcrumb', '.btn-up-one-level');
     var oPagination = new PaginationView('.ithit-pagination-container');
     var oTableSorting = new TableSortingView('.ithit-grid-container th.sort');
     var oHistoryApi = new HistoryApiController('.ithit-grid-container, .ithit-breadcrumb-container');

@@ -23,4 +23,12 @@ function BaseButton(sName, cssClass) {
     this.Activate = function () {
         this.$Button.attr('disabled', false);
     }
+
+    this.HideOnMobile = function () {
+        this.$Button.addClass('d-none d-md-inline');
+    }
+
+    this.ShowOnMobile = function () {
+        this.$Button.removeClass('d-none d-md-inline');
+    }
 }

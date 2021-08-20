@@ -3,9 +3,7 @@ package com.ithit.webdav.samples.fsstorageservlet
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension
 import com.ithit.webdav.server.*
 import com.ithit.webdav.server.exceptions.*
-import com.ithit.webdav.server.DavContext
 import com.ithit.webdav.server.util.StringUtil
-
 import java.io.File
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder

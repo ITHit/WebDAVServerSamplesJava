@@ -29,7 +29,7 @@ HerarhyItemPrintController.prototype = {
 
 function ToolbarPrintButton(name, cssClass, toolbar) {
     BaseButton.call(this, name, cssClass);
-    this.InnerHtmlContent = '<span class="d-none d-lg-inline">Print</span>';
+    this.InnerHtmlContent = '<span class="d-none d-xl-inline">Print</span>';
 
     this.Render = function () {
         this.$Button.on('click', function () {

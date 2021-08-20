@@ -23,7 +23,7 @@ HerarhyItemDeleteController.prototype = {
 
 function ToolbarDeleteButton(name, cssClass, toolbar) {
     BaseButton.call(this, name, cssClass);
-    this.InnerHtmlContent = '<span class="d-none d-lg-inline">Delete</span>';
+    this.InnerHtmlContent = '<span class="d-none d-xl-inline">Delete</span>';
 
     this.Render = function () {
         this.$Button.on('click', function () {

@@ -56,21 +56,64 @@ Toolbar.prototype = {
         var self = this;
 
         $.each(self.buttons, function (index) {
+            if (typeof ToolbarCreateFolderButton === "function" && this instanceof ToolbarCreateFolderButton) {
+                self.FolderGrid.selectedItems.length == 0 ? this.ShowOnMobile() : this.HideOnMobile();
+            }
             if (typeof ToolbarDeleteButton === "function" && this instanceof ToolbarDeleteButton) {
-                self.FolderGrid.selectedItems.length == 0 ? this.Disable() : this.Activate();
+                if (self.FolderGrid.selectedItems.length == 0) {
+                    this.Disable();
+                    this.HideOnMobile();
+                }
+                else {
+                    this.Activate();
+                    this.ShowOnMobile();
+                }
             }
             if (typeof ToolbarRenameButton === "function" && this instanceof ToolbarRenameButton) {
-                (self.FolderGrid.selectedItems.length == 0 ||
-                    self.FolderGrid.selectedItems.length != 1) ? this.Disable() : this.Activate();
+                if (self.FolderGrid.selectedItems.length == 0 ||
+                    self.FolderGrid.selectedItems.length != 1) {
+                    this.Disable();
+                    this.HideOnMobile();
+                }
+                else {
+                    this.Activate();
+                    this.ShowOnMobile();
+                }
             }
             if (typeof CopyPasteButtonsControl === "function" && this instanceof CopyPasteButtonsControl) {
-                self.FolderGrid.selectedItems.length == 0 ? this.CopyButton.Disable() : this.CopyButton.Activate();
-                self.FolderGrid.selectedItems.length == 0 ? this.CutButton.Disable() : this.CutButton.Activate();
-                this.storedItems.length == 0 ? this.PasteButton.Disable() : this.PasteButton.Activate();
+                if (self.FolderGrid.selectedItems.length == 0) {
+                    this.CopyButton.Disable();
+                    this.CopyButton.HideOnMobile();
+
+                    this.CutButton.Disable();
+                    this.CutButton.HideOnMobile();
+                }
+                else {
+                    this.CopyButton.Activate();
+                    this.CopyButton.ShowOnMobile();
+
+                    this.CutButton.Activate();
+                    this.CutButton.ShowOnMobile();
+                }
+
+                if (this.storedItems.length == 0) {
+                    this.PasteButton.Disable();
+                    this.PasteButton.HideOnMobile();
+                }
+                else {
+                    this.PasteButton.Activate();
+                    this.PasteButton.ShowOnMobile();
+                }
             }
             if (ITHit.Environment.OS == 'Windows' && typeof ToolbarPrintButton === "function" && this instanceof ToolbarPrintButton) {
-                self.FolderGrid.selectedItems.filter(function (item) { return !item.IsFolder(); }).length == 0 ?
-                    this.Disable() : this.Activate();
+                if (self.FolderGrid.selectedItems.filter(function (item) { return !item.IsFolder(); }).length == 0) {
+                    this.Disable();
+                    this.HideOnMobile();
+                }
+                else {
+                    this.Activate();
+                    this.ShowOnMobile();
+                }
             }
         });
     },

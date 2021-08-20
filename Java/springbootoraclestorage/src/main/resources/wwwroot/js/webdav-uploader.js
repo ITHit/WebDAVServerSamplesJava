@@ -68,33 +68,40 @@
         this.Uploader = new ITHit.WebDAV.Client.Upload.Uploader();
         this._dropCounter = 0;
 
-        var input = this.Uploader.Inputs.AddById('ithit-hidden-input');
+        this.Uploader.Inputs.AddById('ithit-button-input');
         this._dropZone = this.Uploader.DropZones.AddById('ithit-dropzone');
         this._dropZone.HtmlElement.addEventListener('dragenter', this._OnDragEnter.bind(this), false);
         this._dropZone.HtmlElement.addEventListener('dragleave', this._OnDragLeave.bind(this), false);
         this._dropZone.HtmlElement.addEventListener('drop', this._OnDrop.bind(this), false);
-        $(this._dropZone.HtmlElement).on('click', function (event) {
-            $(input.HtmlElement).trigger('click');
-        });
 
         this.Uploader.SetUploadUrl(ITHit.WebDAV.Client.Encoder.Decode(window.location.href.split("#")[0]));
         this.Uploader.Queue.AddListener('OnQueueChanged', '_QueueChange', this);
         this.Uploader.Queue.AddListener('OnUploadItemsCreated', this._OnUploadItemsCreated, this);
-        var $table = this.$table = $(sSelector);
+
+        var $container = this.$container = $(sSelector);
+        this.$uploadingBlock= this.$container.find('.uploading-block');
+        this.$uploadingDetails = this.$container.find('.uploading-details');
+        this.$uploadingDetails.draggable();
+
         this.rows = [];
         this.fileLoadCompleted = function () {
-            if (this.$table.find('td').length == 0)
-                this.$table.addClass('d-none');
+            if (this.$container.find('.uploading-item').length == 0) {
+                this.$container.addClass('d-none');
+                this.$container.find('.progress-wrapper .progress-bar').attr('aria-valuenow', 0).css('width', 0 + '%');
+                this.$uploadingBlock.find('.persent').text(0 + '%');
+            }
             window.WebDAVController.Reload();
         }
 
         window.addEventListener('beforeunload', function (event) {
-            if ($table.find('td').length != 0) {
+            if ($container.find('.uploading-item').length != 0) {
                 var warnMessage = 'Uploader is running!';
                 (event || window.event).returnValue = warnMessage;
                 return warnMessage;
             }
         });
+
+        this._DataBindUploaderBlock();
     };
 
     UploaderGridView.prototype.SetUploadUrl = function(sPath) {
@@ -371,10 +378,9 @@
     
         // Display each ited added to the upload queue in the grid.
         oQueueChanged.AddedItems.forEach(function (value) {
-            var row = new UploaderGridRow(value, this.fileLoadCompleted.bind(this), this._ShowExistsCheckError.bind(this));
+            var row = new UploaderGridRow(value, this.fileLoadCompleted.bind(this), this._ShowExistsCheckError.bind(this), this._DataBindAllProgress.bind(this));
             this.rows.push(row);
-            this.$table.append(row.$el);
-            this.$table.append(row.$progressBarRow);
+            this.$container.find('.uploading-items').append(row.$el);
         }.bind(this));
 
         // Remove items deleted from upload queue from the grid.
@@ -384,14 +390,115 @@
             var rowIndex = this.rows.indexOf(aRows[0]);
             this.rows.splice(rowIndex, 1);
             aRows[0].$el.remove();
-            aRows[0].$progressBarRow.remove();
         }.bind(this));
 
         if (this.rows.length == 0) {
-            this.$table.addClass('d-none');
+            this.$container.addClass('d-none');
         } else {
-            this.$table.removeClass('d-none');
+            this.$container.removeClass('d-none');
+            this.$uploadingBlock.addClass('show');
+            var $uploading = this.$uploadingBlock;
+            setTimeout(function() {
+                    $uploading.removeClass('show');
+                }, 3000);
         }
+    };
+
+    UploaderGridView.prototype._DataBindAllProgress = function () {
+        var currProgress = 0;
+        var count = 0;
+        this.rows.forEach(function (value) {
+            if (value.UploadItem.GetState() !== 'Canceled') {
+                var valueProgress = value.UploadItem.GetProgress().Completed;
+                if (valueProgress < 100) {
+                    currProgress += valueProgress;
+                }
+                else {
+                    currProgress += 100;
+                }
+                count++;
+            }
+        });
+        currProgress /= count;
+        if (currProgress > 0) {
+            var $progress = this.$container.find('.progress-wrapper .progress-bar');
+            $progress.attr('aria-valuenow', currProgress).css('width', currProgress + '%');
+            this.$uploadingBlock.find('.persent').text(Math.round(currProgress) + '%');
+        }
+    }
+
+    UploaderGridView.prototype._DataBindUploaderBlock = function () {
+        this.$container.find('.pause-all-button').click(this._PauseAllClickHandler.bind(this));
+        this.$container.find('.play-all-button').click(this._StartAllClickHandler.bind(this));
+        this.$uploadingBlock.find('.details-button').click(this._DetailsClickHandler.bind(this));
+        this.$uploadingDetails.find('.close-button').click(this._CloseClickHandler.bind(this));
+        this.$container.find('.cancel-all-button').click(this._CancelAllClickHandler.bind(this));
+        this._SwitchActions();
+    }
+
+    UploaderGridView.prototype._SwitchActions = function () {
+        var $playButton = this.$container.find(".play-all-button");
+        var $pauseButton = this.$container.find(".pause-all-button");
+        if ($playButton.hasClass('d-none')) {
+            $pauseButton.addClass('d-none');
+            $playButton.removeClass('d-none');
+        }
+        else {
+            $pauseButton.removeClass('d-none');
+            $playButton.addClass('d-none');
+        }
+    };
+
+    UploaderGridView.prototype._DetailsClickHandler = function () {
+        this.$uploadingBlock.addClass('hide');
+        this.$uploadingDetails.removeClass('d-none');
+    }
+
+    UploaderGridView.prototype._CloseClickHandler = function () {
+        this.$uploadingBlock.removeClass('hide');
+        this.$uploadingDetails.addClass('d-none');
+    }
+
+
+    UploaderGridView.prototype._DisableActions = function () {
+        this.$container.find('.cancel-all-button').attr("disabled", 'disabled');
+        this.$container.find('.play-all-button').attr("disabled", 'disabled');
+        this.$container.find('.pause-all-button').attr("disabled", 'disabled');
+    };
+
+    UploaderGridView.prototype._EnableActions = function () {
+        this.$container.find('.cancel-all-button').removeAttr("disabled");
+        this.$container.find('.play-all-button').removeAttr("disabled");
+        this.$container.find('.pause-all-button').removeAttr("disabled");
+    };
+
+    UploaderGridView.prototype._StartAllClickHandler = function () {
+        this._DisableActions();
+        this.rows.forEach(function (value) {
+            if (value.UploadItem.GetState() === 'Paused') {
+                value._StartClickHandler();
+            }
+        });
+        this._SwitchActions();
+        this._EnableActions();
+    };
+
+    UploaderGridView.prototype._PauseAllClickHandler = function () {
+        this._DisableActions();
+        this.rows.forEach(function (value) {
+                value._PauseClickHandler();
+        });
+        this._SwitchActions();
+        this._EnableActions();
+    };
+
+    UploaderGridView.prototype._CancelAllClickHandler = function () {
+        this._DisableActions();
+        this.rows.forEach(function (value) {
+            value._CancelClickHandler();
+        });
+        this._SwitchActions();
+        this._EnableActions();
     };
 
     /** 
@@ -399,22 +506,22 @@
      */    
     UploaderGridView.prototype._OnDragEnter = function (oEvent) {
         this._dropCounter++;
-        $(oEvent.target).closest('#ithit-dropzone').addClass('bg-info');
+        $(oEvent.target).closest('#ithit-dropzone').addClass('dropzone');
     };
 
     UploaderGridView.prototype._OnDragLeave = function (oEvent) {
         this._dropCounter--;
         if (this._dropCounter <= 0) {
             this._dropCounter = 0;
-            oEvent.currentTarget.classList.remove('bg-info');
+            oEvent.currentTarget.classList.remove('dropzone');
         }
     };
 
     UploaderGridView.prototype._OnDrop = function (oEvent) {
         this._dropCounter = 0;
-        this._dropZone.HtmlElement.classList.remove('bg-info');
+        this._dropZone.HtmlElement.classList.remove('dropzone');
         this._dropZone.HtmlElement.querySelectorAll("*").forEach(function (value) {
-            value.classList.remove('bg-info');
+            value.classList.remove('dropzone');
         });
     };
 
@@ -426,24 +533,20 @@
      * Represents uploader grid row and subscribes for upload changes.
      * @param {ITHit.WebDAV.Client.Upload.UploadItem} oUploadItem - Upload item.
      */    
-    function UploaderGridRow(oUploadItem, fileLoadCompletedCallback, fileUploadFailedCallback) {
-        this.$el = $('<tr></tr>');
-        this.$progressBarRow = $('<tr></tr>');
+    function UploaderGridRow(oUploadItem, fileLoadCompletedCallback, fileUploadFailedCallback, progressChangedCallback) {
+        this.$el = $('<div class="row uploading-item" />');
         this.UploadItem = oUploadItem;
         this.UploadItem.AddListener('OnProgressChanged', '_OnProgress', this);
         this.UploadItem.AddListener('OnStateChanged', '_OnStateChange', this);
         this.UploadItem.AddListener('OnBeforeUploadStarted', this._OnBeforeUploadStarted, this);
         this.UploadItem.AddListener('OnUploadError', this._OnUploadError, this);
         this._Render(oUploadItem);
-        this._RenderProgressRow(oUploadItem);
         this._MaxRetry = 10;
         this._CurrentRetry = 0;
         this._RetryDelay = 10;
         this.fileLoadCompletedCallback = fileLoadCompletedCallback;
         this.fileUploadFailedCallback = fileUploadFailedCallback;
-        if (oUploadItem.GetState() === 'Failed') {
-            this._ShowError(oUploadItem.GetLastError());
-        }
+        this.progressChangedCallback = progressChangedCallback;
     };
 
     /**
@@ -452,94 +555,71 @@
      */
     UploaderGridRow.prototype._Render = function (oUploadItem) {
 
-        var oProgress = oUploadItem.GetProgress();
-        var columns = [
-            'ellipsis',
-            'd-none d-sm-table-cell text-right',
-            'd-none d-sm-table-cell text-right',
-            'd-none d-sm-table-cell text-right',
-            'd-none d-md-table-cell custom-hidden text-right',
-            'text-right',
-            'd-none d-md-table-cell text-right',
-            'd-none d-md-table-cell custom-hidden'
-        ];
+        var $cancelBlock = $('<div class="col-auto px-0" />')
+            .append($('<button class="cancel-button float-left" title="Cancel" />').
+                click(this._CancelClickHandler.bind(this)));
 
-        var $columns = [];
-        columns.forEach(function (item) {
-            var $column = $('<td></td>');
-            $column.addClass(item);
-            $columns.push($column);
-        });
+        var $itemIcon = $('<div class="col-auto px-0 file-wrapper" />').append($('<div class="file-icon" />'));
 
-        var $actions = $('<td class="column-action"></td>');
-        this._RenderActions(oUploadItem).forEach(function (item) {
-            $actions.append(item);
-        });
+        var $itemData = $('<div class="col" />')
+            .append($('<div class="row align-items-center" />')
+                .html(
+                    '<div class="col item-name ellipsis"></div>' +
+                    '<div class="col-auto item-size"></div>' +
+                    '<div class="col-auto retry-message d-none"></div>'
+                    ))
+            .append($('<div class="row" />')
+                .html(
+                    '<div class="col">' +
+                    '<div class="progress">' +
+                    '<div class= "progress-bar" rol="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>' +
+                    '</div>' +
+                    '</div>'
+                    ))
+            .append($('<div class="row justify-content-between mt-1" />')
+               .html(
+                    '<div class="col-auto item-progress"></div>' +
+                    '<div class="col-auto item-speed"></div>'
+                    ));
 
-        $columns.push($actions);
+        var $actions = $('<div class="col-auto px-0" />')
+            .append($('<button class="pause-button float-right" title="Pause" />').
+                click(this._PauseClickHandler.bind(this)))
+            .append($('<button class="play-button float-right" title="Resume" />').
+                click(this._StartClickHandler.bind(this)));
+
         this.$el.empty();
-        this.$el.append($columns);
+        this.$el.append($cancelBlock).append($itemIcon).append($itemData).append($actions);
 
         this._DataBind(oUploadItem);
     };
 
-    /**
-     * Creates upload row actions view.
-     * @param {ITHit.WebDAV.Client.Upload.UploadItem} oUploadItem - Upload item to render actions.
-     */
-    UploaderGridRow.prototype._RenderActions = function (oUploadItem) {
-        var actions = [];
-        actions.push($('<button class="btn btn-transparent" />').
-            html('<span class="fas fa-play text-primary"></span>').
-            click(this._StartClickHandler.bind(this)));
-
-        actions.push($('<button class="btn btn-transparent" />').
-            html('<span class="fas fa-pause text-primary"></span>').
-            click(this._PauseClickHandler.bind(this)));
-
-        actions.push($('<button class="btn btn-transparent .lnk-cancel" />').
-            html('<span class="fas fa-trash-alt text-primary"></span>').
-            click(this._CancelClickHandler.bind(this)));
-
-        return actions;
-    };
-
     UploaderGridRow.prototype._DataBindActions = function (oUploadItem) {
-        if (oUploadItem.GetState() !== 'Uploading') {
-            this.$el.children().last().children().eq(1).hide();
-            this.$el.children().last().children().eq(0).show();
+        if (oUploadItem.GetState() === 'Paused') {
+            this.$el.find('.play-button').show();
+            this.$el.find('.pause-button').hide();
         }
         else {
-            this.$el.children().last().children().eq(0).hide();
-            this.$el.children().last().children().eq(1).show();
+            this.$el.find('.play-button').hide();
+            this.$el.find('.pause-button').show();
         }
     };
 
     UploaderGridRow.prototype._DataBind = function (oUploadItem) {
+        var $container = this.$el;
+
+        var sFileExtansion = WebdavCommon.Formatters.GetFileExtension(oUploadItem.GetName());
+        var $itemIcon = $container.find(".file-icon");
         var oProgress = oUploadItem.GetProgress();
-        var $tr = this.$el;
-        var $errorInfoBtn = null;
-        var columns = [
-            '<span>' + oUploadItem.GetName() + '</span>',
-            WebdavCommon.Formatters.FileSize(oUploadItem.GetSize()),
-            WebdavCommon.Formatters.FileSize(oProgress.UploadedBytes),
-            oProgress.Completed + ' %',
-            WebdavCommon.Formatters.TimeSpan(oProgress.ElapsedTime),
-            WebdavCommon.Formatters.TimeSpan(oProgress.RemainingTime),
-            WebdavCommon.Formatters.FileSize(oProgress.Speed) + '/s',
-            oUploadItem.GetState()
-        ];
+        if (sFileExtansion.length < 5) {
+            $itemIcon.addClass('file-' + sFileExtansion);
+            $itemIcon.html('<span class="file-extension">' + sFileExtansion.toUpperCase() + '</span>');
+        }
+        $container.find(".item-name").html('<span>' + oUploadItem.GetName() + '</span>');
+        $container.find(".item-size").text(WebdavCommon.Formatters.FileSize(oProgress.TotalBytes));
+        $container.find(".item-speed").text(oProgress.Completed + ' % done');
+        $container.find(".item-progress").text(WebdavCommon.Formatters.FileSize(oProgress.Speed) + '/sec');
 
-        columns.forEach(function (item, index) {
-            $tr.children().eq(index).html(item);
-
-            if (index == 5) {
-                $errorInfoBtn = $('<button class="btn btn-transparent btn-info" title="Error Info"><span class="fas fa-info-circle"></span></button>').appendTo($tr.children().eq(index));
-                $errorInfoBtn.hide();
-            }
-        });
-
-        this.$errorInfoBtn = $errorInfoBtn;
         this._DataBindActions(oUploadItem); 
         var sCurrentState = oUploadItem.GetState();
         if (sCurrentState === 'Completed' || sCurrentState === 'Canceled') {
@@ -548,23 +628,10 @@
         }
     };
 
-    UploaderGridRow.prototype._RenderProgressRow = function () {
-        var $td = $('<td colspan="9" class="progress-container"></td>');
-        var $progressBar = $('<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100"></div></div>');
-        $td.append($progressBar);
-
-        this.$progressBarRow.empty();
-        this.$progressBarRow.append($td);
-    };
-
     UploaderGridRow.prototype._DataBindProgressRow = function (oUploadItem) {
         var oProgress = oUploadItem.GetProgress();
-        this.$progressBarRow.find('.progress-bar').css('width', oProgress.Completed + '%');
-
-        var sCurrentState = oUploadItem.GetState();
-        if (sCurrentState === 'Completed' || sCurrentState === 'Canceled') {
-            this.$progressBarRow.remove();
-        }
+        this.$el.find('.progress-bar').attr('aria-valuenow', oProgress.Completed).css('width', oProgress.Completed + '%');
+        this.progressChangedCallback();
     };
 
     /**
@@ -576,9 +643,6 @@
         this._RemoveRetryMessage();
         this._DataBindProgressRow(oStateChanged.Sender);
         this._DataBind(oStateChanged.Sender);
-        if (oStateChanged.NewState === 'Failed') {
-            this._ShowError(oStateChanged.Sender.GetLastError());
-        }
     };
 
     /**
@@ -593,7 +657,6 @@
     UploaderGridRow.prototype._StartClickHandler = function () {
         this._DisableActions();
         this._CurrentRetry = 0;
-        this._HideError();
         this.UploadItem.StartAsync(this._EnableActions.bind(this));
     };
 
@@ -610,11 +673,15 @@
     };
 
     UploaderGridRow.prototype._DisableActions = function () {
-        this.$el.children().last().children().slice(-3).attr("disabled", 'disabled');
+        this.$el.find('.cancel-button').attr("disabled", 'disabled');
+        this.$el.find('.play-button').attr("disabled", 'disabled');
+        this.$el.find('.pause-button').attr("disabled", 'disabled');
     };
 
     UploaderGridRow.prototype._EnableActions = function () {
-        this.$el.children().last().children().slice(-3).removeAttr("disabled");
+        this.$el.find('.cancel-button').removeAttr("disabled");
+        this.$el.find('.play-button').removeAttr("disabled");
+        this.$el.find('.pause-button').removeAttr("disabled");
     };
 
     
@@ -682,32 +749,17 @@
     
     UploaderGridRow.prototype._SetRetryMessage = function (timeLeft) {
         var sMessage = WebdavCommon.PasteFormat(sRetryMessageFormat, WebdavCommon.Formatters.TimeSpan(Math.ceil(timeLeft / 1000)));
-        this.$el.children().eq(5).html(sMessage).addClass('text-danger');
-        this.$progressBarRow.find('.progress-bar').addClass('bg-danger');
+        this.$el.find('.retry-message').html(sMessage).addClass('text-danger d-block');
+        this.$el.find('.progress-bar').addClass('bg-danger');
     };
 
     UploaderGridRow.prototype._RemoveRetryMessage = function () {
-        this.$el.children().eq(5).removeClass('text-danger');
-        this.$progressBarRow.find('.progress-bar').removeClass('bg-danger');
+        this.$el.find('.retry-message').html("");
+        this.$el.find('.progress-bar').removeClass('bg-danger d-none');
         this._DataBind(this.UploadItem);
     };
 
-    UploaderGridRow.prototype._ShowError = function (oError) {
-        this.$progressBarRow.find('.progress-bar').addClass('bg-danger');
-        this.$errorInfoBtn.popover({
-            content: oError.Message,
-            placement: 'top'
-        });
-        this.$errorInfoBtn.show();
-    };
-
-    UploaderGridRow.prototype._HideError = function () {
-        this.$progressBarRow.find('.progress-bar').removeClass('bg-danger');
-        this.$errorInfoBtn.hide();
-    };
-
     UploaderGridRow.prototype._CancelRetry = function () {
-        this._HideError();
         if (this.CancelRetryCallback) this.CancelRetryCallback.call(this);
     };
     
@@ -726,7 +778,6 @@
     
         // Stop upload if max upload retries reached.
         if (this._MaxRetry <= this._CurrentRetry) {
-            this._ShowError(oUploadError.Error);
             oUploadError.Skip();
             return;
         }

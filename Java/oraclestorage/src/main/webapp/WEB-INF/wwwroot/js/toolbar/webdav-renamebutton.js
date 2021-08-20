@@ -12,8 +12,8 @@ RenameItemController.prototype = {
     Rename: function (newItemName, fCallback) {
         this.Toolbar.FolderGrid.selectedItems[0].MoveToAsync(this.Toolbar.WebDAV.CurrentFolder,
             newItemName, null, null, function (oAsyncResult) {
-            fCallback(oAsyncResult);
-        });
+                fCallback(oAsyncResult);
+            });
     },
 }
 
@@ -47,7 +47,7 @@ function RenameItemModal(modalSelector, renameItemController) {
             self.$submitButton.attr('disabled', 'disabled');
             renameItemController.Rename(self.$txt.val().trim(), function (oAsyncResult) {
                 if (!oAsyncResult.IsSuccess) {
-                     if (oAsyncResult.Error instanceof ITHit.WebDAV.Client.Exceptions.LockedException) {
+                    if (oAsyncResult.Error instanceof ITHit.WebDAV.Client.Exceptions.LockedException) {
                         WebdavCommon.ErrorModal.Show(sRenameItemLockedErrorMessage, oAsyncResult.Error);
                     }
                     else {

@@ -2,7 +2,6 @@ package com.ithit.webdav.samples.springbootoracle.impl;
 
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
-import com.ithit.webdav.server.DavContext;
 import com.ithit.webdav.server.util.StringUtil;
 
 import java.math.BigDecimal;
