@@ -7,6 +7,7 @@
 <h2>Requirements</h2>
 <ul>
 <li>Java 1.8.</li>
+<li>Lombok plug-in should be installed in your favorite IDE otherwise syntax error will be displayed</li>
 </ul>
 <h2>Running the sample</h2>
 <ol>

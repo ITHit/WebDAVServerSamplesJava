@@ -24,6 +24,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This servlet processes WEBDAV requests.
@@ -42,6 +46,7 @@ public class WebDavServlet extends HttpServlet {
     private SearchFacade searchFacade;
     private String license;
     static final String START_TIME = "" + System.currentTimeMillis();
+    private Set<String> localMaskRequestHeaders;
 
     /**
      * Returns root folder for the WebDav.
@@ -101,10 +106,11 @@ public class WebDavServlet extends HttpServlet {
         realPath = servletConfig.getServletContext().getRealPath("/");
         servletContext = servletConfig.getServletContext().getContextPath();
         rootLocalPath = servletConfig.getInitParameter("root");
+        localMaskRequestHeaders = toSet(servletConfig.getInitParameter("maskRequestHeaders"));
         checkRootPath(rootLocalPath);
         String indexLocalPath = createIndexPath();
         supportsUserDefinedAttributes = ExtendedAttributesExtension.isExtendedAttributesSupported(Paths.get(getRootLocalPath()).toString());
-        WebDavEngine engine = new WebDavEngine(logger, license);
+        WebDavEngine engine = new WebDavEngine(logger, license, localMaskRequestHeaders);
         String indexInterval = servletConfig.getInitParameter("index-interval");
         Integer interval = null;
         if (indexInterval != null) {
@@ -174,7 +180,7 @@ public class WebDavServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws ServletException, IOException {
-        WebDavEngine engine = new WebDavEngine(logger, license);
+        WebDavEngine engine = new WebDavEngine(logger, license, localMaskRequestHeaders);
         HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest);
         HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
         CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), Engine.getVersion());
@@ -196,4 +202,11 @@ public class WebDavServlet extends HttpServlet {
         }
     }
 
+    private Set<String> toSet(String parameters) {
+        if (parameters == null) {
+            return new HashSet<>();
+        }
+        final String[] pars = parameters.split(",");
+        return new HashSet<>(Arrays.asList(pars));
+    }
 }

@@ -9,6 +9,7 @@
 <li>NTFS, Ext4, Ext3 or any other file system which supports extended file attributes. You can find a complete list of file systems that support extended attributes&nbsp;<a href="https://en.wikipedia.org/wiki/Extended_file_attributes">here</a>. To enable extended file attributes on Linux change fstab to look like:&nbsp;
 <pre class="brush:html;auto-links:false;toolbar:false">/dev/sda1  /               ext4    errors=remount-ro,user_xattr   0       1</pre>
 </li>
+<li>Lombok plug-in should be installed in your favorite IDE otherwise syntax error will be displayed</li>
 </ul>
 <h2>Running the sample</h2>
 <ol>

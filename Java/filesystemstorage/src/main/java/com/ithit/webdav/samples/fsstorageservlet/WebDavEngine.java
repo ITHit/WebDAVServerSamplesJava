@@ -6,6 +6,8 @@ import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.ServerException;
 
+import java.util.Set;
+
 /**
  * Implementation if {@link Engine}.
  * Resolves hierarchy items by paths.
@@ -16,6 +18,7 @@ public class WebDavEngine extends Engine {
     private final WebSocketServer _FAKED_WEB_SOCKET = new WebSocketServer();
     private final Logger logger;
     private final String license;
+    private final Set<String> maskRequestHeaders;
     private SearchFacade searchFacade;
 
     /**
@@ -24,9 +27,10 @@ public class WebDavEngine extends Engine {
      * @param logger  Where to log messages.
      * @param license License string.
      */
-    WebDavEngine(Logger logger, String license) {
+    WebDavEngine(Logger logger, String license, Set<String> maskRequestHeaders) {
         this.logger = logger;
         this.license = license;
+        this.maskRequestHeaders = maskRequestHeaders;
     }
 
     /**
@@ -73,6 +77,11 @@ public class WebDavEngine extends Engine {
     @Override
     public String getLicense() {
         return license;
+    }
+
+    @Override
+    public Set<String> getMaskRequestHeaders() {
+        return maskRequestHeaders;
     }
 
     /**
