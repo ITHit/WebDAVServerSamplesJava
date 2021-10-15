@@ -294,7 +294,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         } finally {
             writer.close();
         }
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyUpdated(getPath());
         return totalWrittenBytes;
     }
 
@@ -330,7 +330,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             getEngine().getLogger().logError("Tried to delete file in use.", e);
             throw new ServerException(e);
         }
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyDeleted(getPath());
         try {
             getEngine().getSearchFacade().getIndexer().deleteIndex(this);
         } catch (Exception ex) {
@@ -356,9 +356,9 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         if (ExtendedAttributesExtension.hasExtendedAttribute(newPath.toString(), activeLocksAttribute)) {
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
         }
-        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {
             String currentPath = folder.getPath() + destName;
+            getEngine().getWebSocketServer().notifyCreated(currentPath);
             getEngine().getSearchFacade().getIndexer().indexFile(decode(destName), decode(currentPath), null, this);
         } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
@@ -385,10 +385,9 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         if (ExtendedAttributesExtension.hasExtendedAttribute(newPath.toString(), activeLocksAttribute)) {
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
         }
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
-        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
         try {
             String currentPath = folder.getPath() + destName;
+            getEngine().getWebSocketServer().notifyMoved(getPath(), currentPath);
             getEngine().getSearchFacade().getIndexer().indexFile(decode(destName), decode(currentPath), getPath(), this);
         } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);

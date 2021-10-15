@@ -74,7 +74,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, ResumableUp
         if (hierarchyItem == null) {
             try {
                 getEngine().getDataClient().storeObject(originalPath, null, null, 0);
-                getEngine().getWebSocketServer().notifyRefresh(getPath());
+                getEngine().getWebSocketServer().notifyCreated(getPath() + name);
                 final long created = System.currentTimeMillis();
                 return FileImpl.getFile(originalPath, decodedName, created, created, 0, getEngine());
             } catch (Exception e) {
@@ -104,7 +104,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, ResumableUp
             } catch (Exception e) {
                 throw new ServerException(e);
             }
-            getEngine().getWebSocketServer().notifyRefresh(getPath());
+            getEngine().getWebSocketServer().notifyCreated(getPath() + name);
         }
     }
 
@@ -143,7 +143,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, ResumableUp
                 }
             }
             getEngine().getDataClient().delete(getPath());
-            getEngine().getWebSocketServer().notifyDelete(getPath());
+            getEngine().getWebSocketServer().notifyDeleted(getPath());
         } catch (SdkException e) {
             throw new ServerException(e);
         }

@@ -60,7 +60,7 @@ function CreateFolderModal(modalSelector, createFolderController) {
 function ToolbarCreateFolderButton(name, cssClass, toolbar) {
     BaseButton.call(this, name, cssClass);
     var oCreateFolderModal = new CreateFolderModal('#CreateFolderModal', new CreateFolderController(toolbar));
-    this.InnerHtmlContent = '<span class="d-none d-lg-inline text-nowrap">Create Folder</span>';
+    this.InnerHtmlContent = '<span class="d-none d-xl-inline text-nowrap">Create Folder</span>';
     this.Render = function () {
         this.$Button.on('click', function () {
             oCreateFolderModal.$txt.val('');

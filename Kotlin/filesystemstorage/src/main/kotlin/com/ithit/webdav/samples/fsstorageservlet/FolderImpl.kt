@@ -57,7 +57,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
             } catch (e: IOException) {
                 throw ServerException(e)
             }
-            engine.webSocketServer?.notifyRefresh(path)
+            engine.webSocketServer?.notifyCreated(path + name)
             return FileImpl.getFile(path + encode(name), engine)
         }
         return null
@@ -78,7 +78,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
         if (!Files.exists(fullPath)) {
             try {
                 Files.createDirectory(fullPath)
-                engine.webSocketServer?.notifyRefresh(path)
+                engine.webSocketServer?.notifyCreated(path + name)
             } catch (e: IOException) {
                 throw ServerException(e)
             }
@@ -127,7 +127,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
         try {
             removeIndex(fullPath, this)
             FileUtils.deleteDirectory(fullPath.toFile())
-            engine.webSocketServer?.notifyDelete(path)
+            engine.webSocketServer?.notifyDeleted(path)
         } catch (e: IOException) {
             throw ServerException(e)
         }
@@ -148,7 +148,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
             val sourcePath = this.fullPath
             val destinationFullPath = Paths.get(destinationFolder, destName)
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile())
-            engine.webSocketServer?.notifyRefresh(folder.path)
+            engine.webSocketServer?.notifyCreated(folder.path + name)
             addIndex(destinationFullPath, folder.path + destName, destName)
         } catch (e: IOException) {
             throw ServerException(e)
@@ -248,8 +248,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
         }
 
         setName(destName)
-        engine.webSocketServer?.notifyDelete(path)
-        engine.webSocketServer?.notifyRefresh(folder.path)
+        engine.webSocketServer?.notifyMoved(path, folder.path + destName)
     }
 
     /**

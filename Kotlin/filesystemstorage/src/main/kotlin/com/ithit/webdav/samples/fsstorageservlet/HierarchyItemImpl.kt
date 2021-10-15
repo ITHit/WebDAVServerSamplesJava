@@ -300,7 +300,7 @@ internal abstract class HierarchyItemImpl
                 .filter { e -> !propNamesToDel.contains(e.name) }
                 .collect(Collectors.toList())
         ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), propertiesAttribute, SerializationUtils.serialize(properties as List<Property>))
-        engine.webSocketServer?.notifyRefresh(getParent(getPath()))
+        engine.webSocketServer?.notifyUpdated(getPath())
     }
 
     /**
@@ -361,7 +361,7 @@ internal abstract class HierarchyItemImpl
         val lockInfo = LockInfo(shared, deep, token, expires, owner)
         activeLocks!!.add(lockInfo)
         ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), activeLocksAttribute, SerializationUtils.serialize<List<LockInfo>>(activeLocks!!))
-        engine.webSocketServer?.notifyRefresh(getParent(getPath()))
+        engine.webSocketServer?.notifyLocked(getPath())
         return LockResult(token, localTimeout)
     }
 
@@ -413,7 +413,7 @@ internal abstract class HierarchyItemImpl
             } else {
                 ExtendedAttributesExtension.deleteExtendedAttribute(fullPath.toString(), activeLocksAttribute)
             }
-            engine.webSocketServer?.notifyRefresh(getParent(getPath()))
+            engine.webSocketServer?.notifyUnlocked(getPath())
         } else {
             throw PreconditionFailedException()
         }
@@ -442,20 +442,9 @@ internal abstract class HierarchyItemImpl
         val expires = System.currentTimeMillis() + localTimeout * 1000
         lockInfo.timeout = expires
         ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), activeLocksAttribute, SerializationUtils.serialize<List<LockInfo>>(activeLocks!!))
-        engine.webSocketServer?.notifyRefresh(getParent(getPath()))
+        engine.webSocketServer?.notifyLocked(getPath())
         return RefreshLockResult(lockInfo.isShared, lockInfo.isDeep,
                 localTimeout, lockInfo.owner)
-    }
-
-    fun getParent(path: String): String {
-        var parentPath = StringUtil.trimEnd(StringUtil.trimStart(path, "/"), "/")
-        val index = parentPath.lastIndexOf("/")
-        parentPath = if (index > -1) {
-            parentPath.substring(0, index)
-        } else {
-            ""
-        }
-        return parentPath
     }
 
     companion object {

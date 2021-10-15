@@ -41,55 +41,113 @@ public class WebSocketServer {
     /**
      * Send notification to the client
      *
-     * @param type   of the notification
-     * @param folder to notify
+     * @param itemPath   File/Folder path.
+     * @param operation  Operation name: created/updated/deleted/moved
      */
-    private void send(String type, String folder) {
+    private void send(String itemPath, String operation) {
+        itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
         for (Session s : sessions) {
             if (s.isOpen()) {
-                s.getAsyncRemote().sendObject(new Notification(folder, type));
+                s.getAsyncRemote().sendObject(new Notification(itemPath, operation));
             }
         }
     }
 
     /**
-     * Sends refresh notification to the web socket client
+     * Notifies client that file/folder was created.
      *
-     * @param folder to refresh
+     * @param itemPath file/folder.
      */
-    public void notifyRefresh(String folder) {
-        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
-        send("refresh", folder);
+    public void notifyCreated(String itemPath) {
+        send(itemPath, "created");
     }
 
     /**
-     * Sends delete notification to the web socket client
+     * Notifies client that file/folder was updated.
      *
-     * @param folder to delete
+     * @param itemPath file/folder.
      */
-    public void notifyDelete(String folder) {
-        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
-        send("delete", folder);
+    public void notifyUpdated(String itemPath) {
+        send(itemPath, "updated");
+    }
+
+    /**
+     * Notifies client that file/folder was deleted.
+     *
+     * @param itemPath file/folder.
+     */
+    public void notifyDeleted(String itemPath) {
+        send(itemPath, "deleted");
+    }
+
+    /**
+     * Notifies client that file/folder was locked.
+     *
+     * @param itemPath file/folder.
+     */
+    public void notifyLocked(String itemPath) {
+        send(itemPath, "locked");
+    }
+
+    /**
+     * Notifies client that file/folder was unlocked.
+     *
+     * @param itemPath file/folder.
+     */
+    public void notifyUnlocked(String itemPath) {
+        send(itemPath, "unlocked");
+    }
+
+    /**
+     * Notifies client that file/folder was moved.
+     *
+     * @param itemPath file/folder.
+     */
+    public void notifyMoved(String itemPath, String targetPath) {
+        itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
+        targetPath = StringUtil.trimEnd(StringUtil.trimStart(targetPath, "/"), "/");
+        for (Session s : sessions) {
+            if (s.isOpen()) {
+                s.getAsyncRemote().sendObject(new MovedNotification(itemPath, "moved", targetPath));
+            }
+        }
     }
 
     /**
      * Represents VO to exchange between client and server
      */
-    class Notification {
-        private String folderPath;
-        private String eventType;
+    static class Notification {
+        private final String itemPath;
+        private final String operation;
 
-        Notification(String folderPath, String eventType) {
-            this.folderPath = folderPath;
-            this.eventType = eventType;
+        Notification(String itemPath, String operation) {
+            this.itemPath = itemPath;
+            this.operation = operation;
         }
 
-        String getFolderPath() {
-            return folderPath;
+        String getItemPath() {
+            return itemPath;
         }
 
-        String getEventType() {
-            return eventType;
+        String getOperation() {
+            return operation;
         }
+    }
+
+    /**
+     * Represents VO to exchange between client and server for move type
+     */
+    static class MovedNotification extends Notification {
+        private final String targetPath;
+
+        MovedNotification(String itemPath, String operation, String targetPath) {
+            super(itemPath, operation);
+            this.targetPath = targetPath;
+        }
+
+        String getTargetPath() {
+            return targetPath;
+        }
+
     }
 }

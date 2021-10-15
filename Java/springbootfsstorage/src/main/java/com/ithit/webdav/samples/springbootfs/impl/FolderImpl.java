@@ -104,7 +104,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
             } catch (IOException e) {
                 throw new ServerException(e);
             }
-            getEngine().getWebSocketServer().notifyRefresh(getPath());
+            getEngine().getWebSocketServer().notifyCreated(getPath() + name);
             return FileImpl.getFile(getPath() + encode(name), getEngine());
         }
         return null;
@@ -126,7 +126,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
         if (!Files.exists(fullPath)) {
             try {
                 Files.createDirectory(fullPath);
-                getEngine().getWebSocketServer().notifyRefresh(getPath());
+                getEngine().getWebSocketServer().notifyCreated(getPath() + name);
             } catch (IOException e) {
                 throw new ServerException(e);
             }
@@ -175,7 +175,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
         try {
             removeIndex(getFullPath(), this);
             FileUtils.deleteDirectory(getFullPath().toFile());
-            getEngine().getWebSocketServer().notifyDelete(getPath());
+            getEngine().getWebSocketServer().notifyDeleted(getPath());
         } catch (IOException e) {
             throw new ServerException(e);
         }
@@ -197,7 +197,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
             Path sourcePath = this.getFullPath();
             Path destinationFullPath = Paths.get(destinationFolder, destName);
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile());
-            getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
+            getEngine().getWebSocketServer().notifyCreated(folder.getPath() + destName);
             addIndex(destinationFullPath, folder.getPath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
@@ -296,8 +296,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
             throw new ServerException(e);
         }
         setName(destName);
-        getEngine().getWebSocketServer().notifyDelete(getPath());
-        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + destName);
     }
 
     /**

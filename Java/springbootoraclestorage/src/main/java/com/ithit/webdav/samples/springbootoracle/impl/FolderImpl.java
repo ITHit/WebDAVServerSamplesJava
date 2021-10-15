@@ -149,7 +149,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
             long now = Calendar.getInstance().getTime().getTime();
             item = new FileImpl(newId, getId(), name, getPath() + name, now, now, now, 0, getEngine());
         }
-        getEngine().getWebSocketServer().notifyRefresh(getPath());
+        getEngine().getWebSocketServer().notifyCreated(getPath() + name);
         return item;
 
     }
@@ -227,8 +227,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         }
         // delete this folder
         deleteThisItem();
-        getEngine().getWebSocketServer().notifyDelete(getPath());
-        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + destName);
     }
 
     @Override
@@ -275,7 +274,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                 }
             }
         }
-        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyCreated(folder.getPath() + destName);
         if (mr.getResponses().length > 0)
             throw mr;
 
@@ -317,7 +316,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
             }
             deleteThisItem();
         }
-        getEngine().getWebSocketServer().notifyDelete(getPath());
+        getEngine().getWebSocketServer().notifyDeleted(getPath());
     }
 
     /**

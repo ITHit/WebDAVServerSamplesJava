@@ -112,7 +112,7 @@ public class FileImpl extends HierarchyItemImpl implements
         ensureHasToken();
 
         deleteThisItem();
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyDeleted(getPath());
         try {
             getEngine().getSearchFacade().getIndexer().deleteIndex(this);
         } catch (Exception ex) {
@@ -215,7 +215,7 @@ public class FileImpl extends HierarchyItemImpl implements
         } else {
             copy = copyThisItem(destFolder, null, destName);
         }
-        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyCreated(folder.getPath() + destName);
         try {
             if (copy != null) {
                 newID = copy.getId();
@@ -346,7 +346,7 @@ public class FileImpl extends HierarchyItemImpl implements
                 if (os != null)
                     os.close();
             }
-            getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+            getEngine().getWebSocketServer().notifyUpdated(getPath());
             try {
                 getEngine().getSearchFacade().getIndexer().indexFile(getName(), getId(), getId(), this);
             } catch (Exception ex) {
@@ -384,8 +384,7 @@ public class FileImpl extends HierarchyItemImpl implements
         } else {
             moveThisItem(destFolder, destName, parent);
         }
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
-        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + destName);
         try {
             getEngine().getSearchFacade().getIndexer().indexFile(destName, getId(), getId(), this);
         } catch (Exception ex) {

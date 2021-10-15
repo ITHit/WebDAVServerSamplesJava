@@ -209,7 +209,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock,
         ensureHasToken();
         incrementSerialNumber();
         getEngine().getDataClient().storeObject(getPath(), content, contentType, totalFileLength);
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyUpdated(getPath());
         return totalFileLength;
     }
 
@@ -245,7 +245,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock,
             getEngine().getLogger().logError("Tried to delete file in use.", e);
             throw new ServerException(e);
         }
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyDeleted(getPath());
     }
 
     @Override
@@ -264,7 +264,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock,
         }
         // Locks should not be copied, delete them
         getEngine().getDataClient().setMetadata(destPath, activeLocksAttribute, null);
-        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyCreated(destPath);
     }
 
     @Override
@@ -286,7 +286,6 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock,
         setName(destName);
         // Locks should not be copied, delete them
         getEngine().getDataClient().setMetadata(destPath, activeLocksAttribute, null);
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
-        getEngine().getWebSocketServer().notifyRefresh(folder.getPath());
+        getEngine().getWebSocketServer().notifyMoved(getPath(), destPath);
     }
 }

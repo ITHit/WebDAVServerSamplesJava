@@ -21,13 +21,14 @@ public class WebSocketServer {
     /**
      * Send notification to the client
      *
-     * @param type   of the notification
-     * @param folder to notify
+     * @param itemPath   File/Folder path.
+     * @param operation  Operation name: created/updated/deleted/moved
      */
-    private void send(String type, String folder) {
+    private void send(String itemPath, String operation) {
+        itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
         for (WebSocketSession session: sessions) {
             try {
-                session.sendMessage(new TextMessage(new Notification(folder, type).toString()));
+                session.sendMessage(new TextMessage(new Notification(itemPath, operation).toString()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -35,43 +36,107 @@ public class WebSocketServer {
     }
 
     /**
-     * Sends refresh notification to the web socket client
+     * Notifies client that file/folder was created.
      *
-     * @param folder to refresh
+     * @param itemPath file/folder.
      */
-    public void notifyRefresh(String folder) {
-        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
-        send("refresh", folder);
+    public void notifyCreated(String itemPath) {
+        send(itemPath, "created");
     }
 
     /**
-     * Sends delete notification to the web socket client
+     * Notifies client that file/folder was updated.
      *
-     * @param folder to delete
+     * @param itemPath file/folder.
      */
-    public void notifyDelete(String folder) {
-        folder = StringUtil.trimEnd(StringUtil.trimStart(folder, "/"), "/");
-        send("delete", folder);
+    public void notifyUpdated(String itemPath) {
+        send(itemPath, "updated");
+    }
+
+    /**
+     * Notifies client that file/folder was deleted.
+     *
+     * @param itemPath file/folder.
+     */
+    public void notifyDeleted(String itemPath) {
+        send(itemPath, "deleted");
+    }
+
+    /**
+     * Notifies client that file/folder was locked.
+     *
+     * @param itemPath file/folder.
+     */
+    public void notifyLocked(String itemPath) {
+        send(itemPath, "locked");
+    }
+
+    /**
+     * Notifies client that file/folder was unlocked.
+     *
+     * @param itemPath file/folder.
+     */
+    public void notifyUnlocked(String itemPath) {
+        send(itemPath, "unlocked");
+    }
+
+    /**
+     * Notifies client that file/folder was moved.
+     *
+     * @param itemPath file/folder.
+     */
+    public void notifyMoved(String itemPath, String targetPath) {
+        itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
+        targetPath = StringUtil.trimEnd(StringUtil.trimStart(targetPath, "/"), "/");
+        for (WebSocketSession session: sessions) {
+            try {
+                session.sendMessage(new TextMessage(new MovedNotification(itemPath, "moved", targetPath).toString()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
      * Represents VO to exchange between client and server
      */
     static class Notification {
-        private String folderPath;
-        private String eventType;
+        protected final String itemPath;
+        protected final String operation;
 
-        Notification(String folderPath, String eventType) {
-            this.folderPath = folderPath;
-            this.eventType = eventType;
+        Notification(String itemPath, String operation) {
+            this.itemPath = itemPath;
+            this.operation = operation;
         }
 
         @Override
         public String toString() {
             return "{" +
-                    "\"folderPath\" : \"" + folderPath + "\" ," +
-                    "\"eventType\" : \"" + eventType + "\"" +
+                    "\"itemPath\" : \"" + itemPath + "\" ," +
+                    "\"eventType\" : \"" + operation + "\"" +
                     "}";
         }
+    }
+
+    /**
+     * Represents VO to exchange between client and server for move type
+     */
+    static class MovedNotification extends Notification {
+        private final String targetPath;
+
+        MovedNotification(String itemPath, String operation, String targetPath) {
+            super(itemPath, operation);
+            this.targetPath = targetPath;
+        }
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "\"itemPath\" : \"" + itemPath + "\" ," +
+                    "\"targetPath\" : \"" + targetPath + "\" ," +
+                    "\"eventType\" : \"" + operation + "\"" +
+                    "}";
+        }
+
     }
 }

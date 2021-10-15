@@ -2,7 +2,6 @@ package com.ithit.webdav.samples.springboots3.impl;
 
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
-import com.ithit.webdav.server.util.StringUtil;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -252,7 +251,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
                 .filter(e -> !propNamesToDel.contains(e.getName()))
                 .collect(Collectors.toList());
         getEngine().getDataClient().setMetadata(getPath(), propertiesAttribute, SerializationUtils.serialize(properties));
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyUpdated(getPath());
     }
 
     /**
@@ -291,7 +290,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         LockInfo lockInfo = new LockInfo(shared, deep, token, expires, owner);
         activeLocks.add(lockInfo);
         getEngine().getDataClient().setMetadata(getPath(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyLocked(getPath());
         return new LockResult(token, timeout);
     }
 
@@ -344,7 +343,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             } else {
                 getEngine().getDataClient().setMetadata(getPath(), activeLocksAttribute, null);
             }
-            getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+            getEngine().getWebSocketServer().notifyUnlocked(getPath());
         } else {
             throw new PreconditionFailedException();
         }
@@ -375,19 +374,8 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         long expires = System.currentTimeMillis() + timeout * 1000;
         lockInfo.setTimeout(expires);
         getEngine().getDataClient().setMetadata(getPath(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
-        getEngine().getWebSocketServer().notifyRefresh(getParent(getPath()));
+        getEngine().getWebSocketServer().notifyLocked(getPath());
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());
-    }
-
-    String getParent(String path) {
-        String parentPath = StringUtil.trimEnd(StringUtil.trimStart(path, "/"), "/");
-        int index = parentPath.lastIndexOf("/");
-        if (index > -1) {
-            parentPath = parentPath.substring(0, index);
-        } else {
-            parentPath = "";
-        }
-        return parentPath;
     }
 }

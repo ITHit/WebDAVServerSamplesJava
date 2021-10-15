@@ -19,9 +19,13 @@ public class NotificationEncoder implements Encoder.Text<WebSocketServer.Notific
 
     @Override
     public String encode(WebSocketServer.Notification notification) throws EncodeException {
-        return "{" +
-                "\"folderPath\" : \"" + notification.getFolderPath() + "\" ," +
-                "\"eventType\" : \"" + notification.getEventType() + "\"" +
+        String target = "";
+        if (notification instanceof WebSocketServer.MovedNotification) {
+            target = "\"targetPath\" : \"" + ((WebSocketServer.MovedNotification) notification).getTargetPath() + "\" ,";
+        }
+        return "{" + target +
+                "\"itemPath\" : \"" + notification.getItemPath() + "\" ," +
+                "\"eventType\" : \"" + notification.getOperation() + "\"" +
                 "}";
     }
 }

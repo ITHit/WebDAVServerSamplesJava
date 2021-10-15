@@ -15,9 +15,13 @@ class NotificationEncoder : Encoder.Text<WebSocketServer.Notification> {
 
     @Throws(EncodeException::class)
     override fun encode(notification: WebSocketServer.Notification): String {
-        return "{" +
-                "\"folderPath\" : \"" + notification.folderPath + "\" ," +
-                "\"eventType\" : \"" + notification.eventType + "\"" +
+        var target = ""
+        if (notification is WebSocketServer.MovedNotification) {
+            target = "\"targetPath\" : \"" + notification.targetPath + "\" ,"
+        }
+        return "{" + target +
+                "\"itemPath\" : \"" + notification.itemPath + "\" ," +
+                "\"eventType\" : \"" + notification.operation + "\"" +
                 "}"
     }
 }

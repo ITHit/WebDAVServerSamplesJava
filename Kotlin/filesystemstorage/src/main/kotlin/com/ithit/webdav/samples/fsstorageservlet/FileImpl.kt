@@ -254,7 +254,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
         } finally {
             writer.close()
         }
-        engine.webSocketServer?.notifyRefresh(getParent(path))
+        engine.webSocketServer?.notifyUpdated(path)
         return totalWrittenBytes
     }
 
@@ -282,7 +282,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
             throw ServerException(e)
         }
 
-        engine.webSocketServer?.notifyRefresh(getParent(path))
+        engine.webSocketServer?.notifyDeleted(path)
         try {
             engine.searchFacade!!.indexer!!.deleteIndex(this)
         } catch (ex: Exception) {
@@ -309,9 +309,9 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
         if (ExtendedAttributesExtension.hasExtendedAttribute(newPath.toString(), activeLocksAttribute)) {
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute)
         }
-        engine.webSocketServer?.notifyRefresh(folder.getPath())
         try {
             val currentPath = folder.getPath() + destName
+            engine.webSocketServer?.notifyCreated(currentPath)
             engine.searchFacade!!.indexer!!.indexFile(HierarchyItemImpl.decode(destName), HierarchyItemImpl.decode(currentPath), null, this)
         } catch (ex: Exception) {
             engine.logger?.logError("Errors during indexing.", ex)
@@ -339,10 +339,9 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
         if (ExtendedAttributesExtension.hasExtendedAttribute(newPath.toString(), activeLocksAttribute)) {
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute)
         }
-        engine.webSocketServer?.notifyRefresh(getParent(path))
-        engine.webSocketServer?.notifyRefresh(folder.path)
         try {
             val currentPath = folder.path + destName
+            engine.webSocketServer?.notifyMoved(path, currentPath)
             engine.searchFacade!!.indexer!!.indexFile(HierarchyItemImpl.decode(destName), HierarchyItemImpl.decode(currentPath), path, this)
         } catch (ex: Exception) {
             engine.logger?.logError("Errors during indexing.", ex)

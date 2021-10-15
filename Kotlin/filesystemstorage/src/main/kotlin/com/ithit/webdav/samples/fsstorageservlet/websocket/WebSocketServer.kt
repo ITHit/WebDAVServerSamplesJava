@@ -35,46 +35,93 @@ class WebSocketServer {
     /**
      * Send notification to the client
      *
-     * @param type   of the notification
-     * @param folder to notify
+     * @param itemPath   File/Folder path.
+     * @param operation  Operation name: created/updated/deleted/moved
      */
-    private fun send(type: String, folder: String) {
+    private fun send(itemPath: String, operation: String) {
+        var itemPath: String? = itemPath
+        itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/")
         for (s in sessions) {
             if (s.isOpen) {
-                s.asyncRemote.sendObject(Notification(folder, type))
+                s.asyncRemote.sendObject(Notification(itemPath, operation))
             }
         }
     }
 
     /**
-     * Sends refresh notification to the web socket client
+     * Notifies client that file/folder was created.
      *
-     * @param folder to refresh
+     * @param itemPath file/folder.
      */
-    fun notifyRefresh(folder: String) {
-        var localFolder = folder
-        localFolder = StringUtil.trimEnd(StringUtil.trimStart(localFolder, "/"), "/")
-        send("refresh", localFolder)
+    fun notifyCreated(itemPath: String) {
+        send(itemPath, "created")
     }
 
     /**
-     * Sends delete notification to the web socket client
+     * Notifies client that file/folder was updated.
      *
-     * @param folder to delete
+     * @param itemPath file/folder.
      */
-    fun notifyDelete(folder: String) {
-        var localFolder = folder
-        localFolder = StringUtil.trimEnd(StringUtil.trimStart(localFolder, "/"), "/")
-        send("delete", localFolder)
+    fun notifyUpdated(itemPath: String) {
+        send(itemPath, "updated")
+    }
+
+    /**
+     * Notifies client that file/folder was deleted.
+     *
+     * @param itemPath file/folder.
+     */
+    fun notifyDeleted(itemPath: String) {
+        send(itemPath, "deleted")
+    }
+
+    /**
+     * Notifies client that file/folder was locked.
+     *
+     * @param itemPath file/folder.
+     */
+    fun notifyLocked(itemPath: String) {
+        send(itemPath, "locked")
+    }
+
+    /**
+     * Notifies client that file/folder was unlocked.
+     *
+     * @param itemPath file/folder.
+     */
+    fun notifyUnlocked(itemPath: String) {
+        send(itemPath, "unlocked")
+    }
+
+    /**
+     * Notifies client that file/folder was moved.
+     *
+     * @param itemPath file/folder.
+     */
+    fun notifyMoved(itemPath: String?, targetPath: String?) {
+        var itemPath = itemPath
+        var targetPath = targetPath
+        itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/")
+        targetPath = StringUtil.trimEnd(StringUtil.trimStart(targetPath, "/"), "/")
+        for (s in sessions) {
+            if (s.isOpen) {
+                s.asyncRemote.sendObject(MovedNotification(itemPath, "moved", targetPath))
+            }
+        }
     }
 
     /**
      * Represents VO to exchange between client and server
      */
-    inner class Notification(val folderPath: String, val eventType: String)
+    open inner class Notification(val itemPath: String?, val operation: String)
+
+    /**
+     * Represents VO to exchange between client and server for move type
+     */
+    inner class MovedNotification(itemPath: String?, operation: String, val targetPath: String?) :
+        Notification(itemPath, operation)
 
     companion object {
-
-        private val sessions = HashSet<Session>()
+        private val sessions: MutableSet<Session> = HashSet()
     }
 }
