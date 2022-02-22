@@ -243,7 +243,8 @@
                         </goals>
                         <configuration>
                             <installDirectory>${java.io.tmpdir}</installDirectory>
-                            <nodeVersion>v4.6.0</nodeVersion>
+                            <nodeVersion>v12.22.7</nodeVersion>
+                            <npmVersion>6.14.0</npmVersion>
                         </configuration>
                     </execution>
                     <execution>
