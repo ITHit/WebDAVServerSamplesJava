@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>oraclestorage</artifactId>
-    <version>5.1.5291</version>
+    <version>5.1.5402</version>
     <packaging>war</packaging>
 
     <properties>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>5.1.5291</version>
+            <version>5.1.5402</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -61,12 +61,12 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.23</version>
+            <version>1.28.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
-            <version>1.23</version>
+            <version>1.28.1</version>
             <exclusions>
                 <exclusion>
                     <artifactId>cxf-core</artifactId>
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>5.1.5291</version>
+            <version>5.1.5402</version>
         </dependency>
 
         <dependency>
@@ -165,7 +165,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/oraclestorage-5.1.5291/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/oraclestorage-5.1.5402/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -244,7 +244,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/oraclestorage-5.1.5291</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-5.1.5402</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -275,7 +275,7 @@
 			<plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.6</version>			
+                <version>1.12.1</version>
                 <executions>
                     <execution>
                         <id>install node and npm</id>
@@ -284,8 +284,20 @@
                         </goals>
                         <configuration>
                             <installDirectory>${java.io.tmpdir}</installDirectory>
-                            <nodeVersion>v12.22.7</nodeVersion>
-                            <npmVersion>6.14.0</npmVersion>
+                            <nodeVersion>v16.14.2</nodeVersion>
+                            <npmVersion>8.7.0</npmVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm update</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>update</arguments>
+                            <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
+                            <installDirectory>c:\temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>

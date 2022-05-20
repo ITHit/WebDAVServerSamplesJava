@@ -9,14 +9,14 @@
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springbootoraclestorage</artifactId>
-    <version>5.1.5291</version>
+    <version>5.1.5402</version>
     <name>springbootoraclestorage</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
         <lucene-core.version>7.5.0</lucene-core.version>
-        <tika-core.version>1.23</tika-core.version>
+        <tika-core.version>1.28.1</tika-core.version>
     </properties>
 
     <dependencies>
@@ -54,12 +54,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>5.1.5291</version>
+            <version>5.1.5402</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>5.1.5291</version>
+            <version>5.1.5402</version>
         </dependency>
 
         <!-- Oracle dependencies -->
@@ -184,7 +184,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.6</version>
+                <version>1.12.1</version>
                 <executions>
                     <execution>
                         <id>install node and npm</id>
@@ -193,8 +193,20 @@
                         </goals>
                         <configuration>
                             <installDirectory>${java.io.tmpdir}</installDirectory>
-                            <nodeVersion>v12.22.7</nodeVersion>
-                            <npmVersion>6.14.0</npmVersion>
+                            <nodeVersion>v16.14.2</nodeVersion>
+                            <npmVersion>8.7.0</npmVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm update</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>update</arguments>
+                            <workingDirectory>src/main/resources/wwwroot/js</workingDirectory>
+                            <installDirectory>${java.io.tmpdir}</installDirectory>
                         </configuration>
                     </execution>
                     <execution>

@@ -387,8 +387,21 @@ internal abstract class HierarchyItemImpl
     @Throws(ServerException::class)
     override fun getActiveLocks(): List<LockInfo> {
         activeLocks = if (activeLocks == null) {
-            val activeLocksJson = ExtendedAttributesExtension.getExtendedAttribute(fullPath.toString(), activeLocksAttribute)
-            SerializationUtils.deserializeList(LockInfo::class.java, activeLocksJson).stream().filter { x -> System.currentTimeMillis() < x.timeout }.collect(Collectors.toList())
+            val activeLocksJson =
+                ExtendedAttributesExtension.getExtendedAttribute(fullPath.toString(), activeLocksAttribute)
+            SerializationUtils.deserializeList(LockInfo::class.java, activeLocksJson)
+                .stream()
+                .filter { x -> System.currentTimeMillis() < x.timeout }
+                .map { lock ->
+                    LockInfo(
+                        lock.isShared,
+                        lock.isDeep,
+                        lock.token,
+                        if (lock.timeout < 1 || lock.timeout == Long.MAX_VALUE) lock.timeout else (lock.timeout - System.currentTimeMillis()) / 1000,
+                        lock.owner
+                    )
+                }
+                .collect(Collectors.toList())
         } else {
             LinkedList()
         }

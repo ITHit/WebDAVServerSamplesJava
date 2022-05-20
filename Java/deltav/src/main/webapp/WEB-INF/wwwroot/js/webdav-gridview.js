@@ -61,7 +61,7 @@
             this.$el.find('tbody').html(
                 aItems.map(function (oItem) {
                     var locked = oItem.ActiveLocks.length > 0
-                        ? ('<span class="ithit-grid-icon-locked"></span>' +
+                        ? ('<span class="ithit-grid-icon-locked" title="' + self._RenderLokedIconTooltip(oItem) + '"></span>' +
                             (oItem.ActiveLocks[0].LockScope === 'Shared' ? ('<span class="badge badge-pill badge-dark">' + oItem.ActiveLocks.length + '</span>') : ''))
                         : '';
                     /** @type {ITHit.WebDAV.Client.HierarchyItem} oItem */
@@ -112,6 +112,22 @@
         /**
         * @param {ITHit.WebDAV.Client.HierarchyItem} oItem
         **/
+        _RenderLokedIconTooltip(oItem) {
+            var tooltipTitle = 'Exclusive lock: ' + oItem.ActiveLocks[0].Owner;
+            if (oItem.ActiveLocks[0].LockScope === 'Shared') {
+                var userNames = [];
+                tooltipTitle = 'Shared lock' + (oItem.ActiveLocks.length > 1 ? '(s)':'') + ': ';
+                for (var i = 0; i < oItem.ActiveLocks.length; i++) {
+                    userNames.push(oItem.ActiveLocks[i].Owner);
+                }
+                tooltipTitle += userNames.join(', ');
+            }
+            return tooltipTitle;
+        },
+
+        /**
+        * @param {ITHit.WebDAV.Client.HierarchyItem} oItem
+        **/
         _RenderDisplayName: function (oItem) {
             var oElement = oItem.IsFolder() ?
                 $('<td class="ellipsis" />').html($('<a />').text(oItem.DisplayName).attr('href', oItem.Href)) :
@@ -154,7 +170,9 @@
             } else {
                 var $btnGroup = $('<div class="btn-group"></div>');
                 var displayRadioBtns = (isMicrosoftOfficeDocument && isGSuiteDocument);
-                $('<button type="button" class="btn btn-primary btn-sm btn-labeled btn-default-edit" title="' + (displayRadioBtns ? self._GetActionGroupBtnTooltipText() : 'Edit document with desktop associated application.') + '"><span class="btn-label"><i class="' +
+                var isExclusiveLocked = oItem.ActiveLocks.length > 0 && oItem.ActiveLocks[0].LockScope === 'Exclusive';
+                $('<button type="button" class="btn btn-primary btn-sm btn-labeled btn-default-edit" title="' + (displayRadioBtns ? self._GetActionGroupBtnTooltipText() : 'Edit document with desktop associated application.') +
+                    '"' + self._GetDisabledGroupBtnAttribute(isExclusiveLocked) + '><span class="btn-label"><i class="' +
                     (displayRadioBtns ? self._GetActionGroupBtnCssClass() : 'icon-edit') + '"></i></span><span class="d-none d-lg-inline-block btn-edit-label">Edit</span></button>')
                     .appendTo($btnGroup).on('click', function () {
                         var $radio = $(this).parent().find('input[type=radio]:checked');
@@ -169,7 +187,7 @@
                 var $dropdownToggle = $('<button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Toggle Dropdown</span></button>')
                     .appendTo($btnGroup).prop("disabled", !isDavProtocolSupported && !isMicrosoftOfficeDocument);
 
-                this._RenderContextMenu(oItem, $btnGroup, isMicrosoftOfficeDocument, isGSuiteDocument, isDavProtocolSupported);
+                this._RenderContextMenu(oItem, $btnGroup, isMicrosoftOfficeDocument, isGSuiteDocument, isDavProtocolSupported, isExclusiveLocked);
 
                 $btnGroup.on('shown.bs.dropdown', function () {
                     self.ContextMenuID = oItem.Href;
@@ -203,6 +221,14 @@
             return tooltipText;
         },
 
+        _GetDisabledGroupBtnAttribute: function (isExclusiveLocked) {
+            var attribute = '';
+            if (this._defaultEditor == 'GSuiteEditor' && isExclusiveLocked) {
+                attribute = ' disabled="disabled"';
+            }
+            return attribute;
+        },
+
         _GetActionGroupBtnCssClass: function () {
             var cssClassName = 'icon-edit';
             switch (this._defaultEditor) {
@@ -217,7 +243,7 @@
             return cssClassName;
         },
 
-        _RenderContextMenu: function (oItem, $btnGroup, isMicrosoftOfficeDocument, isGSuiteDocument, isDavProtocolSupported) {
+        _RenderContextMenu: function (oItem, $btnGroup, isMicrosoftOfficeDocument, isGSuiteDocument, isDavProtocolSupported, isExclusiveLocked) {
             var self = this;
             var supportGSuiteFeature = oWebDAV.OptionsInfo.Features & ITHit.WebDAV.Client.Features.GSuite;
             var displayRadioBtns = (isMicrosoftOfficeDocument && isGSuiteDocument);

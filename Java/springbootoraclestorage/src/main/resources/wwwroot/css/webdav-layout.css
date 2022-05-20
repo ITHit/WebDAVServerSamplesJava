@@ -414,6 +414,16 @@ header .versions {
         color: white;
         text-decoration: underline;
     }
+
+    .header-content .flex-column {
+        position: relative;
+        padding-bottom: 48px;
+    }
+
+        .header-content .flex-column .btn {
+            position: absolute;
+            bottom: 10px;
+        }
 /*End Header styles*/
 
 /*Start Main layout styles*/

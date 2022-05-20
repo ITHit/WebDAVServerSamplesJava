@@ -427,8 +427,17 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     public List<LockInfo> getActiveLocks() throws ServerException {
         if (activeLocks == null) {
             String activeLocksJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), activeLocksAttribute);
-            activeLocks = SerializationUtils.deserializeList(LockInfo.class, activeLocksJson).
-                    stream().filter(x -> System.currentTimeMillis() < x.getTimeout()).collect(Collectors.toList());
+            activeLocks = SerializationUtils.deserializeList(LockInfo.class, activeLocksJson)
+                    .stream()
+                    .filter(x -> System.currentTimeMillis() < x.getTimeout())
+                    .map(lock -> new LockInfo(
+                            lock.isShared(),
+                            lock.isDeep(),
+                            lock.getToken(),
+                            (lock.getTimeout() < 1 || lock.getTimeout() == Long.MAX_VALUE) ? lock.getTimeout() : (lock.getTimeout() - System.currentTimeMillis()) / 1000,
+                            lock.getOwner())
+                    )
+                    .collect(Collectors.toList());
         } else {
             activeLocks = new LinkedList<>();
         }
