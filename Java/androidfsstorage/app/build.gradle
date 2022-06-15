@@ -73,7 +73,7 @@ dependencies {
     })
     implementation 'io.apisense:rhino-android:1.0'
     implementation 'commons-io:commons-io:2.7'
-    implementation 'com.google.code.gson:gson:2.7'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation('com.ithit.webdav.integration:android-integration:5.1.5432', {
         exclude group: 'org.nanohttpd', module: 'nanohttpd'
