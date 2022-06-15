@@ -4,7 +4,6 @@ import com.ithit.webdav.server.util.StringUtil;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ public class WebSocketServer {
         for (WebSocketSession session: sessions) {
             try {
                 session.sendMessage(new TextMessage(new Notification(itemPath, operation).toString()));
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -91,7 +90,7 @@ public class WebSocketServer {
         for (WebSocketSession session: sessions) {
             try {
                 session.sendMessage(new TextMessage(new MovedNotification(itemPath, "moved", targetPath).toString()));
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

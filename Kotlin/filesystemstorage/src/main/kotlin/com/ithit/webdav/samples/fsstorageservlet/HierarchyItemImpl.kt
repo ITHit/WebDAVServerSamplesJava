@@ -389,23 +389,22 @@ internal abstract class HierarchyItemImpl
         activeLocks = if (activeLocks == null) {
             val activeLocksJson =
                 ExtendedAttributesExtension.getExtendedAttribute(fullPath.toString(), activeLocksAttribute)
-            SerializationUtils.deserializeList(LockInfo::class.java, activeLocksJson)
-                .stream()
-                .filter { x -> System.currentTimeMillis() < x.timeout }
-                .map { lock ->
-                    LockInfo(
-                        lock.isShared,
-                        lock.isDeep,
-                        lock.token,
-                        if (lock.timeout < 1 || lock.timeout == Long.MAX_VALUE) lock.timeout else (lock.timeout - System.currentTimeMillis()) / 1000,
-                        lock.owner
-                    )
-                }
-                .collect(Collectors.toList())
+            ArrayList(SerializationUtils.deserializeList(LockInfo::class.java, activeLocksJson))
         } else {
             LinkedList()
         }
-        return activeLocks!!.toList()
+        return activeLocks!!.stream()
+            .filter { x -> System.currentTimeMillis() < x.timeout }
+            .map { lock ->
+                LockInfo(
+                    lock.isShared,
+                    lock.isDeep,
+                    lock.token,
+                    if (lock.timeout < 0 || lock.timeout == Long.MAX_VALUE) lock.timeout else (lock.timeout - System.currentTimeMillis()) / 1000,
+                    lock.owner
+                )
+            }
+            .collect(Collectors.toList())
     }
 
     /**
