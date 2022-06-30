@@ -27,11 +27,11 @@ import java.util.Objects;
 class FileImpl extends HierarchyItemImpl implements File, Lock,
         ResumableUpload, UploadProgress {
 
-    private int bufferSize = 1048576; // 1 Mb
+    private static final int BUFFER_SIZE = 1048576; // 1 Mb
 
     private String snippet;
     
-    private OpenOption[] allowedOpenFileOptions;
+    private final OpenOption[] allowedOpenFileOptions;
 
     /**
      * Initializes a new instance of the {@link FileImpl} class.
@@ -78,8 +78,9 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         Path fullPath;
         String name = null;
         try {
-            String pathFragment = decodeAndConvertToPath(path);
-            String rootFolder = getRootFolder();
+            String realPath = engine.getContextAware(path);
+            String pathFragment = decodeAndConvertToPath(realPath);
+            String rootFolder = engine.getDataFolder();
             fullPath = Paths.get(rootFolder, pathFragment);
             if (Files.exists(fullPath)) {
                 name = Paths.get(pathFragment).getFileName().toString();
@@ -207,7 +208,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
     public String getContentType() throws ServerException {
         String name = this.getName();
         int periodIndex = name.lastIndexOf('.');
-        String ext = name.substring(periodIndex + 1, name.length());
+        String ext = name.substring(periodIndex + 1);
         String contentType = MimeType.getInstance().getMimeType(ext);
         if (contentType == null)
             contentType = "application/octet-stream";
@@ -230,7 +231,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
     @Override
     public void read(OutputStream out, long startIndex, long count) throws ServerException {
         Path fullPath = this.getFullPath();
-        byte[] buf = new byte[bufferSize];
+        byte[] buf = new byte[BUFFER_SIZE];
         int retVal;
         try (InputStream in = Files.newInputStream(fullPath)) {
             in.skip(startIndex);
@@ -273,7 +274,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             writer.position(startIndex);
         }
         incrementSerialNumber();
-        byte[] inputBuffer = new byte[bufferSize];
+        byte[] inputBuffer = new byte[BUFFER_SIZE];
         long totalWrittenBytes = startIndex;
         int readBytes;
         try {
@@ -285,7 +286,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             }
 
             try {
-                getEngine().getSearchFacade().getIndexer().indexFile(getName(), decode(getPath()), null, this);
+                getEngine().getSearchFacade().getIndexer().indexFile(getName(), decode(getContextAwarePath()), null, this);
             } catch (Exception ex){
                 getEngine().getLogger().logError("Errors during indexing.", ex);
             }
@@ -342,7 +343,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
     public void copyTo(Folder folder, String destName, boolean deep)
             throws LockedException, MultistatusException, ServerException, ConflictException {
         ((FolderImpl) folder).ensureHasToken();
-        String destinationFolder = Paths.get(getRootFolder(), decodeAndConvertToPath(folder.getPath())).toString();
+        String destinationFolder = Paths.get(getRootFolder(), decodeAndConvertToPath(((FolderImpl) folder).getContextAwarePath())).toString();
         if (!Files.exists(Paths.get(destinationFolder))) {
             throw new ConflictException();
         }
@@ -357,8 +358,8 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
         }
         try {
-            String currentPath = folder.getPath() + destName;
-            getEngine().getWebSocketServer().notifyCreated(currentPath);
+            String currentPath = ((FolderImpl) folder).getContextAwarePath() + destName;
+            getEngine().getWebSocketServer().notifyCreated(folder.getPath() + destName);
             getEngine().getSearchFacade().getIndexer().indexFile(decode(destName), decode(currentPath), null, this);
         } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
@@ -370,7 +371,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             ConflictException, MultistatusException, ServerException {
         ensureHasToken();
         ((FolderImpl) folder).ensureHasToken();
-        String destinationFolder = Paths.get(getRootFolder(), decodeAndConvertToPath(folder.getPath())).toString();
+        String destinationFolder = Paths.get(getRootFolder(), decodeAndConvertToPath(((FolderImpl) folder).getContextAwarePath())).toString();
         if (!Files.exists(Paths.get(destinationFolder))) {
             throw new ConflictException();
         }
@@ -386,9 +387,9 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
         }
         try {
-            String currentPath = folder.getPath() + destName;
-            getEngine().getWebSocketServer().notifyMoved(getPath(), currentPath);
-            getEngine().getSearchFacade().getIndexer().indexFile(decode(destName), decode(currentPath), getPath(), this);
+            String currentPath = ((FolderImpl) folder).getContextAwarePath() + destName;
+            getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + destName);
+            getEngine().getSearchFacade().getIndexer().indexFile(decode(destName), decode(currentPath), getContextAwarePath(), this);
         } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
         }

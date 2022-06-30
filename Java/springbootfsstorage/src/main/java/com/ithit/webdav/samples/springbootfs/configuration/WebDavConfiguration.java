@@ -93,7 +93,7 @@ public class WebDavConfiguration extends WebMvcConfigurationSupport implements W
         } catch (IOException e) {
             license = "";
         }
-        final WebDavEngine webDavEngine = new WebDavEngine(license, rootLocalPath, properties.isShowExceptions());
+        final WebDavEngine webDavEngine = new WebDavEngine(license, rootLocalPath, properties.isShowExceptions(), properties.getRootContext());
         final boolean extendedAttributesSupported = ExtendedAttributesExtension.isExtendedAttributesSupported(rootLocalPath);
         CustomFolderGetHandler handler = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), extendedAttributesSupported, customGetHandler(), errorPage(), properties.getRootContext());
         CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(webDavEngine.getResponseCharacterEncoding(), Engine.getVersion(), extendedAttributesSupported, customGetHandler(), errorPage(), properties.getRootContext());
@@ -140,8 +140,9 @@ public class WebDavConfiguration extends WebMvcConfigurationSupport implements W
                 return path;
             }
             try {
-                if (Files.exists(Paths.get(realPath, rootPath))) {
-                    path = Paths.get(realPath, rootPath).toString();
+                Path relative = Paths.get(realPath, rootPath);
+                if (Files.exists(relative)) {
+                    path = relative.toString();
                 } else {
                     path = createDefaultPath();
                 }
@@ -153,7 +154,6 @@ public class WebDavConfiguration extends WebMvcConfigurationSupport implements W
     }
 
     private String createDefaultPath() {
-        resourceReader.readFiles();
         return resourceReader.getDefaultPath();
     }
 

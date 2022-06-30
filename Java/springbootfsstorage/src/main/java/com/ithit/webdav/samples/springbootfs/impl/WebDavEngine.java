@@ -5,6 +5,7 @@ import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.ServerException;
+import com.ithit.webdav.server.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -17,20 +18,24 @@ public class WebDavEngine extends Engine {
 
     private final Logger logger;
     private final String license;
-    static String dataFolder;
-    private boolean showExceptions;
+    private final String dataFolder;
+    private final boolean showExceptions;
+    private final String rootContext;
     private SearchFacade searchFacade;
     private WebSocketServer webSocketServer;
 
     /**
      * Initializes a new instance of the WebDavEngine class.
-     *  @param license License string.
-     * @param dataFolder Path to the root folder to map to DAV.
+     *
+     * @param license        License string.
+     * @param dataFolder     Path to the root folder to map to DAV.
      * @param showExceptions True if you want to print exceptions in the response.
+     * @param rootContext    Context path where webdav service is working.
      */
-    public WebDavEngine(String license, String dataFolder, boolean showExceptions) {
-        WebDavEngine.dataFolder = dataFolder;
+    public WebDavEngine(String license, String dataFolder, boolean showExceptions, String rootContext) {
+        this.dataFolder = dataFolder;
         this.showExceptions = showExceptions;
+        this.rootContext = StringUtil.trimEnd(rootContext, "/");
         this.logger = new SpringBootLogger(log);
         this.license = license;
     }
@@ -69,6 +74,14 @@ public class WebDavEngine extends Engine {
     @Override
     public Logger getLogger() {
         return logger;
+    }
+
+    /**
+     * Returns folder where data will be sourced for WebDAV
+     * @return data folder.
+     */
+    public String getDataFolder() {
+        return dataFolder;
     }
 
     /**
@@ -123,5 +136,18 @@ public class WebDavEngine extends Engine {
      */
     WebSocketServer getWebSocketServer() {
         return webSocketServer;
+    }
+
+    /**
+     * Returns real path considering context which may vary.
+     * @param path context aware path.
+     * @return real path.
+     */
+    public String getContextAware(String path) {
+        if (path != null && path.startsWith(rootContext)) {
+            String contextAware = path.replaceFirst(rootContext, "/");
+            return contextAware.replace("//", "/");
+        }
+        return path;
     }
 }

@@ -58,9 +58,10 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
         Path fullPath;
         String name = null;
         try {
-            boolean root = path.equals("/");
-            String pathFragment = decodeAndConvertToPath(path);
-            String rootFolder = getRootFolder();
+            String realPath = engine.getContextAware(path);
+            boolean root = realPath.equals("/");
+            String pathFragment = decodeAndConvertToPath(realPath);
+            String rootFolder = engine.getDataFolder();
             fullPath = root ? Paths.get(rootFolder) : Paths.get(rootFolder, pathFragment);
             if (Files.exists(fullPath)) {
                 name = root ? "ROOT" : Paths.get(pathFragment).getFileName().toString();
@@ -105,7 +106,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
                 throw new ServerException(e);
             }
             getEngine().getWebSocketServer().notifyCreated(getPath() + name);
-            return FileImpl.getFile(getPath() + encode(name), getEngine());
+            return FileImpl.getFile(getContextAwarePath() + encode(name), getEngine());
         }
         return null;
     }
@@ -145,7 +146,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
      */
     @Override
     public PageResults getChildren(List<Property> propNames, Long offset, Long nResults, List<OrderProperty> orderProps) throws ServerException {
-        String decodedPath = HierarchyItemImpl.decodeAndConvertToPath(getPath());
+        String decodedPath = HierarchyItemImpl.decodeAndConvertToPath(getContextAwarePath());
         Path fullFolderPath = Paths.get(getRootFolder() + decodedPath);
         List<HierarchyItemImpl> children = new ArrayList<>();
         Long total = null;
@@ -186,7 +187,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
             throws LockedException, ServerException {
         ((FolderImpl) folder).ensureHasToken();
 
-        String relUrl = HierarchyItemImpl.decodeAndConvertToPath(folder.getPath());
+        String relUrl = HierarchyItemImpl.decodeAndConvertToPath(((FolderImpl) folder).getContextAwarePath());
         String destinationFolder = Paths.get(getRootFolder(), relUrl).toString();
         if (isRecursive(relUrl)) {
             throw new ServerException("Cannot copy to subfolder", WebDavStatus.FORBIDDEN);
@@ -197,8 +198,8 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
             Path sourcePath = this.getFullPath();
             Path destinationFullPath = Paths.get(destinationFolder, destName);
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile());
-            getEngine().getWebSocketServer().notifyCreated(folder.getPath() + destName);
-            addIndex(destinationFullPath, folder.getPath() + destName, destName);
+            getEngine().getWebSocketServer().notifyCreated(((FolderImpl) folder).getContextAwarePath() + destName);
+            addIndex(destinationFullPath, ((FolderImpl) folder).getContextAwarePath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
         }
@@ -213,7 +214,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
      * @throws ServerException in case of any server exception.
      */
     private boolean isRecursive(String destFolder) throws ServerException {
-        return destFolder.startsWith(getPath().replace("/", java.io.File.separator));
+        return destFolder.startsWith(getContextAwarePath().replace("/", java.io.File.separator));
     }
 
     /**
@@ -283,7 +284,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
             ConflictException, ServerException {
         ensureHasToken();
         ((FolderImpl) folder).ensureHasToken();
-        String destinationFolder = Paths.get(getRootFolder(), HierarchyItemImpl.decodeAndConvertToPath(folder.getPath())).toString();
+        String destinationFolder = Paths.get(getRootFolder(), HierarchyItemImpl.decodeAndConvertToPath(((FolderImpl) folder).getContextAwarePath())).toString();
         if (!Files.exists(Paths.get(destinationFolder)))
             throw new ConflictException();
         Path sourcePath = this.getFullPath();
@@ -291,12 +292,12 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
         try {
             removeIndex(getFullPath(), this);
             FileUtils.moveDirectory(sourcePath.toFile(), destinationFullPath.toFile());
-            addIndex(destinationFullPath, folder.getPath() + destName, destName);
+            addIndex(destinationFullPath, ((FolderImpl) folder).getContextAwarePath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
         }
         setName(destName);
-        getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + destName);
+        getEngine().getWebSocketServer().notifyMoved(getContextAwarePath(), ((FolderImpl) folder).getContextAwarePath() + destName);
     }
 
     /**
@@ -322,7 +323,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, Res
         }
         Map<String, String> searchResult;
         try {
-            String decodedPath = decode(getPath());
+            String decodedPath = decode(getContextAwarePath());
             searchResult = searcher.search(searchString, options, decodedPath, snippet);
             for (Map.Entry<String, String> entry : searchResult.entrySet()) {
                 try {

@@ -30,7 +30,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     private final WebDavEngine engine;
     private String name;
     String activeLocksAttribute = "Locks";
-    private String propertiesAttribute = "Properties";
+    private static final String PROPERTIES_ATTRIBUTE = "Properties";
     private List<Property> properties;
     private List<LockInfo> activeLocks;
 
@@ -54,26 +54,26 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     /**
      * Decodes URL and converts it to proper path string.
      *
-     * @param URL URL to decode.
+     * @param url URL to decode.
      * @return Path.
      */
-    static String decodeAndConvertToPath(String URL) {
-        String path = decode(URL);
+    static String decodeAndConvertToPath(String url) {
+        String path = decode(url);
         return path.replace("/", File.separator);
     }
 
     /**
      * Decodes URL.
      *
-     * @param URL URL to decode.
+     * @param url URL to decode.
      * @return Path.
      */
-    static String decode(String URL) {
+    static String decode(String url) {
         String path = "";
         try {
-            path = URLDecoder.decode(URL.replaceAll("\\+", "%2B"), "UTF-8");
+            path = URLDecoder.decode(url.replaceAll("\\+", "%2B"), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            System.out.println("UTF-8 encoding can not be used to decode " + URL);
+            System.out.println("UTF-8 encoding can not be used to decode " + url);
         }
         return path;
     }
@@ -97,8 +97,8 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      *
      * @return Path to the folder in File System which will be the root for the WebDav storage.
      */
-    static String getRootFolder() {
-        return WebDavEngine.dataFolder;
+    public String getRootFolder() {
+        return getEngine().getDataFolder();
     }
 
     /**
@@ -206,6 +206,14 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     }
 
     /**
+     * Unique item path in the repository relative to storage root considering the context root.
+     * @return Item path relative to storage root considering the context root.
+     */
+    public String getContextAwarePath() throws ServerException {
+        return engine.getContextAware(getPath());
+    }
+
+    /**
      * Gets values of all properties or selected properties for this item.
      *
      * @return List of properties with values set. If property cannot be found it shall be omitted from the result.
@@ -230,7 +238,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
 
     private List<Property> getProperties() throws ServerException {
         if (properties == null) {
-            String propertiesJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), propertiesAttribute);
+            String propertiesJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE);
             properties = SerializationUtils.deserializeList(Property.class, propertiesJson);
         }
         return properties;
@@ -244,8 +252,8 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      */
     @Override
     public List<Property> getPropertyNames() throws ServerException {
-        if (ExtendedAttributesExtension.hasExtendedAttribute(getFullPath().toString(), propertiesAttribute)) {
-            String propJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), propertiesAttribute);
+        if (ExtendedAttributesExtension.hasExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE)) {
+            String propJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE);
             return SerializationUtils.deserializeList(Property.class, propJson);
         }
         return new LinkedList<>();
@@ -270,11 +278,11 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      */
     private boolean clientHasToken() throws ServerException {
         getActiveLocks();
-        if (activeLocks.size() == 0) {
+        if (activeLocks.isEmpty()) {
             return true;
         }
         List<String> clientLockTokens = DavContext.currentRequest().getClientLockTokens();
-        return !(activeLocks.stream().filter(x -> clientLockTokens.contains(x.getToken())).count() == 0);
+        return activeLocks.stream().anyMatch(x -> clientLockTokens.contains(x.getToken()));
     }
 
     /**
@@ -317,8 +325,8 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         properties = properties.stream()
                 .filter(e -> !propNamesToDel.contains(e.getName()))
                 .collect(Collectors.toList());
-        ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), propertiesAttribute, SerializationUtils.serialize(properties));
-        getEngine().getWebSocketServer().notifyUpdated(getPath());
+        ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE, SerializationUtils.serialize(properties));
+        getEngine().getWebSocketServer().notifyUpdated(getContextAwarePath());
     }
 
     /**
@@ -368,7 +376,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     Path getFullPath() {
         String fullPath = "";
         try {
-            fullPath = getRootFolder() + HierarchyItemImpl.decodeAndConvertToPath(getPath());
+            fullPath = getRootFolder() + HierarchyItemImpl.decodeAndConvertToPath(getContextAwarePath());
         } catch (ServerException ignored) {
         }
         return Paths.get(fullPath);
