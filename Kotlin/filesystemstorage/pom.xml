@@ -170,7 +170,7 @@
     </repositories>
 
     <build>
-        <sourceDirectory>C:\Java\Release\WebdavJavaRepo\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
+        <sourceDirectory>D:\myproj\Java\ithit\webdav-server-for-java\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -268,7 +268,7 @@
                         <configuration>
                             <arguments>update</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
-                            <installDirectory>C:\Users\build\AppData\Local\Temp\</installDirectory>
+                            <installDirectory>c:\temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>
