@@ -24,14 +24,14 @@ import java.util.Objects;
 /**
  * Represents file in the File System repository.
  */
-final class FileImpl extends HierarchyItemImpl implements File, Lock,
+class FileImpl extends HierarchyItemImpl implements File, Lock,
         ResumableUpload, UploadProgress {
 
-    private static final int BUFFER_SIZE = 1048576; // 1 Mb
+    private int bufferSize = 1048576; // 1 Mb
 
     private String snippet;
     
-    private final OpenOption[] allowedOpenFileOptions;
+    private OpenOption[] allowedOpenFileOptions;
 
     /**
      * Initializes a new instance of the {@link FileImpl} class.
@@ -111,7 +111,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
 
     /**
      * In this method implementation you can delete partially uploaded file.
-     * <p>
+     *
      * Client do not plan to restore upload. Remove any temporary files / cleanup resources here.
      *
      * @throws LockedException - this item or its parent was locked and client did not provide lock token.
@@ -208,7 +208,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
     public String getContentType() throws ServerException {
         String name = this.getName();
         int periodIndex = name.lastIndexOf('.');
-        String ext = name.substring(periodIndex + 1);
+        String ext = name.substring(periodIndex + 1, name.length());
         String contentType = MimeType.getInstance().getMimeType(ext);
         if (contentType == null)
             contentType = "application/octet-stream";
@@ -231,7 +231,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
     @Override
     public void read(OutputStream out, long startIndex, long count) throws ServerException {
         Path fullPath = this.getFullPath();
-        byte[] buf = new byte[BUFFER_SIZE];
+        byte[] buf = new byte[bufferSize];
         int retVal;
         try (InputStream in = Files.newInputStream(fullPath)) {
             in.skip(startIndex);
@@ -274,7 +274,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
             writer.position(startIndex);
         }
         incrementSerialNumber();
-        byte[] inputBuffer = new byte[BUFFER_SIZE];
+        byte[] inputBuffer = new byte[bufferSize];
         long totalWrittenBytes = startIndex;
         int readBytes;
         try {
@@ -304,7 +304,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
             Property serialNumber = Property.create("", "SerialNumber", "1");
             String sn = getSerialNumber();
             if (!Objects.equals(sn, "0")) {
-                serialNumber.setValue(String.valueOf((Integer.parseInt(sn) + 1)));
+                serialNumber.setValue(String.valueOf((Integer.valueOf(sn) + 1)));
             }
             ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), "SerialNumber", SerializationUtils.serialize(Collections.singletonList(serialNumber)));
         } catch (Exception ex) {

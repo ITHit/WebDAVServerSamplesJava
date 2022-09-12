@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Represents a folder in the Oracle DB repository.
  */
-public final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, ResumableUploadBase {
+public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, ResumableUploadBase {
 
     private long usedBytes;
 
@@ -105,7 +105,7 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Searc
      */
     public FileImpl createFile(String name) throws LockedException, ServerException {
         ensureHasToken();
-        return (FileImpl) createChild(name, ItemType.FILE);
+        return (FileImpl) createChild(name, ItemType.File);
     }
 
     /**
@@ -117,7 +117,7 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Searc
      */
     public void createFolder(String name) throws LockedException, ServerException {
         ensureHasToken();
-        createChild(name, ItemType.FOLDER);
+        createChild(name, ItemType.Folder);
     }
 
     /**
@@ -145,8 +145,8 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Searc
         updateModified();
 
         HierarchyItemImpl item = null;
-        if (itemType == ItemType.FILE) {
-            long now = new Date().getTime();
+        if (itemType == ItemType.File) {
+            long now = Calendar.getInstance().getTime().getTime();
             item = new FileImpl(newId, getId(), name, getPath() + name, now, now, now, 0, getEngine());
         }
         getEngine().getWebSocketServer().notifyCreated(getPath() + name);
@@ -388,7 +388,7 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Searc
         List<HierarchyItem> results = new LinkedList<>();
         SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
-            return new PageResults(results, (long) 0);
+            return new PageResults(results, (long) results.size());
         }
         boolean snippet = false;
         for (Property pr : propNames) {
@@ -416,7 +416,7 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Searc
                     if (Objects.equals(pathParts[i], "")) {
                         continue;
                     }
-                    pathBuilder.append('/');
+                    pathBuilder.append("/");
                     pathBuilder.append(pathParts[i]);
                 }
                 String itemPath = pathBuilder.toString();

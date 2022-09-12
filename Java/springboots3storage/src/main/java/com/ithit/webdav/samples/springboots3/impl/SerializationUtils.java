@@ -11,10 +11,7 @@ import java.util.List;
 /**
  * Utility class to perform serialization of objects.
  */
-final class SerializationUtils {
-
-    private SerializationUtils() {
-    }
+class SerializationUtils {
 
     /**
      * Serializes object to JSON string.

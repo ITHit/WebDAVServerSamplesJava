@@ -11,10 +11,7 @@ import java.sql.SQLException;
 /**
  * Helper class to read blobs.
  */
-final class DownloadUtil {
-
-    private DownloadUtil() {
-    }
+class DownloadUtil {
 
     /**
      * Writes the content of the blob to the specified stream.

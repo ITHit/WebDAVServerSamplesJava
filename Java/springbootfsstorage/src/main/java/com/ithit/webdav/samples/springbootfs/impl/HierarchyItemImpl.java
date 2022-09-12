@@ -69,11 +69,13 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return Path.
      */
     static String decode(String url) {
+        String path = "";
         try {
-            return URLDecoder.decode(url.replace("+", "%2B"), "UTF-8");
+            path = URLDecoder.decode(url.replaceAll("\\+", "%2B"), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            return URLDecoder.decode(url.replace("+", "%2B"));
+            System.out.println("UTF-8 encoding can not be used to decode " + url);
         }
+        return path;
     }
 
     /**

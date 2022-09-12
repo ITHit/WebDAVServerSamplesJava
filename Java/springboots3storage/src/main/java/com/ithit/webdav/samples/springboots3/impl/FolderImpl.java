@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Represents a folder in the File system repository.
  */
-public final class FolderImpl extends HierarchyItemImpl implements Folder, ResumableUploadBase {
+public class FolderImpl extends HierarchyItemImpl implements Folder, ResumableUploadBase {
 
 
     /**
@@ -236,7 +236,7 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Resum
                     orderProps) {
                 Comparator<HierarchyItem> tempComp = null;
                 if ("is-directory".equals(orderProperty.getProperty().getName())) {
-                    Function<HierarchyItem, Boolean> sortFunc = Folder.class::isInstance;
+                    Function<HierarchyItem, Boolean> sortFunc = item -> item instanceof Folder;
                     tempComp = Comparator.comparing(sortFunc);
                 }
                 if ("quota-used-bytes".equals(orderProperty.getProperty().getName())) {

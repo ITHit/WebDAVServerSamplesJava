@@ -28,7 +28,7 @@ import java.util.stream.StreamSupport;
 /**
  * Represents a folder in the File system repository.
  */
-final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, ResumableUploadBase {
+class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, ResumableUploadBase {
 
 
     /**
@@ -315,9 +315,12 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         List<HierarchyItem> results = new LinkedList<>();
         SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
-            return new PageResults(results, (long) 0);
+            return new PageResults(results, (long) results.size());
         }
-        boolean snippet = propNames.stream().anyMatch(x -> SNIPPET.equalsIgnoreCase(x.getName()));
+        boolean snippet = false;
+        if (propNames.stream().filter(x -> SNIPPET.equalsIgnoreCase(x.getName())).findFirst().orElse(null) != null) {
+            snippet = true;
+        }
         Map<String, String> searchResult;
         try {
             String decodedPath = decode(getContextAwarePath());

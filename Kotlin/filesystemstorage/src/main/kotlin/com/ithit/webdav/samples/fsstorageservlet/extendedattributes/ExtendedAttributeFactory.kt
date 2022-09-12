@@ -16,7 +16,7 @@ internal object ExtendedAttributeFactory {
     @Synchronized
     fun buildFileExtendedAttributeSupport(): ExtendedAttribute? {
         if (extendedAttribute == null) {
-            extendedAttribute = if (System.getProperty("os.name").lowercase().contains("mac")) {
+            extendedAttribute = if (System.getProperty("os.name").toLowerCase().contains("mac")) {
                 OSXExtendedAttribute()
             } else {
                 DefaultExtendedAttribute()

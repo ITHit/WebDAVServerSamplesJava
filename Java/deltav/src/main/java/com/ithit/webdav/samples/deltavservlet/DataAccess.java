@@ -164,7 +164,7 @@ public class DataAccess {
      */
     HierarchyItemImpl readItem(String sql, String path, boolean parentPath, Object... args) throws ServerException {
         List<HierarchyItemImpl> items = readItems(sql, path, parentPath, args);
-        return !items.isEmpty() ? items.get(0) : null;
+        return items.size() != 0 ? items.get(0) : null;
     }
 
     /**
@@ -197,7 +197,7 @@ public class DataAccess {
             String encodedName = encode(itemName);
             String itemPath = parentPath ? (path.endsWith("/") ? path + encodedName : path + "/" + encodedName) : path;
             switch (itemType) {
-                case ItemType.FILE:
+                case ItemType.File:
                     return new FileImpl(itemID,
                             parentId,
                             itemName,
@@ -213,7 +213,7 @@ public class DataAccess {
                             autoVersion,
                             engine);
 
-                case ItemType.FOLDER:
+                case ItemType.Folder:
                     if (!itemPath.endsWith("/"))
                         itemPath = itemPath + "/";
                     return new FolderImpl(itemID, parentId, itemName, itemPath, itemCreated, itemModified, engine);
@@ -329,15 +329,17 @@ public class DataAccess {
     /**
      * Decodes URL.
      *
-     * @param url URL to decode.
+     * @param URL URL to decode.
      * @return path.
      */
-    String decode(String url) {
+    String decode(String URL) {
+        String path = "";
         try {
-            return URLDecoder.decode(url.replace("+", "%2B"), "UTF-8");
+            path = URLDecoder.decode(URL.replaceAll("\\+", "%2B"), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            return URLDecoder.decode(url.replace("+", "%2B"));
+            System.out.println("UTF-8 encoding can not be used to decode " + URL);
         }
+        return path;
     }
 
     /**
@@ -420,7 +422,7 @@ public class DataAccess {
         ElementReader<Object> elementReader = rs -> rs.getObject(1);
 
         List<Object> res = readObjects(sql, elementReader, args);
-        return res.isEmpty() ? null : (T) res.get(0);
+        return res.size() == 0 ? null : (T) res.get(0);
     }
 
     /**
@@ -435,7 +437,7 @@ public class DataAccess {
         ElementReader<Integer> elementReader = rs -> rs.getInt(1);
 
         List<Integer> res = readObjects(sql, elementReader, args);
-        return res.isEmpty() ? null : res.get(0);
+        return res.size() == 0 ? null : res.get(0);
     }
 
     /**
@@ -476,6 +478,7 @@ public class DataAccess {
      */
     void executeUpdate(String sql, Object... args) throws ServerException {
 
+        //engine.getLogger().logDebug(s);
         try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
             setParams(statement, args);
             statement.executeUpdate();

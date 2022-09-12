@@ -4,7 +4,7 @@ import com.ithit.webdav.server.Logger;
 
 public class SpringBootLogger implements Logger {
 
-    private final org.slf4j.Logger logger;
+    private org.slf4j.Logger logger;
 
     public SpringBootLogger(org.slf4j.Logger logger) {
         this.logger = logger;

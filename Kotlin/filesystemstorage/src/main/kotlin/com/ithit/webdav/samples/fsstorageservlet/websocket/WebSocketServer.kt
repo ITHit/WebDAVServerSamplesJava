@@ -41,10 +41,9 @@ class WebSocketServer {
     private fun send(itemPath: String, operation: String) {
         var itemPath: String? = itemPath
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/")
-        var notification = Notification(itemPath, operation)
         for (s in sessions) {
             if (s.isOpen) {
-                s.asyncRemote.sendObject(notification)
+                s.asyncRemote.sendObject(Notification(itemPath, operation))
             }
         }
     }
@@ -104,10 +103,9 @@ class WebSocketServer {
         var targetPath = targetPath
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/")
         targetPath = StringUtil.trimEnd(StringUtil.trimStart(targetPath, "/"), "/")
-        var movedNotification = MovedNotification(itemPath, "moved", targetPath)
         for (s in sessions) {
             if (s.isOpen) {
-                s.asyncRemote.sendObject(movedNotification)
+                s.asyncRemote.sendObject(MovedNotification(itemPath, "moved", targetPath))
             }
         }
     }

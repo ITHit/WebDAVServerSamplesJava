@@ -26,7 +26,7 @@ public class WebDavEngine extends Engine {
      * Initializes a new instance of the WebDavEngine class.
      * @param license License string.
      * @param showExceptions True if you want to print exceptions in the response.
-     * @param dataClient S3 dataClient
+     * @param dataClient
      */
     public WebDavEngine(String license, boolean showExceptions, DataClient dataClient) {
         this.showExceptions = showExceptions;
@@ -44,7 +44,7 @@ public class WebDavEngine extends Engine {
      */
     @Override
     public HierarchyItem getHierarchyItem(String contextPath) throws ServerException {
-        int i = contextPath.indexOf('?');
+        int i = contextPath.indexOf("?");
         if (i >= 0) {
             contextPath = contextPath.substring(0, i);
         }

@@ -35,7 +35,7 @@ public class DataClient {
     S3Client s3Client;
     String bucket;
     String context;
-    static final String FOLDER = "application/x-directory";
+    final static String FOLDER = "application/x-directory";
 
     /**
      * Locates object in S3 by original WebDAV path. Returns null if nothing is found.
@@ -244,6 +244,6 @@ public class DataClient {
 
     private String getName(String key) {
         key = StringUtil.trimEnd(key, "/");
-        return key.substring(key.lastIndexOf('/') + 1);
+        return key.substring(key.lastIndexOf("/") + 1);
     }
 }

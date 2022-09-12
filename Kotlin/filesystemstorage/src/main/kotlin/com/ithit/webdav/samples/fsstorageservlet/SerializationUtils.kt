@@ -33,6 +33,6 @@ internal object SerializationUtils {
         array = Gson().fromJson<Array<T>>(json, array!!.javaClass as Type)
         return if (array == null) {
             ArrayList()
-        } else ArrayList(listOf(*array))
+        } else ArrayList(Arrays.asList(*array))
     }
 }

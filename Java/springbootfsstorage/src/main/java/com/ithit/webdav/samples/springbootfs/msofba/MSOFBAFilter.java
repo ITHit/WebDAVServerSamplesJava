@@ -74,7 +74,11 @@ public class MSOFBAFilter extends GenericFilterBean {
         // Microsoft Office does not submit X-FORMS_BASED_AUTH_ACCEPTED header, but it still supports MS-OFBA,
         // Microsoft Office includes "Microsoft Office" string into User-Agent header
         String userAgent = request.getHeader("User-Agent");
-        return userAgent != null && userAgent.contains("Microsoft Office");
+        if (userAgent != null && userAgent.contains("Microsoft Office")) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

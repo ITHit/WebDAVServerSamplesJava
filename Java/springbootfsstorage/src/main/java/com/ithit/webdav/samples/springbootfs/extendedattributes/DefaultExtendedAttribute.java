@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
@@ -22,16 +21,15 @@ class DefaultExtendedAttribute implements ExtendedAttribute {
      */
     @Override
     public void setExtendedAttribute(String path, String attribName, String attribValue) throws IOException {
-        final Path sysPath = Paths.get(path);
-        FileTime lastWriteTime = Files.getLastModifiedTime(sysPath, LinkOption.NOFOLLOW_LINKS);
+    	FileTime lastWriteTime = Files.getLastModifiedTime(Paths.get(path), LinkOption.NOFOLLOW_LINKS);
     	
         UserDefinedFileAttributeView view = Files
-                .getFileAttributeView(sysPath, UserDefinedFileAttributeView.class);
+                .getFileAttributeView(Paths.get(path), UserDefinedFileAttributeView.class);
         view.write(attribName, Charset.defaultCharset().encode(attribValue));
         
-        // File modification date should not change when locking and unlocking. Otherwise, client application may think that the file was changed.
+        // File modification date should not change when locking and unlocking. Otherwise client application may think that the file was changed.
         // Preserve last modification date.
-        Files.setLastModifiedTime(sysPath, lastWriteTime);
+        Files.setLastModifiedTime(Paths.get(path), lastWriteTime); 
     }
 
     /**

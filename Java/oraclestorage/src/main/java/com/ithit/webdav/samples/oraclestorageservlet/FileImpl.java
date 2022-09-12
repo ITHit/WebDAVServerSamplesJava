@@ -25,8 +25,8 @@ import java.util.List;
  */
 public class FileImpl extends HierarchyItemImpl implements File, Lock, ResumableUpload, UploadProgress {
 
-    private final long lastChunkSaved;
-    private final long totalContentLength;
+    private long lastChunkSaved;
+    private long totalContentLength;
     private String snippet;
 
     /**
@@ -131,7 +131,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
         if (contentType == null || contentType.length() == 0) {
             String name = this.getName();
             int periodIndex = name.lastIndexOf('.');
-            String ext = name.substring(periodIndex + 1);
+            String ext = name.substring(periodIndex + 1, name.length());
             contentType = MimeType.getInstance().getMimeType(ext);
             if (contentType == null)
                 contentType = "application/octet-stream";
@@ -301,7 +301,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
                 long lastStartIndex = startIndex;
                 long lastUpdateTime = new Date().getTime();
                 int bufSize = 1048576; // 1Mb
-                final long updateInterval = 1000;
+                final long UPDATE_INTERVAL = 1000;
                 byte[] buf = new byte[bufSize];
                 Blob bb = getDataAccess().executeScalar("select content from Repository where id = ? for update", getId());
                 os = bb.setBinaryStream(startIndex + 1);
@@ -310,7 +310,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
                     startIndex += read;
                     //commit every megabate or every second so upload progress is visible
                     //and we don't lose more than 1MB if something happens.
-                    if (startIndex - lastStartIndex > bufSize || (new Date().getTime() - lastUpdateTime) > updateInterval) {
+                    if (startIndex - lastStartIndex > bufSize || (new Date().getTime() - lastUpdateTime) > UPDATE_INTERVAL) {
                         os.close();
                         os = null;
                         getDataAccess().executeUpdate("UPDATE Repository SET LastChunkSaved = CURRENT_TIMESTAMP  WHERE ID = ?", getId());

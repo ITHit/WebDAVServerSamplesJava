@@ -38,11 +38,11 @@ public class WebDavEngine extends Engine {
      *
      * @param contextPath Item relative path including query string.
      * @return Instance of corresponding {@link HierarchyItem} or null if item is not found.
-     * @throws ServerException in case if engine cannot read file attributes.
+     * @throws ServerException in case if cannot read file attributes.
      */
     @Override
     public HierarchyItem getHierarchyItem(String contextPath) throws ServerException {
-        int i = contextPath.indexOf('?');
+        int i = contextPath.indexOf("?");
         if (i >= 0) {
             contextPath = contextPath.substring(0, i);
         }

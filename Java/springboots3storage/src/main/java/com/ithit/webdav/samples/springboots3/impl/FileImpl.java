@@ -19,10 +19,10 @@ import java.util.Objects;
 /**
  * Represents file in the File System repository.
  */
-public final class FileImpl extends HierarchyItemImpl implements File, Lock,
+public class FileImpl extends HierarchyItemImpl implements File, Lock,
         ResumableUpload, UploadProgress {
 
-    private static final int BUFFER_SIZE = 1048576; // 1 Mb
+    private final int bufferSize = 1048576; // 1 Mb
     private final long contentLength;
 
     /**
@@ -64,7 +64,7 @@ public final class FileImpl extends HierarchyItemImpl implements File, Lock,
 
     /**
      * In this method implementation you can delete partially uploaded file.
-     * <p>
+     *
      * Client do not plan to restore upload. Remove any temporary files / cleanup resources here.
      *
      * @throws LockedException - this item or its parent was locked and client did not provide lock token.
@@ -173,7 +173,7 @@ public final class FileImpl extends HierarchyItemImpl implements File, Lock,
      */
     @Override
     public void read(OutputStream out, long startIndex, long count) throws ServerException {
-        byte[] buf = new byte[BUFFER_SIZE];
+        byte[] buf = new byte[bufferSize];
         int retVal;
         try (InputStream in = getEngine().getDataClient().getObject(getPath())) {
             in.skip(startIndex);
@@ -263,7 +263,7 @@ public final class FileImpl extends HierarchyItemImpl implements File, Lock,
             throw new ServerException(e);
         }
         // Locks should not be copied, delete them
-        getEngine().getDataClient().setMetadata(destPath, ACTIVE_LOCKS_ATTRIBUTE, null);
+        getEngine().getDataClient().setMetadata(destPath, activeLocksAttribute, null);
         getEngine().getWebSocketServer().notifyCreated(destPath);
     }
 
@@ -285,7 +285,7 @@ public final class FileImpl extends HierarchyItemImpl implements File, Lock,
         }
         setName(destName);
         // Locks should not be copied, delete them
-        getEngine().getDataClient().setMetadata(destPath, ACTIVE_LOCKS_ATTRIBUTE, null);
+        getEngine().getDataClient().setMetadata(destPath, activeLocksAttribute, null);
         getEngine().getWebSocketServer().notifyMoved(getPath(), destPath);
     }
 }

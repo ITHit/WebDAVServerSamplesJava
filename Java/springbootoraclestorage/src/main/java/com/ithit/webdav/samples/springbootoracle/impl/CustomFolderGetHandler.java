@@ -16,11 +16,11 @@ import java.io.PrintStream;
 public class CustomFolderGetHandler implements MethodHandler {
 
     private MethodHandler previousHandler;
-    private final String charset;
-    private final String version;
+    private String charset;
+    private String version;
     private String customPage;
-    private final String rootContext;
-    private final String rootWebSocket;
+    private String rootContext;
+    private String rootWebSocket;
 
     public CustomFolderGetHandler(String charset, String version, String customPage, String rootContext, String rootWebSocket) {
         this.charset = charset;
@@ -49,9 +49,9 @@ public class CustomFolderGetHandler implements MethodHandler {
             if (customPage.contains(wsRoot)) {
                 customPage = customPage.replace(wsRoot, rootWebSocket);
             }
-            String startTime = "<%startTime%>";
-            if (customPage.contains(startTime)) {
-                customPage = customPage.replace(startTime, "" + System.currentTimeMillis());
+            String version = "<%startTime%>";
+            if (customPage.contains(version)) {
+                customPage = customPage.replace(version, "" + System.currentTimeMillis());
             }
             stream.println(customPage);
             stream.flush();

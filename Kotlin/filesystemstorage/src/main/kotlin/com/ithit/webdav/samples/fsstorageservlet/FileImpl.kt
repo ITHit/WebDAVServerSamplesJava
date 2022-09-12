@@ -238,17 +238,14 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
         val inputBuffer = ByteArray(bufferSize)
         var totalWrittenBytes = startIndex
         try {
-            var readBytes: Int
-            while (run {
-                    readBytes = content.read(inputBuffer)
-                    readBytes
-                } > -1) {
+            var readBytes: Int = -1
+            while ({readBytes = content.read(inputBuffer); readBytes} () > -1) {
                 val byteBuffer: ByteBuffer = ByteBuffer.wrap(inputBuffer, 0, readBytes)
                 writer.write(byteBuffer)
                 totalWrittenBytes += readBytes.toLong()
             }
             try {
-                engine.searchFacade!!.indexer!!.indexFile(name!!, decode(path), null, this)
+                engine.searchFacade!!.indexer!!.indexFile(name!!, HierarchyItemImpl.decode(path), null, this)
             } catch (ex: Exception) {
                 engine.logger?.logError("Errors during indexing.", ex)
             }
@@ -297,7 +294,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
     @Throws(LockedException::class, MultistatusException::class, ServerException::class, ConflictException::class)
     override fun copyTo(folder: Folder, destName: String, deep: Boolean) {
         (folder as FolderImpl).ensureHasToken()
-        val destinationFolder = Paths.get(rootFolder!!, decodeAndConvertToPath(folder.path)).toString()
+        val destinationFolder = Paths.get(rootFolder!!, HierarchyItemImpl.decodeAndConvertToPath(folder.getPath())).toString()
         if (!Files.exists(Paths.get(destinationFolder))) {
             throw ConflictException()
         }
@@ -313,9 +310,9 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute)
         }
         try {
-            val currentPath = folder.path + destName
+            val currentPath = folder.getPath() + destName
             engine.webSocketServer?.notifyCreated(currentPath)
-            engine.searchFacade!!.indexer!!.indexFile(decode(destName), decode(currentPath), null, this)
+            engine.searchFacade!!.indexer!!.indexFile(HierarchyItemImpl.decode(destName), HierarchyItemImpl.decode(currentPath), null, this)
         } catch (ex: Exception) {
             engine.logger?.logError("Errors during indexing.", ex)
         }
@@ -326,7 +323,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
     override fun moveTo(folder: Folder, destName: String) {
         ensureHasToken()
         (folder as FolderImpl).ensureHasToken()
-        val destinationFolder = Paths.get(rootFolder!!, decodeAndConvertToPath(folder.path)).toString()
+        val destinationFolder = Paths.get(rootFolder!!, HierarchyItemImpl.decodeAndConvertToPath(folder.getPath())).toString()
         if (!Files.exists(Paths.get(destinationFolder))) {
             throw ConflictException()
         }
@@ -345,7 +342,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
         try {
             val currentPath = folder.path + destName
             engine.webSocketServer?.notifyMoved(path, currentPath)
-            engine.searchFacade!!.indexer!!.indexFile(decode(destName), decode(currentPath), path, this)
+            engine.searchFacade!!.indexer!!.indexFile(HierarchyItemImpl.decode(destName), HierarchyItemImpl.decode(currentPath), path, this)
         } catch (ex: Exception) {
             engine.logger?.logError("Errors during indexing.", ex)
         }
@@ -368,12 +365,12 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
             val fullPath: Path
             var name: String? = null
             try {
-                val pathFragment = decodeAndConvertToPath(path)
+                val pathFragment = HierarchyItemImpl.decodeAndConvertToPath(path)
                 val rootFolder = rootFolder
                 fullPath = Paths.get(rootFolder!!, pathFragment)
                 if (Files.exists(fullPath)) {
                     name = Paths.get(pathFragment).fileName.toString()
-                    view = Files.getFileAttributeView(fullPath, BasicFileAttributeView::class.java).readAttributes()
+                    view = Files.getFileAttributeView<BasicFileAttributeView>(fullPath, BasicFileAttributeView::class.java).readAttributes()
                 }
                 if (view == null) {
                     return null

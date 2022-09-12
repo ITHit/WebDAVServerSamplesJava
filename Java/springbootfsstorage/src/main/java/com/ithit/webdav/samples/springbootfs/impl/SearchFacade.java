@@ -34,25 +34,24 @@ import java.util.regex.Pattern;
 /**
  * Facade that encapsulates all functionality regarding indexing and searching
  */
-public final class SearchFacade {
-    private static final StandardAnalyzer ANALYZER = new StandardAnalyzer();
+public class SearchFacade {
     private Indexer indexer;
     private Searcher searcher;
-    private final WebDavEngine engine;
-    private final Logger logger;
-    private static SearchFacade instance;
-    private boolean indexed;
+    private WebDavEngine engine;
+    private Logger logger;
+    private static SearchFacade INSTANCE;
+    private volatile boolean indexed = false;
 
     private SearchFacade(WebDavEngine webDavEngine, Logger logger) {
         engine = webDavEngine;
         this.logger = logger;
     }
 
-    public static synchronized SearchFacade getInstance(WebDavEngine webDavEngine, Logger logger) {
-        if (instance == null) {
-            instance = new SearchFacade(webDavEngine, logger);
+    public synchronized static SearchFacade getInstance(WebDavEngine webDavEngine, Logger logger) {
+        if (INSTANCE == null) {
+            INSTANCE = new SearchFacade(webDavEngine, logger);
         }
-        return instance;
+        return INSTANCE;
     }
 
     /**
@@ -80,9 +79,9 @@ public final class SearchFacade {
      */
     private class IndexTask extends TimerTask {
 
-        private final String dataFolder;
-        private final String indexFolder;
-        private final Integer interval;
+        private String dataFolder;
+        private String indexFolder;
+        private Integer interval;
 
         /**
          * Build initial index of root folder.
@@ -107,10 +106,11 @@ public final class SearchFacade {
             try {
                 List<HierarchyItem> filesToIndex = new ArrayList<>();
                 File data = new File(dataFolder);
-                searcher = new Searcher(indexFolder, ANALYZER, logger);
+                StandardAnalyzer standardAnalyzer = new StandardAnalyzer();
+                searcher = new Searcher(indexFolder, standardAnalyzer, logger);
                 getFilesToIndex(data.listFiles(), filesToIndex, dataFolder);
                 fsDir = FSDirectory.open(Paths.get(indexFolder));
-                IndexWriterConfig conf = new IndexWriterConfig(ANALYZER);
+                IndexWriterConfig conf = new IndexWriterConfig(standardAnalyzer);
                 conf.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
                 IndexWriter indexWriter = new IndexWriter(fsDir, conf);
                 Tika tika = new Tika();
@@ -168,7 +168,7 @@ public final class SearchFacade {
         String quote = Pattern.quote(dataFolder);
         try {
             String context = f.getAbsolutePath().replaceAll("(?i)" + quote, "");
-            context = context.replace("\\", "/");
+            context = context.replaceAll("\\\\", "/");
             if (f.isDirectory()) {
                 context += "/";
             }
@@ -189,12 +189,12 @@ public final class SearchFacade {
         static final String NAME = "name";
         static final String PARENT_NAME = "parent_name";
         static final String CONTENTS = "contents";
-        private final IndexWriter indexWriter;
-        private final List<HierarchyItem> files;
-        private final Logger logger;
-        private final Tika tika;
-        private final String dataRoot;
-        private static final int BATCH_SIZE = 100;
+        private IndexWriter indexWriter;
+        private List<HierarchyItem> files;
+        private Logger logger;
+        private Tika tika;
+        private String dataRoot;
+        private final static int BATCH_SIZE = 100;
 
         /**
          * Create an instance of Indexer file.
@@ -233,12 +233,12 @@ public final class SearchFacade {
             }
         }
 
-        private static <T> List<List<T>> chopped(List<T> list, final int l) {
+        private static <T> List<List<T>> chopped(List<T> list, final int L) {
             List<List<T>> parts = new ArrayList<>();
-            final int n = list.size();
-            for (int i = 0; i < n; i += l) {
+            final int N = list.size();
+            for (int i = 0; i < N; i += L) {
                 parts.add(new ArrayList<>(
-                        list.subList(i, Math.min(n, i + l)))
+                        list.subList(i, Math.min(N, i + L)))
                 );
             }
             return parts;
@@ -256,7 +256,7 @@ public final class SearchFacade {
             try {
                 Metadata metadata = new Metadata();
                 Document doc = new Document();
-                String parentFolder = currentPath.replace(fileName, "").replace("/", "");
+                String parentFolder = currentPath.replace(fileName, "").replaceAll("/", "");
                 Field pathField = new StringField(PATH, currentPath, Field.Store.YES);
                 Field parentField = new TextField(PARENT_NAME, parentFolder, Field.Store.YES);
                 Field nameField = new TextField(NAME, fileName, Field.Store.YES);
@@ -312,8 +312,8 @@ public final class SearchFacade {
          */
         static class CommitTask extends TimerTask {
 
-            private final IndexWriter indexWriter;
-            private final Logger logger;
+            private IndexWriter indexWriter;
+            private Logger logger;
 
             /**
              * Creates instance of {@link CommitTask}.
@@ -355,11 +355,11 @@ public final class SearchFacade {
      */
     static class Searcher {
 
-        private final String indexFolder;
-        private final QueryParser nameParser;
-        private final QueryParser contentParser;
-        private final QueryParser parentParser;
-        private final Logger logger;
+        private String indexFolder;
+        private QueryParser nameParser;
+        private QueryParser contentParser;
+        private QueryParser parentParser;
+        private Logger logger;
         private IndexSearcher indexSearcher;
 
         /**
@@ -382,15 +382,15 @@ public final class SearchFacade {
 
         /**
          * Searches files by search line either in file name or in content.
-         * <p>
+         *
          * Ajax File Browser accepts regular wild cards used in most OS:
-         * <p>
+         *
          * ‘*’ – to indicate one or more character.
          * ‘?’ – to indicate exactly one character.
          * The ‘*’ and ‘?’ characters are replaced with ‘%’ and ‘_’ characters to comply with DASL standard when submitted to the server.
-         * <p>
+         *
          * If ‘%’, ‘_’ or ‘\’ characters are used in search phrase they are escaped with ‘\%’, ‘\_’ and ‘\\’.
-         * <p>
+         *
          * To make the search behave similarly to how file system search functions Ajax File Browser
          * will automatically add ‘%’ character at the end of the search phrase. To search for the exact match wrap the search phrase in double quotes: “my file”.
          *
@@ -401,8 +401,8 @@ public final class SearchFacade {
          */
         Map<String, String> search(String searchLine, SearchOptions options, String parent, boolean snippet) {
             searchLine = StringEscapeUtils.escapeJava(searchLine);
-            searchLine = searchLine.replace("%", "*");
-            searchLine = searchLine.replace("_", "?");
+            searchLine = searchLine.replaceAll("%", "*");
+            searchLine = searchLine.replaceAll("_", "?");
             Map<String, String> paths = new LinkedHashMap<>();
             try (IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexFolder)))) {
                 indexSearcher = new IndexSearcher(reader);
@@ -451,7 +451,7 @@ public final class SearchFacade {
                 String text = document.get(Indexer.CONTENTS);
                 String path = document.get(Indexer.PATH);
                 TokenStream tokenStream = TokenSources.getAnyTokenStream(indexReader,
-                        scoreDoc.doc, Indexer.CONTENTS, document, ANALYZER);
+                        scoreDoc.doc, Indexer.CONTENTS, document, new StandardAnalyzer());
                 String fragment = highlighter.getBestFragment(tokenStream, text);
                 result.put(path, fragment == null ? "" : fragment);
             }
@@ -462,7 +462,7 @@ public final class SearchFacade {
         private BooleanQuery.Builder addParentQuery(String parent, Query query) throws ParseException {
             BooleanQuery.Builder finalQuery = new BooleanQuery.Builder();
             finalQuery.add(query, BooleanClause.Occur.MUST); // MUST implies that the keyword must occur.
-            String searchString = parent.replace("/", "") + "*";
+            String searchString = parent.replaceAll("/", "") + "*";
             if (!Objects.equals(parent, "/")) {
                 Query parentQuery = parentParser.parse(searchString);
                 finalQuery.add(parentQuery, BooleanClause.Occur.MUST);

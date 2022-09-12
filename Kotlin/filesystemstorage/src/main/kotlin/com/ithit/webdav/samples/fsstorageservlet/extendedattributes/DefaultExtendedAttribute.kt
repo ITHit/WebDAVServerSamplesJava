@@ -23,7 +23,7 @@ internal class DefaultExtendedAttribute : ExtendedAttribute {
     @Throws(ServerException::class)
     override fun setExtendedAttribute(path: String, attribName: String, attribValue: String) {
         val view = Files
-                .getFileAttributeView(Paths.get(path), UserDefinedFileAttributeView::class.java)
+                .getFileAttributeView<UserDefinedFileAttributeView>(Paths.get(path), UserDefinedFileAttributeView::class.java)
         try {
             view.write(attribName, Charset.defaultCharset().encode(attribValue))
         } catch (e: IOException) {
@@ -38,18 +38,19 @@ internal class DefaultExtendedAttribute : ExtendedAttribute {
     @Throws(ServerException::class)
     override fun getExtendedAttribute(path: String, attribName: String): String? {
         val view = Files
-                .getFileAttributeView(Paths.get(path), UserDefinedFileAttributeView::class.java)
+                .getFileAttributeView<UserDefinedFileAttributeView>(Paths.get(path), UserDefinedFileAttributeView::class.java)
         val buf: ByteBuffer
-        return try {
+        try {
             buf = ByteBuffer.allocate(view.size(attribName))
             view.read(attribName, buf)
             buf.flip()
-            Charset.defaultCharset().decode(buf).toString()
+            return Charset.defaultCharset().decode(buf).toString()
         } catch (ignored: NoSuchFileException) {
-            null
         } catch (e: IOException) {
             throw ServerException(String.format("Reading attribute '%s' from file '%s' failed.", attribName, path), e)
         }
+
+        return null
     }
 
     /**
@@ -58,7 +59,7 @@ internal class DefaultExtendedAttribute : ExtendedAttribute {
     @Throws(ServerException::class)
     override fun deleteExtendedAttribute(path: String, attribName: String) {
         val view = Files
-                .getFileAttributeView(Paths.get(path), UserDefinedFileAttributeView::class.java)
+                .getFileAttributeView<UserDefinedFileAttributeView>(Paths.get(path), UserDefinedFileAttributeView::class.java)
         try {
             view.delete(attribName)
         } catch (e: IOException) {

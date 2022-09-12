@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,7 +39,7 @@ public class WebDavServlet extends HttpServlet {
     private static final String DEFAULT_INDEX_PATH = "WEB-INF/Index";
     private static String realPath;
     private static String servletContext;
-    private static String rootLocalPath;
+    private static String rootLocalPath = null;
     private static boolean supportsUserDefinedAttributes;
     private Logger logger;
     private boolean showExceptions;

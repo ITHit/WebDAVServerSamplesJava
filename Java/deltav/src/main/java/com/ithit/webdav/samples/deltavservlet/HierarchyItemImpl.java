@@ -386,7 +386,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
     boolean clientHasToken() throws ServerException {
 
         List<LockInfo> itemLocks = getActiveLocks();
-        if (itemLocks.isEmpty())
+        if (itemLocks.size() == 0)
             return true;
         List<String> clientLockTokens = DavContext.currentRequest().getClientLockTokens();
         for (String clientLockToken : clientLockTokens)
@@ -421,13 +421,16 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
      */
     public List<LockInfo> getActiveLocks() throws ServerException {
         int itemId = getId();
+        ArrayList<LockInfo> l = new ArrayList<>();
 
-        ArrayList<LockInfo> l = new ArrayList<>(getLocks(getId(), false)); // get all locks
+        l.addAll(getLocks(getId(), false)); // get all locks
         while (true) {
             Integer res = getDataAccess().executeInt("SELECT Parent FROM Repository WHERE ID = ?", itemId);
-            if (res == null || res <= 0)
+            if (res == null)
                 break;
             itemId = res;
+            if (itemId <= 0)
+                break;
             l.addAll(getLocks(itemId, true));  // get only deep locks
         }
 
@@ -461,7 +464,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
      */
     private boolean itemHasLock(boolean skipShared) throws ServerException {
         List<LockInfo> locks = getActiveLocks();
-        if (locks.isEmpty())
+        if (locks.size() == 0)
             return false;
         return !(skipShared && locks.get(0).isShared());
     }
@@ -495,7 +498,7 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
 
         FolderImpl folder = root instanceof FolderImpl ? (FolderImpl) root : null;
         if (folder != null)
-            for (HierarchyItem child : folder.getChildren(Collections.emptyList(), null, null, null).getPage()) {
+            for (HierarchyItem child : folder.getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
                 if (((HierarchyItemImpl)child).itemHasLock(skipShared))
                     mr.addResponse(child.getPath(), WebDavStatus.LOCKED);
                 checkNoItemsLocked(mr, ((HierarchyItemImpl)child), skipShared);

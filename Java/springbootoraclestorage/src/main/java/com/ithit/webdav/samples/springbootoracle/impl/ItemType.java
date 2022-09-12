@@ -3,11 +3,7 @@ package com.ithit.webdav.samples.springbootoracle.impl;
 /**
  * Represents possible {@link HierarchyItemImpl} types in the Storage.
  */
-public final class ItemType {
-
-    private ItemType() {
-    }
-
-    static final byte FILE = 0;
-    static final byte FOLDER = 1;
+public class ItemType {
+    final static byte File = 0;
+    final static byte Folder = 1;
 }
