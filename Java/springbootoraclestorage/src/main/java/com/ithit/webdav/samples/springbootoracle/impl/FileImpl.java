@@ -23,10 +23,10 @@ import java.util.List;
 /**
  * Represents file in the Oracle DB repository.
  */
-public class FileImpl extends HierarchyItemImpl implements File, Lock, ResumableUpload, UploadProgress {
+public final class FileImpl extends HierarchyItemImpl implements File, Lock, ResumableUpload, UploadProgress {
 
-    private long lastChunkSaved;
-    private long totalContentLength;
+    private final long lastChunkSaved;
+    private final long totalContentLength;
     private String snippet;
 
     /**
@@ -301,7 +301,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
                 long lastStartIndex = startIndex;
                 long lastUpdateTime = new Date().getTime();
                 int bufSize = 1048576; // 1Mb
-                final long UPDATE_INTERVAL = 1000;
+                final long updateInterval = 1000;
                 byte[] buf = new byte[bufSize];
                 Blob bb = getDataAccess().executeScalar("select content from Repository where id = ? for update", getId());
                 os = bb.setBinaryStream(startIndex + 1);
@@ -310,7 +310,7 @@ public class FileImpl extends HierarchyItemImpl implements File, Lock, Resumable
                     startIndex += read;
                     //commit every megabate or every second so upload progress is visible
                     //and we don't lose more than 1MB if something happens.
-                    if (startIndex - lastStartIndex > bufSize || (new Date().getTime() - lastUpdateTime) > UPDATE_INTERVAL) {
+                    if (startIndex - lastStartIndex > bufSize || (new Date().getTime() - lastUpdateTime) > updateInterval) {
                         os.close();
                         os = null;
                         getDataAccess().executeUpdate("UPDATE Repository SET LastChunkSaved = CURRENT_TIMESTAMP  WHERE ID = ?", getId());

@@ -163,7 +163,7 @@ public class DataAccess {
      */
     HierarchyItemImpl readItem(String sql, String path, boolean parentPath, Object... args) throws ServerException {
         List<HierarchyItemImpl> items = readItems(sql, path, parentPath, args);
-        return items.size() != 0 ? items.get(0) : null;
+        return !items.isEmpty() ? items.get(0) : null;
     }
 
     /**
@@ -190,11 +190,11 @@ public class DataAccess {
             String encodedName = encode(itemName);
             String itemPath = parentPath ? (path.endsWith("/") ? path + encodedName : path + "/" + encodedName) : path;
             switch (itemType) {
-                case ItemType.File:
+                case ItemType.FILE:
                     return new FileImpl(itemID, parentId, itemName, itemPath, itemCreated, itemModified, lastChunkSaved, totalContentLength, engine);
-                case ItemType.Folder:
+                case ItemType.FOLDER:
                     if (!itemPath.endsWith("/"))
-                        itemPath = itemPath + "/";
+                        itemPath = itemPath + '/';
                     return new FolderImpl(itemID, parentId, itemName, itemPath, itemCreated, itemModified, engine);
                 default:
                     return null;
@@ -338,7 +338,7 @@ public class DataAccess {
         ElementReader<Object> elementReader = rs -> rs.getObject(1);
 
         List<Object> res = readObjects(sql, elementReader, args);
-        return res.size() == 0 ? null : (T) res.get(0);
+        return res.isEmpty() ? null : (T) res.get(0);
     }
 
     /**
@@ -353,7 +353,7 @@ public class DataAccess {
         ElementReader<Integer> elementReader = rs -> rs.getInt(1);
 
         List<Integer> res = readObjects(sql, elementReader, args);
-        return res.size() == 0 ? null : res.get(0);
+        return res.isEmpty() ? null : res.get(0);
     }
 
     /**
@@ -440,14 +440,12 @@ public class DataAccess {
      * @param URL to decode.
      * @return Path as string.
      */
-    String decode(String URL) {
-        String path = "";
+    String decode(String url) {
         try {
-            path = URLDecoder.decode(URL.replaceAll("\\+", "%2B"), "UTF-8");
+            return URLDecoder.decode(url.replace("+", "%2B"), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            System.out.println("UTF-8 encoding can not be used to decode " + URL);
+            return URLDecoder.decode(url.replace("+", "%2B"));
         }
-        return path;
     }
 
 

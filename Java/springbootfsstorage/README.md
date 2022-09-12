@@ -78,3 +78,4 @@ The IT Hit Java WebDAV Server Library is fully functional and does not have any 
 <p>&nbsp;</p>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="Spring Boot framework WebDAV Server Example with Oracle back-end. Can both process WebDAV requests and serve web pages on the rest of the website." href="https://www.webdavsystem.com/javaserver/server_examples/spring_boot_sql/">Spring Boot WebDAV Server Example with Oracle Back-end, Java</a>
+

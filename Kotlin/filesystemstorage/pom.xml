@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>kotlinfs</artifactId>
-    <version>5.1.5442</version>
+    <version>5.2.5501</version>
     <packaging>war</packaging>
 
     <properties>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>5.1.5442</version>
+            <version>5.2.5501</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -78,12 +78,12 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.28.1</version>
+            <version>1.28.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
-            <version>1.28.1</version>
+            <version>1.28.4</version>
             <exclusions>
                 <exclusion>
                     <artifactId>cxf-core</artifactId>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>5.1.5442</version>
+            <version>5.2.5501</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -152,12 +152,12 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>1.2.71</version>
+            <version>1.7.10</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
-            <version>1.2.71</version>
+            <version>1.7.10</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -170,7 +170,7 @@
     </repositories>
 
     <build>
-        <sourceDirectory>D:\myproj\Java\ithit\webdav-server-for-java\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
+        <sourceDirectory>C:\Java\Release\WebdavJavaRepo\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -240,7 +240,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/kotlinfs-5.1.5442</warSourceDirectory>
+                    <warSourceDirectory>target/kotlinfs-5.2.5501</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
@@ -268,7 +268,7 @@
                         <configuration>
                             <arguments>update</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
-                            <installDirectory>c:\temp\</installDirectory>
+                            <installDirectory>C:\Users\build\AppData\Local\Temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -291,7 +291,7 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <version>1.2.71</version>
+                <version>1.7.10</version>
                 <executions>
                     <execution>
                         <id>compile</id>

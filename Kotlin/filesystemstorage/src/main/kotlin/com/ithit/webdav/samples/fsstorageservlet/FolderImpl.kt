@@ -97,13 +97,13 @@ private constructor(name: String, path: String, created: Long, modified: Long,
      */
     @Throws(ServerException::class)
     override fun getChildren(propNames: List<Property>, offset: Long?, nResults: Long?, orderProps: List<OrderProperty>?): PageResults {
-        val decodedPath = HierarchyItemImpl.decodeAndConvertToPath(path)
+        val decodedPath = decodeAndConvertToPath(path)
         val fullFolderPath = Paths.get(rootFolder!! + decodedPath)
         var children: MutableList<HierarchyItemImpl> = ArrayList()
         var total: Long? = null
         try {
             Files.newDirectoryStream(fullFolderPath).use { ds ->
-                var paths = StreamSupport.stream<Path>(ds.spliterator(), false).collect(Collectors.toList())
+                var paths = StreamSupport.stream(ds.spliterator(), false).collect(Collectors.toList())
                 paths = sortChildren(paths, orderProps)
                 for (p in paths) {
                     val childPath = path + encode(p.fileName.toString())
@@ -137,7 +137,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
     override fun copyTo(folder: Folder, destName: String, deep: Boolean) {
         (folder as FolderImpl).ensureHasToken()
 
-        val relUrl = HierarchyItemImpl.decodeAndConvertToPath(folder.path)
+        val relUrl = decodeAndConvertToPath(folder.path)
         val destinationFolder = Paths.get(rootFolder!!, relUrl).toString()
         if (isRecursive(relUrl)) {
             throw ServerException("Cannot copy to subfolder", WebDavStatus.FORBIDDEN)
@@ -183,19 +183,19 @@ private constructor(name: String, path: String, created: Long, modified: Long,
                 var tempComp: Comparator<Path>? = null
                 if ("is-directory" == orderProperty.property.name) {
                     val sortFunc = { item: Path -> item.toFile().isDirectory }
-                    tempComp = Comparator.comparing<Path, Boolean>(sortFunc)
+                    tempComp = Comparator.comparing(sortFunc)
                 }
                 if ("quota-used-bytes" == orderProperty.property.name) {
                     val sortFunc = { item: Path -> item.toFile().length() }
-                    tempComp = Comparator.comparing<Path, Long>(sortFunc)
+                    tempComp = Comparator.comparing(sortFunc)
                 }
                 if ("getlastmodified" == orderProperty.property.name) {
                     val sortFunc = { item: Path -> item.toFile().lastModified() }
-                    tempComp = Comparator.comparing<Path, Long>(sortFunc)
+                    tempComp = Comparator.comparing(sortFunc)
                 }
                 if ("displayname" == orderProperty.property.name) {
                     val sortFunc = { item: Path -> item.fileName.toString() }
-                    tempComp = Comparator.comparing<Path, String>(sortFunc)
+                    tempComp = Comparator.comparing(sortFunc)
                 }
                 if ("getcontenttype" == orderProperty.property.name) {
                     val sortFunc = { item: Path -> getExtension(item.fileName.toString()) }
@@ -234,14 +234,14 @@ private constructor(name: String, path: String, created: Long, modified: Long,
     override fun moveTo(folder: Folder, destName: String) {
         ensureHasToken()
         (folder as FolderImpl).ensureHasToken()
-        val destinationFolder = Paths.get(rootFolder!!, HierarchyItemImpl.decodeAndConvertToPath(folder.path)).toString()
+        val destinationFolder = Paths.get(rootFolder!!, decodeAndConvertToPath(folder.path)).toString()
         if (!Files.exists(Paths.get(destinationFolder)))
             throw ConflictException()
         val sourcePath = this.fullPath
         val destinationFullPath = Paths.get(destinationFolder, destName)
         try {
-            removeIndex(fullPath, this);
-            Files.move(sourcePath, destinationFullPath, StandardCopyOption.REPLACE_EXISTING);
+            removeIndex(fullPath, this)
+            Files.move(sourcePath, destinationFullPath, StandardCopyOption.REPLACE_EXISTING)
             addIndex(destinationFullPath, folder.path + destName, destName)
         } catch (e: IOException) {
             throw ServerException(e)
@@ -270,7 +270,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
         }
         val searchResult: Map<String, String>
         try {
-            val decodedPath = HierarchyItemImpl.decode(path)
+            val decodedPath = decode(path)
             searchResult = searcher.search(searchString, options, decodedPath, snippet)
             for ((key, value) in searchResult) {
                 try {
@@ -290,7 +290,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
             engine.logger?.logError("Error during search.", e)
         }
 
-        return PageResults(if (offset != null && nResults != null) results.stream().skip(offset).limit(nResults).collect(Collectors.toList()) as LinkedList<HierarchyItem> else results, results.size.toLong())
+        return PageResults(if (offset != null && nResults != null) results.stream().skip(offset).limit(nResults).collect(Collectors.toList()) else results, results.size.toLong())
     }
 
     /**
@@ -329,10 +329,10 @@ private constructor(name: String, path: String, created: Long, modified: Long,
     private fun addIndex(sourcePath: Path, path: String, name: String) {
         val filesToIndex = ArrayList<HierarchyItem>()
         engine.searchFacade!!.getFilesToIndex(sourcePath.toFile().listFiles(), filesToIndex, WebDavServlet.rootLocalPath!!)
-        engine.searchFacade!!.indexer!!.indexFile(name, HierarchyItemImpl.decode(path), null, null)
+        engine.searchFacade!!.indexer!!.indexFile(name, decode(path), null, null)
         for (hi in filesToIndex) {
             try {
-                engine.searchFacade!!.indexer!!.indexFile(hi.name, HierarchyItemImpl.decode(hi.path), null, hi)
+                engine.searchFacade!!.indexer!!.indexFile(hi.name, decode(hi.path), null, hi)
             } catch (e: Exception) {
                 engine.logger?.logError("Cannot index.", e)
             }
@@ -357,12 +357,12 @@ private constructor(name: String, path: String, created: Long, modified: Long,
             var name: String? = null
             try {
                 val root = path == "/"
-                val pathFragment = HierarchyItemImpl.decodeAndConvertToPath(path)
+                val pathFragment = decodeAndConvertToPath(path)
                 val rootFolder = rootFolder
                 fullPath = if (root) Paths.get(rootFolder) else Paths.get(rootFolder!!, pathFragment)
                 if (Files.exists(fullPath)) {
                     name = if (root) "ROOT" else Paths.get(pathFragment).fileName.toString()
-                    view = Files.getFileAttributeView<BasicFileAttributeView>(fullPath, BasicFileAttributeView::class.java).readAttributes()
+                    view = Files.getFileAttributeView(fullPath, BasicFileAttributeView::class.java).readAttributes()
                 }
                 if (view == null || !view.isDirectory) {
                     return null

@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * Represents file in the File System repository.
  */
-class FileImpl extends HierarchyItemImpl implements File, Lock,
+final class FileImpl extends HierarchyItemImpl implements File, Lock,
         ResumableUpload, UploadProgress {
 
     private static final int BUFFER_SIZE = 1048576; // 1 Mb
@@ -111,7 +111,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
 
     /**
      * In this method implementation you can delete partially uploaded file.
-     *
+     * <p>
      * Client do not plan to restore upload. Remove any temporary files / cleanup resources here.
      *
      * @throws LockedException - this item or its parent was locked and client did not provide lock token.
@@ -377,7 +377,7 @@ class FileImpl extends HierarchyItemImpl implements File, Lock,
         }
         Path newPath = Paths.get(destinationFolder, destName);
         try {
-            Files.move(getFullPath(), Paths.get(destinationFolder, destName), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(getFullPath(), newPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new ServerException(e);
         }

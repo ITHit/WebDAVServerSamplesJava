@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ConfigurationProperties(prefix = "webdav")
 public class WebDavConfigurationProperties {
-    static String INDEX_FOLDER = "Index";
+    static final String INDEX_FOLDER = "Index";
     String license;
     boolean showExceptions;
     String rootContext;

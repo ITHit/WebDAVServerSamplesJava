@@ -17,11 +17,11 @@ class NotificationEncoder : Encoder.Text<WebSocketServer.Notification> {
     override fun encode(notification: WebSocketServer.Notification): String {
         var target = ""
         if (notification is WebSocketServer.MovedNotification) {
-            target = "\"targetPath\" : \"" + notification.targetPath + "\" ,"
+            target = "\"TargetPath\" : \"" + notification.targetPath + "\" ,"
         }
         return "{" + target +
-                "\"itemPath\" : \"" + notification.itemPath + "\" ," +
-                "\"eventType\" : \"" + notification.operation + "\"" +
+                "\"ItemPath\" : \"" + notification.itemPath + "\" ," +
+                "\"EventType\" : \"" + notification.operation + "\"" +
                 "}"
     }
 }

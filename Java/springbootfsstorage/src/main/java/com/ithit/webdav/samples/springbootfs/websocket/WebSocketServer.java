@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class WebSocketServer {
 
-    private List<WebSocketSession> sessions;
+    private final List<WebSocketSession> sessions;
 
     public WebSocketServer(List<WebSocketSession> sessions) {
         this.sessions = sessions;
@@ -25,9 +25,10 @@ public class WebSocketServer {
      */
     private void send(String itemPath, String operation) {
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
+        final TextMessage textMessage = new TextMessage(new Notification(itemPath, operation).toString());
         for (WebSocketSession session: sessions) {
             try {
-                session.sendMessage(new TextMessage(new Notification(itemPath, operation).toString()));
+                session.sendMessage(textMessage);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -87,9 +88,10 @@ public class WebSocketServer {
     public void notifyMoved(String itemPath, String targetPath) {
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
         targetPath = StringUtil.trimEnd(StringUtil.trimStart(targetPath, "/"), "/");
+        final TextMessage textMessage = new TextMessage(new MovedNotification(itemPath, "moved", targetPath).toString());
         for (WebSocketSession session: sessions) {
             try {
-                session.sendMessage(new TextMessage(new MovedNotification(itemPath, "moved", targetPath).toString()));
+                session.sendMessage(textMessage);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -111,8 +113,8 @@ public class WebSocketServer {
         @Override
         public String toString() {
             return "{" +
-                    "\"itemPath\" : \"" + itemPath + "\" ," +
-                    "\"eventType\" : \"" + operation + "\"" +
+                    "\"ItemPath\" : \"" + itemPath + "\" ," +
+                    "\"EventType\" : \"" + operation + "\"" +
                     "}";
         }
     }
@@ -131,9 +133,9 @@ public class WebSocketServer {
         @Override
         public String toString() {
             return "{" +
-                    "\"itemPath\" : \"" + itemPath + "\" ," +
-                    "\"targetPath\" : \"" + targetPath + "\" ," +
-                    "\"eventType\" : \"" + operation + "\"" +
+                    "\"ItemPath\" : \"" + itemPath + "\" ," +
+                    "\"TargetPath\" : \"" + targetPath + "\" ," +
+                    "\"EventType\" : \"" + operation + "\"" +
                     "}";
         }
 

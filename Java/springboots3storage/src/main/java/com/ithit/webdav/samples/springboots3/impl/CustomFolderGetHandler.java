@@ -50,9 +50,9 @@ public class CustomFolderGetHandler implements MethodHandler {
                 if (customPage.contains(contextRoot)) {
                     customPage = customPage.replace(contextRoot, rootContext);
                 }
-                String version = "<%startTime%>";
-                if (customPage.contains(version)) {
-                    customPage = customPage.replace(version, "" + System.currentTimeMillis());
+                String startTime = "<%startTime%>";
+                if (customPage.contains(startTime)) {
+                    customPage = customPage.replace(startTime, "" + System.currentTimeMillis());
                 }
                 stream.println(customPage);
             }

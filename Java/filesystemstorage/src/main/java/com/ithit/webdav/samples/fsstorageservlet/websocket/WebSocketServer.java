@@ -16,12 +16,12 @@ import java.util.Set;
         configurator = GetHttpSessionConfigurator.class, encoders = {NotificationEncoder.class})
 public class WebSocketServer {
 
-    private static final Set<Session> sessions = new HashSet<>();
+    private static final Set<Session> SESSIONS = new HashSet<>();
     private HttpSession httpSession;
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
-        sessions.add(session);
+        SESSIONS.add(session);
         httpSession = (HttpSession) config.getUserProperties()
                 .get(HttpSession.class.getName());
         ((WebDavEngine) httpSession.getAttribute("engine")).setWebSocketServer(this);
@@ -34,7 +34,7 @@ public class WebSocketServer {
 
     @OnClose
     public void onClose(Session session) {
-        sessions.remove(session);
+        SESSIONS.remove(session);
         ((WebDavEngine) httpSession.getAttribute("engine")).setWebSocketServer(this);
     }
 
@@ -46,9 +46,10 @@ public class WebSocketServer {
      */
     private void send(String itemPath, String operation) {
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
-        for (Session s : sessions) {
+        final Notification notification = new Notification(itemPath, operation);
+        for (Session s : SESSIONS) {
             if (s.isOpen()) {
-                s.getAsyncRemote().sendObject(new Notification(itemPath, operation));
+                s.getAsyncRemote().sendObject(notification);
             }
         }
     }
@@ -106,9 +107,10 @@ public class WebSocketServer {
     public void notifyMoved(String itemPath, String targetPath) {
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
         targetPath = StringUtil.trimEnd(StringUtil.trimStart(targetPath, "/"), "/");
-        for (Session s : sessions) {
+        final MovedNotification movedNotification = new MovedNotification(itemPath, "moved", targetPath);
+        for (Session s : SESSIONS) {
             if (s.isOpen()) {
-                s.getAsyncRemote().sendObject(new MovedNotification(itemPath, "moved", targetPath));
+                s.getAsyncRemote().sendObject(movedNotification);
             }
         }
     }

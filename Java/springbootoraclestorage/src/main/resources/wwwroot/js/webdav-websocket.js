@@ -13,24 +13,24 @@ function WebSocketConnect() {
         var regExp = new RegExp("^\/" + webDavSettings.WebSocketPath + "|\/$", "g");
         var currentLocation = location.pathname.replace(regExp, '');
         // Checking message type after receiving.
-        if (notifyObject.eventType === "updated" || notifyObject.eventType === "created" || notifyObject.eventType === "locked" ||
-            notifyObject.eventType === "unlocked") {
+        if (notifyObject.EventType === "updated" || notifyObject.EventType === "created" || notifyObject.EventType === "locked" ||
+            notifyObject.EventType === "unlocked") {
             // Refresh folder structure if any item in this folder is updated or new item is created.
-            if (notifyObject.itemPath.substring(0, notifyObject.itemPath.lastIndexOf('/')).toUpperCase() === currentLocation.toUpperCase()) {
+            if (notifyObject.ItemPath.substring(0, notifyObject.ItemPath.lastIndexOf('/')).toUpperCase() === currentLocation.toUpperCase()) {
                 WebDAVController.Reload();
             }
-        } else if (notifyObject.eventType === "moved") {
+        } else if (notifyObject.EventType === "moved") {
             // Refresh folder structure if file or folder is moved.
-            if (notifyObject.itemPath.substring(0, notifyObject.itemPath.lastIndexOf('/')).toUpperCase() === currentLocation.toUpperCase() ||
-                notifyObject.targetPath.substring(0, notifyObject.targetPath.lastIndexOf('/')).toUpperCase() === currentLocation.toUpperCase()) {
+            if (notifyObject.ItemPath.substring(0, notifyObject.ItemPath.lastIndexOf('/')).toUpperCase() === currentLocation.toUpperCase() ||
+                notifyObject.TargetPath.substring(0, notifyObject.TargetPath.lastIndexOf('/')).toUpperCase() === currentLocation.toUpperCase()) {
                 WebDAVController.Reload();
             }
 
-        } else if (notifyObject.eventType === "deleted") {
-            if (notifyObject.itemPath.substring(0, notifyObject.itemPath.lastIndexOf('/')).toUpperCase() === currentLocation.toUpperCase()) {
+        } else if (notifyObject.EventType === "deleted") {
+            if (notifyObject.ItemPath.substring(0, notifyObject.ItemPath.lastIndexOf('/')).toUpperCase() === currentLocation.toUpperCase()) {
                 // Refresh folder structure if any item in this folder is deleted.
                 WebDAVController.Reload();
-            } else if (currentLocation.toUpperCase().indexOf(notifyObject.itemPath.toUpperCase()) === 0) {
+            } else if (currentLocation.toUpperCase().indexOf(notifyObject.ItemPath.toUpperCase()) === 0) {
                 // Redirect client to the root folder if current path is being deleted.
                 var originPath = location.origin + "/";
                 history.pushState({ Url: originPath }, '', originPath);

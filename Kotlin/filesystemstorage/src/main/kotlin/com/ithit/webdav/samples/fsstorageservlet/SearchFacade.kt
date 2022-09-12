@@ -32,6 +32,8 @@ import java.util.concurrent.ForkJoinTask
 import java.util.concurrent.RecursiveAction
 import java.util.regex.Pattern
 
+private val analyzer = StandardAnalyzer()
+
 /**
  * Facade that incapsulates all functionality regarding indexing and searching
  */
@@ -64,20 +66,19 @@ internal class SearchFacade(private val engine: WebDavEngine, private val logger
      * @param indexFolder Index folder.
      * @param interval    Daemon commit interval.
      */
-    internal constructor(private val dataFolder: String, private val indexFolder: String, private val interval: Int?) : TimerTask() {
+     (private val dataFolder: String, private val indexFolder: String, private val interval: Int?) : TimerTask() {
 
         /**
          * The action to be performed by this timer task.
          */
         override fun run() {
             val filesToIndex = ArrayList<HierarchyItem>()
-            val standardAnalyzer = StandardAnalyzer()
-            searcher = Searcher(indexFolder, standardAnalyzer, logger)
+            searcher = Searcher(indexFolder, analyzer, logger)
             getFilesToIndex(File(dataFolder).listFiles(), filesToIndex, dataFolder)
             val fsDir: Directory
             try {
                 fsDir = FSDirectory.open(Paths.get(indexFolder))
-                val conf = IndexWriterConfig(standardAnalyzer)
+                val conf = IndexWriterConfig(analyzer)
                 conf.openMode = IndexWriterConfig.OpenMode.CREATE_OR_APPEND
                 val indexWriter = IndexWriter(fsDir, conf)
                 val tika = Tika()
@@ -91,7 +92,7 @@ internal class SearchFacade(private val engine: WebDavEngine, private val logger
             }
         }
 
-        internal fun schedule() {
+        fun schedule() {
             val timer = Timer(true)
             timer.schedule(this, 0)
         }
@@ -389,7 +390,8 @@ internal class SearchFacade(private val engine: WebDavEngine, private val logger
                 val text = document.get(Indexer.CONTENTS)
                 val path = document.get(Indexer.PATH)
                 val tokenStream = TokenSources.getAnyTokenStream(indexReader,
-                        scoreDoc.doc, Indexer.CONTENTS, document, StandardAnalyzer())
+                        scoreDoc.doc, Indexer.CONTENTS, document, analyzer
+                )
                 val fragment = highlighter.getBestFragment(tokenStream, text)
                 result[path] = fragment ?: ""
             }

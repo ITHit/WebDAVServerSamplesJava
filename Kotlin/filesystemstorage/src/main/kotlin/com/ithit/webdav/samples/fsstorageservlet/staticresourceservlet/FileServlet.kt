@@ -100,7 +100,7 @@ class FileServlet : HttpServlet() {
             return
         }
 
-        if (!ranges.isEmpty()) {
+        if (ranges.isNotEmpty()) {
             response.status = HttpServletResponse.SC_PARTIAL_CONTENT
         } else {
             ranges.add(Range(0, resource.length - 1)) // Full content.
@@ -562,9 +562,11 @@ class FileServlet : HttpServlet() {
         private const val ETAG = "W/\"%s-%s\""
         private val RANGE_PATTERN = Pattern.compile("^bytes=[0-9]*-[0-9]*(,[0-9]*-[0-9]*)*$")
         private val MULTIPART_BOUNDARY = UUID.randomUUID().toString()
-        private val DEFAULT_MIMETYPES = HashSet(Arrays.asList("text/plain", "text/html", "text/xml", "text/css", "text/javascript", "text/csv", "text/rtf",
+        private val DEFAULT_MIMETYPES = HashSet(
+            listOf("text/plain", "text/html", "text/xml", "text/css", "text/javascript", "text/csv", "text/rtf",
                 "application/xml", "application/xhtml+xml", "application/javascript", "application/json",
-                "image/svg+xml"))
+                "image/svg+xml")
+        )
 
         // Helpers --------------------------------------------------------------------------------------------------------
 

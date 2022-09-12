@@ -7,7 +7,10 @@ import java.io.IOException;
 /**
  * Helper extension methods for custom attributes.
  */
-public class ExtendedAttributesExtension {
+public final class ExtendedAttributesExtension {
+
+    private ExtendedAttributesExtension() {
+    }
 
     /**
      * Reads extended attribute.

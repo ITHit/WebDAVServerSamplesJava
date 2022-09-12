@@ -377,7 +377,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     boolean clientHasToken() throws ServerException {
 
         List<LockInfo> itemLocks = getActiveLocks();
-        if (itemLocks.size() == 0)
+        if (itemLocks.isEmpty())
             return true;
         List<String> clientLockTokens = DavContext.currentRequest().getClientLockTokens();
         for (String clientLockToken : clientLockTokens)
@@ -415,11 +415,9 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         ArrayList<LockInfo> l = new ArrayList<>(getLocks(getId(), false)); // get all locks
         while (true) {
             Integer res = getDataAccess().executeInt("SELECT Parent FROM Repository WHERE ID = ?", itemId);
-            if (res == null)
+            if (res == null || res <= 0)
                 break;
             itemId = res;
-            if (itemId <= 0)
-                break;
             l.addAll(getLocks(itemId, true));  // get only deep locks
         }
 
@@ -453,7 +451,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      */
     private boolean itemHasLock(boolean skipShared) throws ServerException {
         List<LockInfo> locks = getActiveLocks();
-        if (locks.size() == 0)
+        if (locks.isEmpty())
             return false;
         return !(skipShared && locks.get(0).isShared());
     }
