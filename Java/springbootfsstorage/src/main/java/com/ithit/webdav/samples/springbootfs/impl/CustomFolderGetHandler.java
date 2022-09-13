@@ -16,12 +16,12 @@ import java.io.PrintStream;
 public class CustomFolderGetHandler implements MethodHandler {
 
     private MethodHandler previousHandler;
-    private String charset;
-    private String version;
-    private boolean customAttributeSupported;
+    private final String charset;
+    private final String version;
+    private final boolean customAttributeSupported;
     private String customPage;
-    private String errorPage;
-    private String rootContext;
+    private final String errorPage;
+    private final String rootContext;
 
     public CustomFolderGetHandler(String charset, String version, boolean customAttributeSupported, String customPage, String errorPage, String rootContext) {
         this.charset = charset;
@@ -50,9 +50,9 @@ public class CustomFolderGetHandler implements MethodHandler {
                 if (customPage.contains(contextRoot)) {
                     customPage = customPage.replace(contextRoot, rootContext);
                 }
-                String version = "<%startTime%>";
-                if (customPage.contains(version)) {
-                    customPage = customPage.replace(version, "" + System.currentTimeMillis());
+                String startTime = "<%startTime%>";
+                if (customPage.contains(startTime)) {
+                    customPage = customPage.replace(startTime, "" + System.currentTimeMillis());
                 }
                 stream.println(customPage);
             }

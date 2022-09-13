@@ -1,24 +1,19 @@
 package com.ithit.webdav.samples.fsstorageservlet.websocket
 
-import com.ithit.webdav.samples.fsstorageservlet.WebDavEngine
 import com.ithit.webdav.server.util.StringUtil
-import java.util.*
-import javax.servlet.http.HttpSession
 import javax.websocket.*
 import javax.websocket.server.ServerEndpoint
 
 /**
  * WebSocket server, creates web socket endpoint, handles client's sessions
  */
-@ServerEndpoint(value = "/", configurator = GetHttpSessionConfigurator::class, encoders = [NotificationEncoder::class])
+@ServerEndpoint(value = "/", encoders = [NotificationEncoder::class])
 class WebSocketServer {
-    private var httpSession: HttpSession? = null
 
     @OnOpen
     fun onOpen(session: Session, config: EndpointConfig) {
         sessions.add(session)
-        httpSession = config.userProperties[HttpSession::class.java.name] as HttpSession
-        (httpSession!!.getAttribute("engine") as WebDavEngine).webSocketServer = this
+        setInstance(this)
     }
 
     @OnMessage
@@ -29,7 +24,7 @@ class WebSocketServer {
     @OnClose
     fun onClose(session: Session) {
         sessions.remove(session)
-        (httpSession!!.getAttribute("engine") as WebDavEngine).webSocketServer = this
+        setInstance(this)
     }
 
     /**
@@ -41,9 +36,10 @@ class WebSocketServer {
     private fun send(itemPath: String, operation: String) {
         var itemPath: String? = itemPath
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/")
+        var notification = Notification(itemPath, operation)
         for (s in sessions) {
             if (s.isOpen) {
-                s.asyncRemote.sendObject(Notification(itemPath, operation))
+                s.asyncRemote.sendObject(notification)
             }
         }
     }
@@ -103,9 +99,10 @@ class WebSocketServer {
         var targetPath = targetPath
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/")
         targetPath = StringUtil.trimEnd(StringUtil.trimStart(targetPath, "/"), "/")
+        var movedNotification = MovedNotification(itemPath, "moved", targetPath)
         for (s in sessions) {
             if (s.isOpen) {
-                s.asyncRemote.sendObject(MovedNotification(itemPath, "moved", targetPath))
+                s.asyncRemote.sendObject(movedNotification)
             }
         }
     }
@@ -123,5 +120,14 @@ class WebSocketServer {
 
     companion object {
         private val sessions: MutableSet<Session> = HashSet()
+        private var instance: WebSocketServer? = null
+
+        fun getInstance(): WebSocketServer? {
+            return instance
+        }
+
+        fun setInstance(instance: WebSocketServer) {
+            this.instance = instance
+        }
     }
 }

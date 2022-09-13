@@ -12,8 +12,6 @@ import com.ithit.webdav.server.exceptions.ServerException;
  */
 public class WebDavEngine extends Engine {
 
-    private static final WebSocketServer _FAKED_WEB_SOCKET = new WebSocketServer();
-    private WebSocketServer webSocketServer;
     private final Logger logger;
     private final String license;
     private DataAccess dataAccess;
@@ -35,7 +33,7 @@ public class WebDavEngine extends Engine {
      *
      * @param contextPath Item relative path including query string.
      * @return Instance of corresponding {@link HierarchyItem} or null if item is not found.
-     * @throws ServerException in case if cannot read file attributes.
+     * @throws ServerException in case if engine cannot read file attributes.
      */
     @Override
     public HierarchyItem getHierarchyItem(String contextPath) throws ServerException {
@@ -85,21 +83,12 @@ public class WebDavEngine extends Engine {
     }
 
     /**
-     * Sets web socket server instance
-     *
-     * @param webSocketServer web socket server instance
-     */
-    public void setWebSocketServer(WebSocketServer webSocketServer) {
-        this.webSocketServer = webSocketServer;
-    }
-
-    /**
      * Returns web socket server instance
      *
      * @return web socket server instance
      */
     WebSocketServer getWebSocketServer() {
-        return webSocketServer == null ? _FAKED_WEB_SOCKET : webSocketServer;
+        return WebSocketServer.getInstance();
     }
 
     /**

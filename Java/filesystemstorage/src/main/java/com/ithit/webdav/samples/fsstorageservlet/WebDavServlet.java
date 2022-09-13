@@ -16,7 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -25,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +37,7 @@ public class WebDavServlet extends HttpServlet {
     private static final String DEFAULT_INDEX_PATH = "WEB-INF/Index";
     private static String realPath;
     private static String servletContext;
-    private static String rootLocalPath = null;
+    private static String rootLocalPath;
     private static boolean supportsUserDefinedAttributes;
     private Logger logger;
     private boolean showExceptions;
@@ -189,8 +187,6 @@ public class WebDavServlet extends HttpServlet {
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
         engine.setSearchFacade(searchFacade);
 
-        HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("engine", engine);
         try {
             engine.service(davRequest, davResponse);
         } catch (DavException e) {

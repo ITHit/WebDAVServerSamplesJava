@@ -4,19 +4,19 @@ package com.ithit.webdav.samples.fsstorageservlet.extendedattributes;
  * Factory-singleton which creates a ExtendedAttribute instance.
  * Instance is valid for the current platform.
  */
-class ExtendedAttributeFactory {
+final class ExtendedAttributeFactory {
 
     private ExtendedAttributeFactory() {
     }
 
-    private static ExtendedAttribute extendedAttribute = null;
+    private static ExtendedAttribute extendedAttribute;
 
     /**
      * Builds a specific ExtendedAttribute for the current platform.
      *
      * @return Platform specific instance of ExtendedAttribute.
      */
-    synchronized static ExtendedAttribute buildFileExtendedAttributeSupport() {
+    static synchronized ExtendedAttribute buildFileExtendedAttributeSupport() {
         if (extendedAttribute == null) {
             if (System.getProperty("os.name").toLowerCase().contains("mac")) {
                 extendedAttribute = new OSXExtendedAttribute();

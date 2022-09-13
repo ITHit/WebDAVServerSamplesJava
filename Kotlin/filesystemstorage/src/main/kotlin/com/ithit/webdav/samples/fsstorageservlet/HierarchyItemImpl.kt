@@ -3,7 +3,6 @@ package com.ithit.webdav.samples.fsstorageservlet
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension
 import com.ithit.webdav.server.*
 import com.ithit.webdav.server.exceptions.*
-import com.ithit.webdav.server.util.StringUtil
 import java.io.File
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
@@ -68,10 +67,10 @@ internal abstract class HierarchyItemImpl
      * @return Encoded string.
      */
     fun encode(`val`: String): String {
-        try {
-            return URLEncoder.encode(`val`, "UTF-8").replace("+", "%20")
+        return try {
+            URLEncoder.encode(`val`, "UTF-8").replace("+", "%20")
         } catch (e: UnsupportedEncodingException) {
-            return URLEncoder.encode(`val`).replace("+", "%20")
+            URLEncoder.encode(`val`).replace("+", "%20")
         }
 
     }
@@ -197,7 +196,7 @@ internal abstract class HierarchyItemImpl
         if (props == null) {
             return l
         }
-        val propNames = Arrays.stream(props).map<String> { it.name }.collect(Collectors.toSet())
+        val propNames = Arrays.stream(props).map { it.name }.collect(Collectors.toSet())
         result = l.stream().filter { x -> propNames.contains(x.name) }.collect(Collectors.toList())
         val snippet = Arrays.stream(props).filter { propNames.contains(SNIPPET) }.findFirst().orElse(null)
         if (snippet != null && this is FileImpl) {
@@ -295,7 +294,7 @@ internal abstract class HierarchyItemImpl
             }
         }
         properties = getProperties()
-        val propNamesToDel = Arrays.stream(delProps).map<String> { it.name }.collect(Collectors.toSet())
+        val propNamesToDel = Arrays.stream(delProps).map { it.name }.collect(Collectors.toSet())
         properties = properties!!.stream()
                 .filter { e -> !propNamesToDel.contains(e.name) }
                 .collect(Collectors.toList())
@@ -310,7 +309,7 @@ internal abstract class HierarchyItemImpl
      * @param field Field to update
      */
     private fun updateBasicProperties(date: String?, field: String) {
-        val attributes = Files.getFileAttributeView<BasicFileAttributeView>(fullPath, BasicFileAttributeView::class.java)
+        val attributes = Files.getFileAttributeView(fullPath, BasicFileAttributeView::class.java)
         try {
             val propertyCreatedName = "Win32CreationTime"
             val propertyModifiedName = "Win32LastModifiedTime"
@@ -463,29 +462,26 @@ internal abstract class HierarchyItemImpl
         /**
          * Decodes URL and converts it to proper path string.
          *
-         * @param URL URL to decode.
+         * @param url URL to decode.
          * @return Path.
          */
-        fun decodeAndConvertToPath(URL: String): String {
-            val path = decode(URL)
+        fun decodeAndConvertToPath(url: String): String {
+            val path = decode(url)
             return path.replace("/", File.separator)
         }
 
         /**
          * Decodes URL.
          *
-         * @param URL URL to decode.
+         * @param url URL to decode.
          * @return Path.
          */
-        fun decode(URL: String): String {
-            var path = ""
-            try {
-                path = URLDecoder.decode(URL.replace("\\+".toRegex(), "%2B"), "UTF-8")
+        fun decode(url: String): String {
+            return try {
+                URLDecoder.decode(url.replace("+", "%2B"), "UTF-8")
             } catch (e: UnsupportedEncodingException) {
-                println("UTF-8 encoding can not be used to decode $URL")
+                URLDecoder.decode(url.replace("+", "%2B"))
             }
-
-            return path
         }
 
         /**

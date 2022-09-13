@@ -21,9 +21,9 @@ import java.util.List;
  * </p>
  */
 class VersionHistory implements History {
-    private WebDavEngine engine;
-    private int itemId;
-    private String itemPath;
+    private final WebDavEngine engine;
+    private final int itemId;
+    private final String itemPath;
 
     /**
      * Initializes new instance of the {@link VersionHistory}.

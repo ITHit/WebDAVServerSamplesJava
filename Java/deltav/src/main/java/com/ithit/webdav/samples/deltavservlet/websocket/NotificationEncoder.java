@@ -1,6 +1,5 @@
 package com.ithit.webdav.samples.deltavservlet.websocket;
 
-import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
@@ -18,14 +17,14 @@ public class NotificationEncoder implements Encoder.Text<WebSocketServer.Notific
     }
 
     @Override
-    public String encode(WebSocketServer.Notification notification) throws EncodeException {
+    public String encode(WebSocketServer.Notification notification) {
         String target = "";
         if (notification instanceof WebSocketServer.MovedNotification) {
-            target = "\"targetPath\" : \"" + ((WebSocketServer.MovedNotification) notification).getTargetPath() + "\" ,";
+            target = "\"TargetPath\" : \"" + ((WebSocketServer.MovedNotification) notification).getTargetPath() + "\" ,";
         }
         return "{" + target +
-                "\"itemPath\" : \"" + notification.getItemPath() + "\" ," +
-                "\"eventType\" : \"" + notification.getOperation() + "\"" +
+                "\"ItemPath\" : \"" + notification.getItemPath() + "\" ," +
+                "\"EventType\" : \"" + notification.getOperation() + "\"" +
                 "}";
     }
 }

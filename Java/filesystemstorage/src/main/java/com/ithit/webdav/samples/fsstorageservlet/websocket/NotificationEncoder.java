@@ -21,11 +21,11 @@ public class NotificationEncoder implements Encoder.Text<WebSocketServer.Notific
     public String encode(WebSocketServer.Notification notification) throws EncodeException {
         String target = "";
         if (notification instanceof WebSocketServer.MovedNotification) {
-            target = "\"targetPath\" : \"" + ((WebSocketServer.MovedNotification) notification).getTargetPath() + "\" ,";
+            target = "\"TargetPath\" : \"" + ((WebSocketServer.MovedNotification) notification).getTargetPath() + "\" ,";
         }
         return "{" + target +
-                "\"itemPath\" : \"" + notification.getItemPath() + "\" ," +
-                "\"eventType\" : \"" + notification.getOperation() + "\"" +
+                "\"ItemPath\" : \"" + notification.getItemPath() + "\" ," +
+                "\"EventType\" : \"" + notification.getOperation() + "\"" +
                 "}";
     }
 }

@@ -115,7 +115,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      */
     public FileImpl createFile(String name) throws LockedException, ServerException {
         ensureHasToken();
-        return (FileImpl) createChild(name, ItemType.File);
+        return (FileImpl) createChild(name, ItemType.FILE);
     }
 
     /**
@@ -127,7 +127,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      */
     public void createFolder(String name) throws LockedException, ServerException {
         ensureHasToken();
-        createChild(name, ItemType.Folder);
+        createChild(name, ItemType.FOLDER);
     }
 
     /**
@@ -186,11 +186,10 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         updateModified();
 
         HierarchyItemImpl item = null;
-        switch (itemType) {
-            case ItemType.File:
-                long now = Calendar.getInstance().getTime().getTime();
-                item = new FileImpl(newId, getId(), name, getPath() + name,
-                        now, now, now, 0, false, false, false, false, getEngine().getAutoVersionMode(), getEngine());
+        if (itemType == ItemType.FILE) {
+            long now = new Date().getTime();
+            item = new FileImpl(newId, getId(), name, getPath() + name,
+                    now, now, now, 0, false, false, false, false, getEngine().getAutoVersionMode(), getEngine());
         }
         getEngine().getWebSocketServer().notifyCreated(getPath() + name);
         return item;
@@ -265,7 +264,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         }
         // move children
         MultistatusException mr = new MultistatusException();
-        for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
+        for (HierarchyItem child : getChildren(Collections.emptyList(), null, null, null).getPage()) {
             try {
                 child.moveTo(newDestFolder, child.getName());
             } catch (MultistatusException e) {
@@ -321,7 +320,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         // copy children
         MultistatusException mr = new MultistatusException();
         if (deep) {
-            for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
+            for (HierarchyItem child : getChildren(Collections.emptyList(), null, null, null).getPage()) {
                 try {
                     child.copyTo(newDestFolder, child.getName(), deep);
                 } catch (MultistatusException ex) {
@@ -357,7 +356,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
 
         MultistatusException mx = new MultistatusException();
 
-        for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
+        for (HierarchyItem child : getChildren(Collections.emptyList(), null, null, null).getPage()) {
             try {
                 child.delete();
             } catch (MultistatusException ex) {
@@ -383,7 +382,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      * @throws ServerException in case of DB errors.
      */
     void removeTree() throws ServerException {
-        for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
+        for (HierarchyItem child : getChildren(Collections.emptyList(), null, null, null).getPage()) {
             FolderImpl childFolder = child instanceof FolderImpl ? (FolderImpl) child : null;
             if (childFolder != null)
                 childFolder.removeTree();
@@ -402,7 +401,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
 
         if (!clientHasToken())
             return false;
-        for (HierarchyItem child : getChildren(Collections.<Property>emptyList(), null, null, null).getPage()) {
+        for (HierarchyItem child : getChildren(Collections.emptyList(), null, null, null).getPage()) {
             FolderImpl childFolder = child instanceof FolderImpl ? (FolderImpl) child : null;
             if (childFolder != null) {
                 if (!childFolder.clientHasTokenForTree())
@@ -446,7 +445,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         List<HierarchyItem> results = new LinkedList<>();
         SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
-            return new PageResults(results, (long) results.size());
+            return new PageResults(results, (long) 0);
         }
         boolean snippet = false;
         for (Property pr : propNames) {
@@ -471,13 +470,13 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                     if (Objects.equals(pathParts[i], "")) {
                         continue;
                     }
-                    pathBuilder.append("/");
+                    pathBuilder.append('/');
                     pathBuilder.append(pathParts[i]);
                 }
                 String itemPath = pathBuilder.toString();
                 String decodedPath = getDataAccess().decode(getPath());
                 if (itemPath.startsWith(decodedPath)) {
-                    HierarchyItem item = getDataAccess().getFile(Integer.valueOf(entry.getKey()), itemPath);
+                    HierarchyItem item = getDataAccess().getFile(Integer.parseInt(entry.getKey()), itemPath);
                     if (item != null) {
                         if (snippet && item instanceof FileImpl) {
                             ((FileImpl) item).setSnippet(entry.getValue());

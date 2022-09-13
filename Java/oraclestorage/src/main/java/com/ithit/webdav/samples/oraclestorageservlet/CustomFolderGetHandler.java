@@ -16,9 +16,9 @@ import java.nio.file.Paths;
 public class CustomFolderGetHandler implements MethodHandler {
 
     private MethodHandler previousHandler;
-    private String charset;
-    private String version;
-    private String pathToHTML = "WEB-INF/MyCustomHandlerPage.html";
+    private final String charset;
+    private final String version;
+    private final String pathToHTML = "WEB-INF/MyCustomHandlerPage.html";
 
     public CustomFolderGetHandler(String charset, String version) {
         this.charset = charset;
@@ -52,9 +52,9 @@ public class CustomFolderGetHandler implements MethodHandler {
                 if (line.contains(ws)) {
                     line = line.replace(ws, wsContext);
                 }
-                String version = "<%startTime%>";
-                if (line.contains(version)) {
-                    line = line.replace(version, WebDavServlet.START_TIME);
+                String startTime = "<%startTime%>";
+                if (line.contains(startTime)) {
+                    line = line.replace(startTime, WebDavServlet.START_TIME);
                 }
                 stream.println(line);
             }

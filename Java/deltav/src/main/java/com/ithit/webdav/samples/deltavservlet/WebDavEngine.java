@@ -17,8 +17,6 @@ import java.util.Map;
  */
 public class WebDavEngine extends Engine {
 
-    private static final WebSocketServer _FAKED_WEB_SOCKET = new WebSocketServer();
-    private WebSocketServer webSocketServer;
     private final Logger logger;
     private final String license;
     private DataAccess dataAccess;
@@ -42,7 +40,7 @@ public class WebDavEngine extends Engine {
      *
      * @param pathAndQuery Item relative path including query string.
      * @return Instance of corresponding {@link HierarchyItem} or null if item is not found.
-     * @throws ServerException in case if cannot read file attributes.
+     * @throws ServerException in case if engine cannot read file attributes.
      */
     @Override
     public HierarchyItem getHierarchyItem(String pathAndQuery) throws ServerException {
@@ -61,7 +59,7 @@ public class WebDavEngine extends Engine {
                     + " AND VersionNumber = ?";
 
             List<VersionImpl> versions = dataAccess.readVersions(commandText, itemPath, item.getId(), versionNum);
-            if (versions.size() > 0)
+            if (!versions.isEmpty())
                 return versions.get(0);
         } else if (pathAndQuery.contains("?history")) // History
         {
@@ -177,21 +175,12 @@ public class WebDavEngine extends Engine {
     }
 
     /**
-     * Sets web socket server instance
-     *
-     * @param webSocketServer web socket server instance
-     */
-    public void setWebSocketServer(WebSocketServer webSocketServer) {
-        this.webSocketServer = webSocketServer;
-    }
-
-    /**
      * Returns web socket server instance
      *
      * @return web socket server instance
      */
     WebSocketServer getWebSocketServer() {
-        return webSocketServer == null ? _FAKED_WEB_SOCKET : webSocketServer;
+        return WebSocketServer.getInstance();
     }
 
     /**

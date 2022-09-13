@@ -19,9 +19,7 @@ class WebDavEngine
  */
 internal constructor(private val logger: Logger?, private val license: String?) : Engine() {
 
-    internal var webSocketServer: WebSocketServer? = null
-        get() = if (field == null) _FAKED_WEB_SOCKET else field
-    private val _FAKED_WEB_SOCKET = WebSocketServer()
+    internal var webSocketServer: WebSocketServer? = WebSocketServer.getInstance()
     /**
      * Returns SearchFacade instance
      *

@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Represents a folder in the Oracle DB repository.
  */
-public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, ResumableUploadBase {
+public final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quota, ResumableUploadBase {
 
     private long usedBytes;
 
@@ -105,7 +105,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      */
     public FileImpl createFile(String name) throws LockedException, ServerException {
         ensureHasToken();
-        return (FileImpl) createChild(name, ItemType.File);
+        return (FileImpl) createChild(name, ItemType.FILE);
     }
 
     /**
@@ -117,7 +117,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
      */
     public void createFolder(String name) throws LockedException, ServerException {
         ensureHasToken();
-        createChild(name, ItemType.Folder);
+        createChild(name, ItemType.FOLDER);
     }
 
     /**
@@ -145,8 +145,8 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         updateModified();
 
         HierarchyItemImpl item = null;
-        if (itemType == ItemType.File) {
-            long now = Calendar.getInstance().getTime().getTime();
+        if (itemType == ItemType.FILE) {
+            long now = new Date().getTime();
             item = new FileImpl(newId, getId(), name, getPath() + name, now, now, now, 0, getEngine());
         }
         getEngine().getWebSocketServer().notifyCreated(getPath() + name);
@@ -388,7 +388,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
         List<HierarchyItem> results = new LinkedList<>();
         SearchFacade.Searcher searcher = getEngine().getSearchFacade().getSearcher();
         if (searcher == null) {
-            return new PageResults(results, (long) results.size());
+            return new PageResults(results, (long) 0);
         }
         boolean snippet = false;
         for (Property pr : propNames) {
@@ -416,7 +416,7 @@ public class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quo
                     if (Objects.equals(pathParts[i], "")) {
                         continue;
                     }
-                    pathBuilder.append("/");
+                    pathBuilder.append('/');
                     pathBuilder.append(pathParts[i]);
                 }
                 String itemPath = pathBuilder.toString();

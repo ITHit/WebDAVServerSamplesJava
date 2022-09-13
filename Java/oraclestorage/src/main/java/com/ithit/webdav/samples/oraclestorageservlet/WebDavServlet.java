@@ -14,7 +14,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -117,8 +116,6 @@ public class WebDavServlet extends HttpServlet {
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead));
 
         engine.setSearchFacade(searchFacade);
-        HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("engine", engine);
         DataAccess dataAccess = new DataAccess(engine);
         try {
             engine.service(davRequest, davResponse);

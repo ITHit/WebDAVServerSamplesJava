@@ -1,10 +1,11 @@
 package com.ithit.webdav.samples.oraclestorageservlet.websocket;
 
-import com.ithit.webdav.samples.oraclestorageservlet.WebDavEngine;
 import com.ithit.webdav.server.util.StringUtil;
 
-import javax.servlet.http.HttpSession;
-import javax.websocket.*;
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,18 +14,24 @@ import java.util.Set;
  * WebSocket server, creates web socket endpoint, handles client's sessions
  */
 @ServerEndpoint(value = "/",
-        configurator = GetHttpSessionConfigurator.class, encoders = {NotificationEncoder.class})
+        encoders = {NotificationEncoder.class})
 public class WebSocketServer {
 
-    private static final Set<Session> sessions = new HashSet<>();
-    private HttpSession httpSession;
+    private static final Set<Session> SESSIONS = new HashSet<>();
+    private static WebSocketServer instance;
+
+    public static WebSocketServer getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(WebSocketServer instance) {
+        WebSocketServer.instance = instance;
+    }
 
     @OnOpen
-    public void onOpen(Session session, EndpointConfig config) {
-        sessions.add(session);
-        httpSession = (HttpSession) config.getUserProperties()
-                .get(HttpSession.class.getName());
-        ((WebDavEngine) httpSession.getAttribute("engine")).setWebSocketServer(this);
+    public void onOpen(Session session) {
+        SESSIONS.add(session);
+        setInstance(this);
     }
 
     @OnMessage
@@ -34,8 +41,8 @@ public class WebSocketServer {
 
     @OnClose
     public void onClose(Session session) {
-        sessions.remove(session);
-        ((WebDavEngine) httpSession.getAttribute("engine")).setWebSocketServer(this);
+        SESSIONS.remove(session);
+        setInstance(this);
     }
 
     /**
@@ -46,9 +53,10 @@ public class WebSocketServer {
      */
     private void send(String itemPath, String operation) {
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
-        for (Session s : sessions) {
+        final Notification notification = new Notification(itemPath, operation);
+        for (Session s : SESSIONS) {
             if (s.isOpen()) {
-                s.getAsyncRemote().sendObject(new Notification(itemPath, operation));
+                s.getAsyncRemote().sendObject(notification);
             }
         }
     }
@@ -106,9 +114,10 @@ public class WebSocketServer {
     public void notifyMoved(String itemPath, String targetPath) {
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/");
         targetPath = StringUtil.trimEnd(StringUtil.trimStart(targetPath, "/"), "/");
-        for (Session s : sessions) {
+        final MovedNotification movedNotification = new MovedNotification(itemPath, "moved", targetPath);
+        for (Session s : SESSIONS) {
             if (s.isOpen()) {
-                s.getAsyncRemote().sendObject(new MovedNotification(itemPath, "moved", targetPath));
+                s.getAsyncRemote().sendObject(movedNotification);
             }
         }
     }

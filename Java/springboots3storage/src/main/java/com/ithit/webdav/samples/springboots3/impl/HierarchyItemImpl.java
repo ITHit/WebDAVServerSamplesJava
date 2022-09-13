@@ -19,8 +19,8 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     private final long modified;
     private final WebDavEngine engine;
     private String name;
-    final String activeLocksAttribute = "Locks";
-    private final String propertiesAttribute = "Properties";
+    static final String ACTIVE_LOCKS_ATTRIBUTE = "Locks";
+    private static final String PROPERTIES_ATTRIBUTE = "Properties";
     private List<Property> properties;
     private List<LockInfo> activeLocks;
 
@@ -44,11 +44,11 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     /**
      * Decodes URL and converts it to proper path string.
      *
-     * @param URL URL to decode.
+     * @param url URL to decode.
      * @return Path.
      */
-    static String decodeAndConvertToPath(String URL) {
-        String path = decode(URL);
+    static String decodeAndConvertToPath(String url) {
+        String path = decode(url);
         return path.replace("/", File.separator);
     }
 
@@ -58,14 +58,12 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @param URL URL to decode.
      * @return Path.
      */
-    static String decode(String URL) {
-        String path = "";
+    static String decode(String url) {
         try {
-            path = URLDecoder.decode(URL.replaceAll("\\+", "%2B"), "UTF-8");
+            return URLDecoder.decode(url.replace("+", "%2B"), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            System.out.println("UTF-8 encoding can not be used to decode " + URL);
+            return URLDecoder.decode(url.replace("+", "%2B"));
         }
-        return path;
     }
 
     /**
@@ -179,7 +177,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
 
     private List<Property> getProperties() throws ServerException {
         if (properties == null) {
-            String propertiesJson = getEngine().getDataClient().getMetadata(getPath(), propertiesAttribute);
+            String propertiesJson = getEngine().getDataClient().getMetadata(getPath(), PROPERTIES_ATTRIBUTE);
             properties = SerializationUtils.deserializeList(Property.class, propertiesJson);
         }
         return properties;
@@ -193,7 +191,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      */
     @Override
     public List<Property> getPropertyNames() throws ServerException {
-        String propJson = getEngine().getDataClient().getMetadata(getPath(), propertiesAttribute);
+        String propJson = getEngine().getDataClient().getMetadata(getPath(), PROPERTIES_ATTRIBUTE);
         return SerializationUtils.deserializeList(Property.class, propJson);
     }
 
@@ -216,7 +214,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      */
     private boolean clientHasToken() throws ServerException {
         getActiveLocks();
-        if (activeLocks.size() == 0) {
+        if (activeLocks.isEmpty()) {
             return true;
         }
         List<String> clientLockTokens = DavContext.currentRequest().getClientLockTokens();
@@ -250,7 +248,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         properties = properties.stream()
                 .filter(e -> !propNamesToDel.contains(e.getName()))
                 .collect(Collectors.toList());
-        getEngine().getDataClient().setMetadata(getPath(), propertiesAttribute, SerializationUtils.serialize(properties));
+        getEngine().getDataClient().setMetadata(getPath(), PROPERTIES_ATTRIBUTE, SerializationUtils.serialize(properties));
         getEngine().getWebSocketServer().notifyUpdated(getPath());
     }
 
@@ -289,7 +287,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         long expires = System.currentTimeMillis() + timeout * 1000;
         LockInfo lockInfo = new LockInfo(shared, deep, token, expires, owner);
         activeLocks.add(lockInfo);
-        getEngine().getDataClient().setMetadata(getPath(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
+        getEngine().getDataClient().setMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE, SerializationUtils.serialize(activeLocks));
         getEngine().getWebSocketServer().notifyLocked(getPath());
         return new LockResult(token, timeout);
     }
@@ -315,7 +313,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     @Override
     public List<LockInfo> getActiveLocks() throws ServerException {
         if (activeLocks == null) {
-            String activeLocksJson = getEngine().getDataClient().getMetadata(getPath(), activeLocksAttribute);
+            String activeLocksJson = getEngine().getDataClient().getMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE);
             activeLocks = new ArrayList<>(SerializationUtils.deserializeList(LockInfo.class, activeLocksJson));
         } else {
             activeLocks = new LinkedList<>();
@@ -348,9 +346,9 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         if (lock != null) {
             activeLocks.remove(lock);
             if (!activeLocks.isEmpty()) {
-                getEngine().getDataClient().setMetadata(getPath(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
+                getEngine().getDataClient().setMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE, SerializationUtils.serialize(activeLocks));
             } else {
-                getEngine().getDataClient().setMetadata(getPath(), activeLocksAttribute, null);
+                getEngine().getDataClient().setMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE, null);
             }
             getEngine().getWebSocketServer().notifyUnlocked(getPath());
         } else {
@@ -382,7 +380,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         }
         long expires = System.currentTimeMillis() + timeout * 1000;
         lockInfo.setTimeout(expires);
-        getEngine().getDataClient().setMetadata(getPath(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
+        getEngine().getDataClient().setMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE, SerializationUtils.serialize(activeLocks));
         getEngine().getWebSocketServer().notifyLocked(getPath());
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());

@@ -30,7 +30,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     private final WebDavEngine engine;
     private String name;
     String activeLocksAttribute = "Locks";
-    private String propertiesAttribute = "Properties";
+    private static final String PROPERTIES_ATTRIBUTE = "Properties";
     private List<Property> properties;
     private List<LockInfo> activeLocks;
 
@@ -54,28 +54,26 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
     /**
      * Decodes URL and converts it to proper path string.
      *
-     * @param URL URL to decode.
+     * @param url URL to decode.
      * @return Path.
      */
-    static String decodeAndConvertToPath(String URL) {
-        String path = decode(URL);
+    static String decodeAndConvertToPath(String url) {
+        String path = decode(url);
         return path.replace("/", File.separator);
     }
 
     /**
-     * Decodes URL.
+     * Decodes url.
      *
-     * @param URL URL to decode.
+     * @param url url to decode.
      * @return Path.
      */
-    static String decode(String URL) {
-        String path = "";
+    static String decode(String url) {
         try {
-            path = URLDecoder.decode(URL.replaceAll("\\+", "%2B"), "UTF-8");
+            return URLDecoder.decode(url.replace("+", "%2B"), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            System.out.println("UTF-8 encoding can not be used to decode " + URL);
+            return URLDecoder.decode(url.replace("+", "%2B"));
         }
-        return path;
     }
 
     /**
@@ -234,7 +232,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
 
     private List<Property> getProperties() throws ServerException {
         if (properties == null) {
-            String propertiesJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), propertiesAttribute);
+            String propertiesJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE);
             properties = SerializationUtils.deserializeList(Property.class, propertiesJson);
         }
         return properties;
@@ -248,8 +246,8 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      */
     @Override
     public List<Property> getPropertyNames() throws ServerException {
-        if (ExtendedAttributesExtension.hasExtendedAttribute(getFullPath().toString(), propertiesAttribute)) {
-            String propJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), propertiesAttribute);
+        if (ExtendedAttributesExtension.hasExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE)) {
+            String propJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE);
             return SerializationUtils.deserializeList(Property.class, propJson);
         }
         return new LinkedList<>();
@@ -274,11 +272,11 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      */
     private boolean clientHasToken() throws ServerException {
         getActiveLocks();
-        if (activeLocks.size() == 0) {
+        if (activeLocks.isEmpty()) {
             return true;
         }
         List<String> clientLockTokens = DavContext.currentRequest().getClientLockTokens();
-        return !activeLocks.stream().filter(x -> clientLockTokens.contains(x.getToken())).collect(Collectors.toList()).isEmpty();
+        return activeLocks.stream().anyMatch(x -> clientLockTokens.contains(x.getToken()));
     }
 
     /**
@@ -323,7 +321,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         properties = properties.stream()
                 .filter(e -> !propNamesToDel.contains(e.getName()))
                 .collect(Collectors.toList());
-        ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), propertiesAttribute, SerializationUtils.serialize(properties));
+        ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE, SerializationUtils.serialize(properties));
         getEngine().getWebSocketServer().notifyUpdated(getPath());
     }
 

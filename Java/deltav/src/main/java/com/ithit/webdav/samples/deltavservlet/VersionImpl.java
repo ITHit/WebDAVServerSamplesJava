@@ -109,7 +109,7 @@ class VersionImpl implements Version, File {
         List<VersionImpl> versions = engine.getDataAccess().readVersions(
                 commandText, itemPath, itemId, itemId, versionNumber);
 
-        return versions.size() > 0 ? versions.get(0) : null;
+        return !versions.isEmpty() ? versions.get(0) : null;
     }
 
     /**
@@ -131,7 +131,7 @@ class VersionImpl implements Version, File {
         List<VersionImpl> versions = engine.getDataAccess().readVersions(
                 commandText, itemPath, itemId, itemId, versionNumber);
 
-        return versions.size() > 0 ? versions.get(0) : null;
+        return !versions.isEmpty() ? versions.get(0) : null;
     }
 
     /**
@@ -141,8 +141,8 @@ class VersionImpl implements Version, File {
      * @throws ServerException in case of an error.
      */
     public VersionableItem getVersionableItem() throws ServerException {
-        String itemPath = path.substring(0, path.indexOf('?'));
-        return (VersionableItem) engine.getHierarchyItem(itemPath);
+        String versionableItemPath = path.substring(0, path.indexOf('?'));
+        return (VersionableItem) engine.getHierarchyItem(versionableItemPath);
     }
 
     /**

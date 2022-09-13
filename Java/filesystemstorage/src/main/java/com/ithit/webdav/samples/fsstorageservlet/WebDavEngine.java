@@ -14,8 +14,6 @@ import java.util.Set;
  */
 public class WebDavEngine extends Engine {
 
-    private WebSocketServer webSocketServer;
-    private final WebSocketServer _FAKED_WEB_SOCKET = new WebSocketServer();
     private final Logger logger;
     private final String license;
     private final Set<String> maskRequestHeaders;
@@ -38,11 +36,11 @@ public class WebDavEngine extends Engine {
      *
      * @param contextPath Item relative path including query string.
      * @return Instance of corresponding {@link HierarchyItem} or null if item is not found.
-     * @throws ServerException in case if cannot read file attributes.
+     * @throws ServerException in case if engine cannot read file attributes.
      */
     @Override
     public HierarchyItem getHierarchyItem(String contextPath) throws ServerException {
-        int i = contextPath.indexOf("?");
+        int i = contextPath.indexOf('?');
         if (i >= 0) {
             contextPath = contextPath.substring(0, i);
         }
@@ -56,7 +54,7 @@ public class WebDavEngine extends Engine {
             return item;
         }
         getLogger().logDebug("Could not find item that corresponds to path: " + contextPath);
-        return null; // no hierarchy item that corresponds to path parameter was found in the repository
+        return null; // no hierarchy item corresponds to path parameter was found in the repository
     }
 
     /**
@@ -85,21 +83,12 @@ public class WebDavEngine extends Engine {
     }
 
     /**
-     * Sets web socket server instance
-     *
-     * @param webSocketServer web socket server instance
-     */
-    public void setWebSocketServer(WebSocketServer webSocketServer) {
-        this.webSocketServer = webSocketServer;
-    }
-
-    /**
      * Returns web socket server instance
      *
      * @return web socket server instance
      */
     WebSocketServer getWebSocketServer() {
-        return webSocketServer == null ? _FAKED_WEB_SOCKET : webSocketServer;
+        return WebSocketServer.getInstance();
     }
 
     /**

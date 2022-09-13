@@ -248,7 +248,7 @@ public class FileServlet extends HttpServlet {
         if (rangeHeader == null) {
             return ranges;
         } else if (!RANGE_PATTERN.matcher(rangeHeader).matches()) {
-            return null; // Syntax error.
+            return Collections.emptyList(); // Syntax error.
         }
 
         String ifRange = request.getHeader("If-Range");
@@ -269,7 +269,7 @@ public class FileServlet extends HttpServlet {
             Range range = parseRange(rangeHeaderPart, resource.length);
 
             if (range == null) {
-                return null; // Logic error.
+                return Collections.emptyList(); // Logic error.
             }
 
             ranges.add(range);

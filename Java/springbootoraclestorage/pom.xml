@@ -4,19 +4,19 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.4.RELEASE</version>
+        <version>2.3.11.RELEASE</version>
         <relativePath />
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springbootoraclestorage</artifactId>
-    <version>5.1.5442</version>
+    <version>5.2.5507</version>
     <name>springbootoraclestorage</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
         <lucene-core.version>7.5.0</lucene-core.version>
-        <tika-core.version>1.28.1</tika-core.version>
+        <tika-core.version>1.28.4</tika-core.version>
     </properties>
 
     <dependencies>
@@ -54,12 +54,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>5.1.5442</version>
+            <version>5.2.5507</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>5.1.5442</version>
+            <version>5.2.5507</version>
         </dependency>
 
         <!-- Oracle dependencies -->
@@ -176,6 +176,11 @@
                     <artifactId>sis-netcdf</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+            <version>2.0.6.1</version>
         </dependency>
     </dependencies>
 

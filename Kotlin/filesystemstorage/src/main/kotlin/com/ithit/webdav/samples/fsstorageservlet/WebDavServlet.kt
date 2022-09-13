@@ -137,8 +137,6 @@ class WebDavServlet : HttpServlet() {
         handlerHead.setPreviousHandler(engine.registerMethodHandler("HEAD", handlerHead))
         engine.searchFacade = searchFacade
 
-        val session = httpServletRequest.session
-        session.setAttribute("engine", engine)
         try {
             engine.service(davRequest, davResponse)
         } catch (e: DavException) {
