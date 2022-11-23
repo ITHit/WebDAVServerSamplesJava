@@ -1,9 +1,13 @@
 package com.ithit.webdav.samples.fsstorageservlet.extendedattributes;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.List;
@@ -43,7 +47,8 @@ class DefaultExtendedAttribute implements ExtendedAttribute {
             if (existAttrName.equals(attribName)) {
                 ByteBuffer buf = ByteBuffer.allocate(view.size(attribName));
                 view.read(attribName, buf);
-                buf.flip();
+                // Workaround for https://openjdk.org/jeps/247
+                ((Buffer) buf).flip();
                 return Charset.defaultCharset().decode(buf).toString();
             }
         }

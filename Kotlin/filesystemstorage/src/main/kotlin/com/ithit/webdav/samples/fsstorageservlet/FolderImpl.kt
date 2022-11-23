@@ -57,7 +57,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
             } catch (e: IOException) {
                 throw ServerException(e)
             }
-            engine.webSocketServer?.notifyCreated(path + name)
+            engine.webSocketServer?.notifyCreated(path + encode(name), getWebSocketID())
             return FileImpl.getFile(path + encode(name), engine)
         }
         return null
@@ -72,13 +72,18 @@ private constructor(name: String, path: String, created: Long, modified: Long,
      */
     @Throws(LockedException::class, ServerException::class)
     override fun createFolder(name: String) {
+        createFolderInternal(name)
+
+        engine.webSocketServer?.notifyCreated(path + encode(name), getWebSocketID())
+    }
+
+    private fun createFolderInternal(name: String) {
         ensureHasToken()
 
         val fullPath = Paths.get(this.fullPath.toString(), name)
         if (!Files.exists(fullPath)) {
             try {
                 Files.createDirectory(fullPath)
-                engine.webSocketServer?.notifyCreated(path + name)
             } catch (e: IOException) {
                 throw ServerException(e)
             }
@@ -127,10 +132,10 @@ private constructor(name: String, path: String, created: Long, modified: Long,
         try {
             removeIndex(fullPath, this)
             FileUtils.deleteDirectory(fullPath.toFile())
-            engine.webSocketServer?.notifyDeleted(path)
         } catch (e: IOException) {
             throw ServerException(e)
         }
+        engine.webSocketServer?.notifyDeleted(path, getWebSocketID())
     }
 
     @Throws(LockedException::class, MultistatusException::class, ServerException::class)
@@ -148,12 +153,12 @@ private constructor(name: String, path: String, created: Long, modified: Long,
             val sourcePath = this.fullPath
             val destinationFullPath = Paths.get(destinationFolder, destName)
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile())
-            engine.webSocketServer?.notifyCreated(folder.path + name)
             addIndex(destinationFullPath, folder.path + destName, destName)
         } catch (e: IOException) {
             throw ServerException(e)
         }
         setName(destName)
+        engine.webSocketServer?.notifyCreated(folder.path + encode(name!!), getWebSocketID())
     }
 
     /**
@@ -176,7 +181,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
      */
     private fun sortChildren(paths: List<Path>, orderProps: List<OrderProperty>?): List<Path> {
         var localPaths = paths
-        if (orderProps != null && !orderProps.isEmpty()) {
+        if (!orderProps.isNullOrEmpty()) {
             var index = 0
             var comparator: Comparator<Path>? = null
             for (orderProperty in orderProps) {
@@ -248,7 +253,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
         }
 
         setName(destName)
-        engine.webSocketServer?.notifyMoved(path, folder.path + destName)
+        engine.webSocketServer?.notifyMoved(path, folder.path + encode(destName), getWebSocketID())
     }
 
     /**

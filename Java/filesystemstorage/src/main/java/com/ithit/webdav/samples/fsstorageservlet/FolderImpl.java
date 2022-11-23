@@ -101,8 +101,9 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
             } catch (IOException e) {
                 throw new ServerException(e);
             }
-            getEngine().getWebSocketServer().notifyCreated(getPath() + name);
-            return FileImpl.getFile(getPath() + encode(name), getEngine());
+            final String itemPath = getPath() + encode(name);
+            getEngine().getWebSocketServer().notifyCreated(itemPath, getWebSocketID());
+            return FileImpl.getFile(itemPath, getEngine());
         }
         return null;
     }
@@ -117,13 +118,19 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
     @Override
     public void createFolder(String name) throws LockedException,
             ServerException {
+        createFolderInternal(name);
+
+        getEngine().getWebSocketServer().notifyCreated(getPath() + encode(name), getWebSocketID());
+    }
+
+    private void createFolderInternal(String name) throws LockedException,
+            ServerException {
         ensureHasToken();
 
         Path fullPath = Paths.get(this.getFullPath().toString(), name);
         if (!Files.exists(fullPath)) {
             try {
                 Files.createDirectory(fullPath);
-                getEngine().getWebSocketServer().notifyCreated(getPath() + name);
             } catch (IOException e) {
                 throw new ServerException(e);
             }
@@ -172,10 +179,10 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         try {
             removeIndex(getFullPath(), this);
             FileUtils.deleteDirectory(getFullPath().toFile());
-            getEngine().getWebSocketServer().notifyDeleted(getPath());
         } catch (IOException e) {
             throw new ServerException(e);
         }
+        getEngine().getWebSocketServer().notifyDeleted(getPath(), getWebSocketID());
     }
 
     @Override
@@ -194,12 +201,12 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
             Path sourcePath = this.getFullPath();
             Path destinationFullPath = Paths.get(destinationFolder, destName);
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile());
-            getEngine().getWebSocketServer().notifyCreated(folder.getPath() + destName);
             addIndex(destinationFullPath, folder.getPath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
         }
         setName(destName);
+        getEngine().getWebSocketServer().notifyCreated(folder.getPath() + encode(destName), getWebSocketID());
     }
 
     /**
@@ -293,7 +300,7 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
             throw new ServerException(e);
         }
         setName(destName);
-        getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + destName);
+        getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + encode(destName), getWebSocketID());
     }
 
     /**

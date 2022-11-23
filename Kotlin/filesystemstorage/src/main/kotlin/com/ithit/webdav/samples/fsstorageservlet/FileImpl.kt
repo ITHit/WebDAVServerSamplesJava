@@ -257,7 +257,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
         } finally {
             writer.close()
         }
-        engine.webSocketServer?.notifyUpdated(path)
+        engine.webSocketServer?.notifyUpdated(path, getWebSocketID())
         return totalWrittenBytes
     }
 
@@ -284,14 +284,12 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
             engine.logger?.logError("Tried to delete file in use.", e)
             throw ServerException(e)
         }
-
-        engine.webSocketServer?.notifyDeleted(path)
+        engine.webSocketServer?.notifyDeleted(path, getWebSocketID())
         try {
             engine.searchFacade!!.indexer!!.deleteIndex(this)
         } catch (ex: Exception) {
             engine.logger?.logError("Errors during indexing.", ex)
         }
-
     }
 
     @Throws(LockedException::class, MultistatusException::class, ServerException::class, ConflictException::class)
@@ -313,13 +311,12 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute)
         }
         try {
-            val currentPath = folder.path + destName
-            engine.webSocketServer?.notifyCreated(currentPath)
+            val currentPath = folder.path + encode(destName)
+            engine.webSocketServer?.notifyCreated(currentPath, getWebSocketID())
             engine.searchFacade!!.indexer!!.indexFile(decode(destName), decode(currentPath), null, this)
         } catch (ex: Exception) {
             engine.logger?.logError("Errors during indexing.", ex)
         }
-
     }
 
     @Throws(LockedException::class, ConflictException::class, MultistatusException::class, ServerException::class)
@@ -343,13 +340,12 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute)
         }
         try {
-            val currentPath = folder.path + destName
-            engine.webSocketServer?.notifyMoved(path, currentPath)
+            val currentPath = folder.path + encode(destName)
+            engine.webSocketServer?.notifyMoved(path, currentPath, getWebSocketID())
             engine.searchFacade!!.indexer!!.indexFile(decode(destName), decode(currentPath), path, this)
         } catch (ex: Exception) {
             engine.logger?.logError("Errors during indexing.", ex)
         }
-
     }
 
     companion object {

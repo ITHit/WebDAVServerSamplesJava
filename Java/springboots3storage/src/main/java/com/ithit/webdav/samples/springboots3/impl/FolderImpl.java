@@ -4,10 +4,7 @@ import com.ithit.webdav.server.File;
 import com.ithit.webdav.server.Folder;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Property;
-import com.ithit.webdav.server.exceptions.ConflictException;
-import com.ithit.webdav.server.exceptions.LockedException;
-import com.ithit.webdav.server.exceptions.ServerException;
-import com.ithit.webdav.server.exceptions.WebDavStatus;
+import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.paging.OrderProperty;
 import com.ithit.webdav.server.paging.PageResults;
 import com.ithit.webdav.server.resumableupload.ResumableUploadBase;
@@ -74,7 +71,7 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Resum
         if (hierarchyItem == null) {
             try {
                 getEngine().getDataClient().storeObject(originalPath, null, null, 0);
-                getEngine().getWebSocketServer().notifyCreated(getPath() + name);
+                getEngine().getWebSocketServer().notifyCreated(getPath() + getEngine().getDataClient().encode(name), getWebSocketID());
                 final long created = System.currentTimeMillis();
                 return FileImpl.getFile(originalPath, decodedName, created, created, 0, getEngine());
             } catch (Exception e) {
@@ -104,7 +101,7 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Resum
             } catch (Exception e) {
                 throw new ServerException(e);
             }
-            getEngine().getWebSocketServer().notifyCreated(getPath() + name);
+            getEngine().getWebSocketServer().notifyCreated(getPath() + getEngine().getDataClient().encode(name), getWebSocketID());
         }
     }
 
@@ -133,17 +130,24 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Resum
     @Override
     public void delete() throws LockedException,
             ServerException {
+        deleteInternal(0);
+    }
+
+    @Override
+    public void deleteInternal(int recursionDepth) throws LockedException, ServerException {
         ensureHasToken();
         try {
             for (HierarchyItem hierarchyItem : getChildren(null, null, null, null).getPage()) {
                 try {
-                    hierarchyItem.delete();
+                    ((HierarchyItemImpl)hierarchyItem).deleteInternal(recursionDepth + 1);
                 } catch (Exception e) {
                     throw new ServerException();
                 }
             }
             getEngine().getDataClient().delete(getPath());
-            getEngine().getWebSocketServer().notifyDeleted(getPath());
+            if (recursionDepth == 0) {
+                getEngine().getWebSocketServer().notifyDeleted(getPath(), getWebSocketID());
+            }
         } catch (SdkException e) {
             throw new ServerException(e);
         }
@@ -152,6 +156,11 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Resum
     @Override
     public void copyTo(Folder folder, String destName, boolean deep)
             throws LockedException, ServerException {
+        copyToInternal(folder, destName, deep, 0);
+    }
+
+    @Override
+    public void copyToInternal(Folder folder, String destName, boolean deep, int recursionDepth) throws LockedException, ServerException {
         ((FolderImpl) folder).ensureHasToken();
 
         String relUrl = decodeAndConvertToPath(folder.getPath());
@@ -162,7 +171,7 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Resum
         try {
             for (HierarchyItem hierarchyItem : getChildren(null, null, null, null).getPage()) {
                 try {
-                    hierarchyItem.copyTo(destFolder, hierarchyItem.getName(), deep);
+                    ((HierarchyItemImpl)hierarchyItem).copyToInternal(destFolder, hierarchyItem.getName(), deep, recursionDepth + 1);
                 } catch (Exception e) {
                     throw new ServerException();
                 }
@@ -170,11 +179,19 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Resum
         } catch (SdkException e) {
             throw new ServerException(e);
         }
+        if (recursionDepth == 0) {
+            getEngine().getWebSocketServer().notifyCreated(folder.getPath() + getEngine().getDataClient().encode(destName), getWebSocketID());
+        }
     }
 
     @Override
     public void moveTo(Folder folder, String destName) throws LockedException,
             ConflictException, ServerException {
+        moveToInternal(folder, destName, 0);
+    }
+
+    @Override
+    public void moveToInternal(Folder folder, String destName, int recursionDepth) throws LockedException, ConflictException, ServerException {
         ensureHasToken();
         ((FolderImpl) folder).ensureHasToken();
         String relUrl = decodeAndConvertToPath(folder.getPath());
@@ -186,14 +203,18 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Resum
         try {
             for (HierarchyItem hierarchyItem : getChildren(null, null, null, null).getPage()) {
                 try {
-                    hierarchyItem.moveTo(destFolder, hierarchyItem.getName());
+                    ((HierarchyItemImpl)hierarchyItem).moveToInternal(destFolder, hierarchyItem.getName(), recursionDepth + 1);
                     hierarchyItem.delete();
                 } catch (Exception e) {
                     throw new ServerException();
                 }
             }
+            getEngine().getDataClient().delete(getPath());
         } catch (SdkException e) {
             throw new ServerException(e);
+        }
+        if (recursionDepth == 0) {
+            getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + getEngine().getDataClient().encode(destName), getWebSocketID());
         }
     }
 

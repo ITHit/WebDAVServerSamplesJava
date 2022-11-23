@@ -1,5 +1,6 @@
 package com.ithit.webdav.samples.springboots3.impl;
 
+import com.ithit.webdav.samples.springboots3.websocket.WebSocketServer;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 
@@ -82,6 +83,22 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             throws LockedException, MultistatusException, ServerException, ConflictException;
 
     /**
+     * Creates a copy of this item with a new name in the destination folder.
+     *
+     * @param folder            Destination folder.
+     * @param destName          Name of the destination item.
+     * @param deep              Indicates whether to copy entire subtree.
+     * @param recursionDepth    Recursion depth.
+     * @throws LockedException      - the destination item was locked and client did not provide lock token.
+     * @throws ConflictException    - destination folder does not exist.
+     * @throws MultistatusException - errors has occurred during processing of the subtree.
+     *                              Every item that has been either successfully copied or failed to copy must be present in exception with corresponding status.
+     * @throws ServerException      - In case of other error.
+     */
+    public abstract void copyToInternal(Folder folder, String destName, boolean deep, int recursionDepth)
+            throws LockedException, MultistatusException, ServerException, ConflictException;
+
+    /**
      * Moves this item to the destination folder under a new name.
      *
      * @param folder   Destination folder.
@@ -96,6 +113,21 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             throws LockedException, ConflictException, MultistatusException, ServerException;
 
     /**
+     * Moves this item to the destination folder under a new name.
+     *
+     * @param folder            Destination folder.
+     * @param destName          Name of the destination item.
+     * @param recursionDepth    Recursion depth.
+     * @throws LockedException      - the source or the destination item was locked and client did not provide lock token.
+     * @throws ConflictException    - destination folder does not exist.
+     * @throws MultistatusException - errors has occurred during processing of the subtree. Every processed item must have corresponding response added
+     *                              with corresponding status.
+     * @throws ServerException      - in case of another error.
+     */
+    public abstract void moveToInternal(Folder folder, String destName, int recursionDepth)
+            throws LockedException, ConflictException, MultistatusException, ServerException;
+
+    /**
      * Deletes this item.
      *
      * @throws LockedException      - this item or its parent was locked and client did not provide lock token.
@@ -105,6 +137,18 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      */
     @Override
     public abstract void delete() throws LockedException, MultistatusException,
+            ServerException;
+
+    /**
+     * Deletes this item.
+     *
+     * @param recursionDepth    Recursion depth.
+     * @throws LockedException      - this item or its parent was locked and client did not provide lock token.
+     * @throws MultistatusException - errors has occurred during processing of the subtree. Every processed item must have corresponding response added
+     *                              to the exception with corresponding status.
+     * @throws ServerException      - in case of another error.
+     */
+    public abstract void deleteInternal(int recursionDepth) throws LockedException, MultistatusException,
             ServerException;
 
     /**
@@ -249,7 +293,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
                 .filter(e -> !propNamesToDel.contains(e.getName()))
                 .collect(Collectors.toList());
         getEngine().getDataClient().setMetadata(getPath(), PROPERTIES_ATTRIBUTE, SerializationUtils.serialize(properties));
-        getEngine().getWebSocketServer().notifyUpdated(getPath());
+        getEngine().getWebSocketServer().notifyUpdated(getPath(), getWebSocketID());
     }
 
     /**
@@ -288,7 +332,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         LockInfo lockInfo = new LockInfo(shared, deep, token, expires, owner);
         activeLocks.add(lockInfo);
         getEngine().getDataClient().setMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE, SerializationUtils.serialize(activeLocks));
-        getEngine().getWebSocketServer().notifyLocked(getPath());
+        getEngine().getWebSocketServer().notifyLocked(getPath(), getWebSocketID());
         return new LockResult(token, timeout);
     }
 
@@ -350,7 +394,7 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             } else {
                 getEngine().getDataClient().setMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE, null);
             }
-            getEngine().getWebSocketServer().notifyUnlocked(getPath());
+            getEngine().getWebSocketServer().notifyUnlocked(getPath(), getWebSocketID());
         } else {
             throw new PreconditionFailedException();
         }
@@ -381,8 +425,16 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         long expires = System.currentTimeMillis() + timeout * 1000;
         lockInfo.setTimeout(expires);
         getEngine().getDataClient().setMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE, SerializationUtils.serialize(activeLocks));
-        getEngine().getWebSocketServer().notifyLocked(getPath());
+        getEngine().getWebSocketServer().notifyLocked(getPath(), getWebSocketID());
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());
+    }
+
+    /**
+     * Returns instance ID from header
+     * @return InstanceId
+     */
+    protected String getWebSocketID() {
+        return DavContext.currentRequest().getHeader(WebSocketServer.INSTANCE_HEADER_NAME);
     }
 }

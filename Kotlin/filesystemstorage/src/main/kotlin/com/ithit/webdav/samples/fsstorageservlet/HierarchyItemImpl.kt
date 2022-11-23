@@ -1,6 +1,7 @@
 package com.ithit.webdav.samples.fsstorageservlet
 
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension
+import com.ithit.webdav.samples.fsstorageservlet.websocket.INSTANCE_HEADER_NAME
 import com.ithit.webdav.server.*
 import com.ithit.webdav.server.exceptions.*
 import java.io.File
@@ -63,14 +64,14 @@ internal abstract class HierarchyItemImpl
     /**
      * Encodes string to safe characters.
      *
-     * @param val String to encode.
+     * @param `val` String to encode.
      * @return Encoded string.
      */
-    fun encode(`val`: String): String {
+    fun encode(value: String): String {
         return try {
-            URLEncoder.encode(`val`, "UTF-8").replace("+", "%20")
+            URLEncoder.encode(value, "UTF-8").replace("+", "%20")
         } catch (e: UnsupportedEncodingException) {
-            URLEncoder.encode(`val`).replace("+", "%20")
+            URLEncoder.encode(value).replace("+", "%20")
         }
 
     }
@@ -299,7 +300,7 @@ internal abstract class HierarchyItemImpl
                 .filter { e -> !propNamesToDel.contains(e.name) }
                 .collect(Collectors.toList())
         ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), propertiesAttribute, SerializationUtils.serialize(properties as List<Property>))
-        engine.webSocketServer?.notifyUpdated(getPath())
+        engine.webSocketServer?.notifyUpdated(getPath(), getWebSocketID())
     }
 
     /**
@@ -360,7 +361,7 @@ internal abstract class HierarchyItemImpl
         val lockInfo = LockInfo(shared, deep, token, expires, owner)
         activeLocks!!.add(lockInfo)
         ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), activeLocksAttribute, SerializationUtils.serialize<List<LockInfo>>(activeLocks!!))
-        engine.webSocketServer?.notifyLocked(getPath())
+        engine.webSocketServer?.notifyLocked(getPath(), getWebSocketID())
         return LockResult(token, localTimeout)
     }
 
@@ -424,7 +425,7 @@ internal abstract class HierarchyItemImpl
             } else {
                 ExtendedAttributesExtension.deleteExtendedAttribute(fullPath.toString(), activeLocksAttribute)
             }
-            engine.webSocketServer?.notifyUnlocked(getPath())
+            engine.webSocketServer?.notifyUnlocked(getPath(), getWebSocketID())
         } else {
             throw PreconditionFailedException()
         }
@@ -453,9 +454,17 @@ internal abstract class HierarchyItemImpl
         val expires = System.currentTimeMillis() + localTimeout * 1000
         lockInfo.timeout = expires
         ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), activeLocksAttribute, SerializationUtils.serialize<List<LockInfo>>(activeLocks!!))
-        engine.webSocketServer?.notifyLocked(getPath())
+        engine.webSocketServer?.notifyLocked(getPath(), getWebSocketID())
         return RefreshLockResult(lockInfo.isShared, lockInfo.isDeep,
                 localTimeout, lockInfo.owner)
+    }
+
+    /**
+     * Returns instance ID from header
+     * @return InstanceId
+     */
+    protected open fun getWebSocketID(): String? {
+        return DavContext.currentRequest().getHeader(INSTANCE_HEADER_NAME)
     }
 
     companion object {

@@ -1,6 +1,7 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
+import com.ithit.webdav.samples.fsstorageservlet.websocket.WebSocketServer;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 
@@ -322,7 +323,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
                 .filter(e -> !propNamesToDel.contains(e.getName()))
                 .collect(Collectors.toList());
         ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE, SerializationUtils.serialize(properties));
-        getEngine().getWebSocketServer().notifyUpdated(getPath());
+        getEngine().getWebSocketServer().notifyUpdated(getPath(), getWebSocketID());
     }
 
     /**
@@ -406,7 +407,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         LockInfo lockInfo = new LockInfo(shared, deep, token, expires, owner);
         activeLocks.add(lockInfo);
         ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
-        getEngine().getWebSocketServer().notifyLocked(getPath());
+        getEngine().getWebSocketServer().notifyLocked(getPath(), getWebSocketID());
         return new LockResult(token, timeout);
     }
 
@@ -466,7 +467,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             } else {
                 ExtendedAttributesExtension.deleteExtendedAttribute(getFullPath().toString(), activeLocksAttribute);
             }
-            getEngine().getWebSocketServer().notifyUnlocked(getPath());
+            getEngine().getWebSocketServer().notifyUnlocked(getPath(), getWebSocketID());
         } else {
             throw new PreconditionFailedException();
         }
@@ -497,8 +498,16 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         long expires = System.currentTimeMillis() + timeout * 1000;
         lockInfo.setTimeout(expires);
         ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
-        getEngine().getWebSocketServer().notifyLocked(getPath());
+        getEngine().getWebSocketServer().notifyLocked(getPath(), getWebSocketID());
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());
+    }
+
+    /**
+     * Returns instance ID from header
+     * @return InstanceId
+     */
+    protected String getWebSocketID() {
+        return DavContext.currentRequest().getHeader(WebSocketServer.INSTANCE_HEADER_NAME);
     }
 }

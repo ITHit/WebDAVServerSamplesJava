@@ -295,7 +295,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
         } finally {
             writer.close();
         }
-        getEngine().getWebSocketServer().notifyUpdated(getPath());
+        getEngine().getWebSocketServer().notifyUpdated(getPath(), getWebSocketID());
         return totalWrittenBytes;
     }
 
@@ -331,7 +331,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
             getEngine().getLogger().logError("Tried to delete file in use.", e);
             throw new ServerException(e);
         }
-        getEngine().getWebSocketServer().notifyDeleted(getPath());
+        getEngine().getWebSocketServer().notifyDeleted(getPath(), getWebSocketID());
         try {
             getEngine().getSearchFacade().getIndexer().deleteIndex(this);
         } catch (Exception ex) {
@@ -358,8 +358,8 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
         }
         try {
-            String currentPath = folder.getPath() + destName;
-            getEngine().getWebSocketServer().notifyCreated(currentPath);
+            String currentPath = folder.getPath() + encode(destName);
+            getEngine().getWebSocketServer().notifyCreated(currentPath, getWebSocketID());
             getEngine().getSearchFacade().getIndexer().indexFile(decode(destName), decode(currentPath), null, this);
         } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);
@@ -377,7 +377,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
         }
         Path newPath = Paths.get(destinationFolder, destName);
         try {
-            Files.move(getFullPath(), Paths.get(destinationFolder, destName), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(getFullPath(), newPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new ServerException(e);
         }
@@ -387,8 +387,8 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
         }
         try {
-            String currentPath = folder.getPath() + destName;
-            getEngine().getWebSocketServer().notifyMoved(getPath(), currentPath);
+            String currentPath = folder.getPath() + encode(destName);
+            getEngine().getWebSocketServer().notifyMoved(getPath(), currentPath, getWebSocketID());
             getEngine().getSearchFacade().getIndexer().indexFile(decode(destName), decode(currentPath), getPath(), this);
         } catch (Exception ex) {
             getEngine().getLogger().logError("Errors during indexing.", ex);

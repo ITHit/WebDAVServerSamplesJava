@@ -5,6 +5,7 @@ import com.ithit.webdav.samples.springbootfs.extendedattributes.ExtendedAttribut
 import com.ithit.webdav.samples.springbootfs.impl.CustomFolderGetHandler;
 import com.ithit.webdav.samples.springbootfs.impl.SearchFacade;
 import com.ithit.webdav.samples.springbootfs.impl.WebDavEngine;
+import com.ithit.webdav.samples.springbootfs.websocket.HandshakeHeadersInterceptor;
 import com.ithit.webdav.samples.springbootfs.websocket.SocketHandler;
 import com.ithit.webdav.samples.springbootfs.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
@@ -80,7 +81,7 @@ public class WebDavConfiguration extends WebMvcConfigurationSupport implements W
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(socketHandler, properties.getRootWebSocket()).setAllowedOrigins("*");
+        registry.addHandler(socketHandler, properties.getRootWebSocket()).addInterceptors(new HandshakeHeadersInterceptor()).setAllowedOrigins("*");
     }
 
     @RequestScope

@@ -130,7 +130,7 @@ public class DataClient {
      */
     public void setMetadata(String originalPath, String metaKey, String metadata) {
         String key = getContext(originalPath);
-        String encodedUrl = encodeKey(key);
+        String encodedUrl = encode(key);
         Map<String, String> md = loadExistingMetadata(key);
         updateMetadata(metaKey, metadata, md);
         CopyObjectRequest copyReq = CopyObjectRequest.builder()
@@ -189,7 +189,7 @@ public class DataClient {
     public void copy(String originalPath, String originalDestKey) {
         String key = getContext(originalPath);
         String destKey = getContext(originalDestKey);
-        String encodedUrl = encodeKey(key);
+        String encodedUrl = encode(key);
         CopyObjectRequest copyReq = CopyObjectRequest.builder()
                 .copySource(encodedUrl)
                 .destinationBucket(bucket)
@@ -233,7 +233,7 @@ public class DataClient {
         }
     }
 
-    private String encodeKey(String key) {
+    public String encode(String key) {
         String encodedUrl = null;
         try {
             encodedUrl = URLEncoder.encode(bucket + "/" + key, StandardCharsets.UTF_8.toString());

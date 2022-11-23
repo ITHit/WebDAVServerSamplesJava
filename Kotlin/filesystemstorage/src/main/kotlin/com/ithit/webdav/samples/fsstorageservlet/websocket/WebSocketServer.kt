@@ -4,15 +4,17 @@ import com.ithit.webdav.server.util.StringUtil
 import javax.websocket.*
 import javax.websocket.server.ServerEndpoint
 
+const val INSTANCE_HEADER_NAME = "InstanceId"
+
 /**
  * WebSocket server, creates web socket endpoint, handles client's sessions
  */
-@ServerEndpoint(value = "/", encoders = [NotificationEncoder::class])
+@ServerEndpoint(value = "/", encoders = [NotificationEncoder::class], configurator = GetHttpSessionConfigurator::class)
 class WebSocketServer {
 
     @OnOpen
     fun onOpen(session: Session, config: EndpointConfig) {
-        sessions.add(session)
+        sessions[session.id] = WebSocketClient(config.userProperties[INSTANCE_HEADER_NAME].toString(), session)
         setInstance(this)
     }
 
@@ -23,7 +25,7 @@ class WebSocketServer {
 
     @OnClose
     fun onClose(session: Session) {
-        sessions.remove(session)
+        sessions.remove(session.id)
         setInstance(this)
     }
 
@@ -32,14 +34,17 @@ class WebSocketServer {
      *
      * @param itemPath   File/Folder path.
      * @param operation  Operation name: created/updated/deleted/moved
+     * @param clientId Current clientId.
      */
-    private fun send(itemPath: String, operation: String) {
+    private fun send(itemPath: String, operation: String, clientId: String?) {
         var itemPath: String? = itemPath
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/")
-        var notification = Notification(itemPath, operation)
-        for (s in sessions) {
-            if (s.isOpen) {
-                s.asyncRemote.sendObject(notification)
+        val notification = Notification(itemPath, operation)
+        for (s in if (StringUtil.isNullOrEmpty(clientId))
+                sessions.values else
+                sessions.values.filter { x -> !x.instanceId.equals(clientId, ignoreCase = true) }) {
+            if (s.session.isOpen) {
+                s.session.asyncRemote.sendObject(notification)
             }
         }
     }
@@ -48,61 +53,70 @@ class WebSocketServer {
      * Notifies client that file/folder was created.
      *
      * @param itemPath file/folder.
+     * @param clientId Current clientId.
      */
-    fun notifyCreated(itemPath: String) {
-        send(itemPath, "created")
+    fun notifyCreated(itemPath: String, clientId: String?) {
+        send(itemPath, "created", clientId)
     }
 
     /**
      * Notifies client that file/folder was updated.
      *
      * @param itemPath file/folder.
+     * @param clientId Current clientId.
      */
-    fun notifyUpdated(itemPath: String) {
-        send(itemPath, "updated")
+    fun notifyUpdated(itemPath: String, clientId: String?) {
+        send(itemPath, "updated", clientId)
     }
 
     /**
      * Notifies client that file/folder was deleted.
      *
      * @param itemPath file/folder.
+     * @param clientId Current clientId.
      */
-    fun notifyDeleted(itemPath: String) {
-        send(itemPath, "deleted")
+    fun notifyDeleted(itemPath: String, clientId: String?) {
+        send(itemPath, "deleted", clientId)
     }
 
     /**
      * Notifies client that file/folder was locked.
      *
      * @param itemPath file/folder.
+     * @param clientId Current clientId.
      */
-    fun notifyLocked(itemPath: String) {
-        send(itemPath, "locked")
+    fun notifyLocked(itemPath: String, clientId: String?) {
+        send(itemPath, "locked", clientId)
     }
 
     /**
      * Notifies client that file/folder was unlocked.
      *
      * @param itemPath file/folder.
+     * @param clientId Current clientId.
      */
-    fun notifyUnlocked(itemPath: String) {
-        send(itemPath, "unlocked")
+    fun notifyUnlocked(itemPath: String, clientId: String?) {
+        send(itemPath, "unlocked", clientId)
     }
 
     /**
      * Notifies client that file/folder was moved.
      *
      * @param itemPath file/folder.
+     * @param targetPath file/folder.
+     * @param clientId Current clientId.
      */
-    fun notifyMoved(itemPath: String?, targetPath: String?) {
+    fun notifyMoved(itemPath: String?, targetPath: String?, clientId: String?) {
         var itemPath = itemPath
         var targetPath = targetPath
         itemPath = StringUtil.trimEnd(StringUtil.trimStart(itemPath, "/"), "/")
         targetPath = StringUtil.trimEnd(StringUtil.trimStart(targetPath, "/"), "/")
-        var movedNotification = MovedNotification(itemPath, "moved", targetPath)
-        for (s in sessions) {
-            if (s.isOpen) {
-                s.asyncRemote.sendObject(movedNotification)
+        val movedNotification = MovedNotification(itemPath, "moved", targetPath)
+        for (s in if (StringUtil.isNullOrEmpty(clientId))
+            sessions.values else
+            sessions.values.filter { x -> !x.instanceId.equals(clientId, ignoreCase = true) }) {
+            if (s.session.isOpen) {
+                s.session.asyncRemote.sendObject(movedNotification)
             }
         }
     }
@@ -118,8 +132,10 @@ class WebSocketServer {
     inner class MovedNotification(itemPath: String?, operation: String, val targetPath: String?) :
         Notification(itemPath, operation)
 
+    inner class WebSocketClient(val instanceId: String, val session: Session)
+
     companion object {
-        private val sessions: MutableSet<Session> = HashSet()
+        private var sessions: MutableMap<String, WebSocketClient> = HashMap()
         private var instance: WebSocketServer? = null
 
         fun getInstance(): WebSocketServer? {

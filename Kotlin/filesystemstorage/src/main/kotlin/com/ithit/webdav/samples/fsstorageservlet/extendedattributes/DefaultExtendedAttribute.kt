@@ -3,6 +3,7 @@ package com.ithit.webdav.samples.fsstorageservlet.extendedattributes
 import com.ithit.webdav.server.exceptions.ServerException
 
 import java.io.IOException
+import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.nio.file.Files
@@ -43,7 +44,8 @@ internal class DefaultExtendedAttribute : ExtendedAttribute {
         return try {
             buf = ByteBuffer.allocate(view.size(attribName))
             view.read(attribName, buf)
-            buf.flip()
+            // Workaround for https://openjdk.org/jeps/247
+            (buf as Buffer).flip()
             Charset.defaultCharset().decode(buf).toString()
         } catch (ignored: NoSuchFileException) {
             null

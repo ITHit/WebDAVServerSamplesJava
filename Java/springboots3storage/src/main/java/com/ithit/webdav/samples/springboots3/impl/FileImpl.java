@@ -209,7 +209,7 @@ public final class FileImpl extends HierarchyItemImpl implements File, Lock,
         ensureHasToken();
         incrementSerialNumber();
         getEngine().getDataClient().storeObject(getPath(), content, contentType, totalFileLength);
-        getEngine().getWebSocketServer().notifyUpdated(getPath());
+        getEngine().getWebSocketServer().notifyUpdated(getPath(), getWebSocketID());
         return totalFileLength;
     }
 
@@ -238,6 +238,11 @@ public final class FileImpl extends HierarchyItemImpl implements File, Lock,
 
     @Override
     public void delete() throws LockedException, MultistatusException, ServerException {
+        deleteInternal(0);
+    }
+
+    @Override
+    public void deleteInternal(int recursionDepth) throws LockedException, MultistatusException, ServerException {
         ensureHasToken();
         try {
             getEngine().getDataClient().delete(getPath());
@@ -245,18 +250,25 @@ public final class FileImpl extends HierarchyItemImpl implements File, Lock,
             getEngine().getLogger().logError("Tried to delete file in use.", e);
             throw new ServerException(e);
         }
-        getEngine().getWebSocketServer().notifyDeleted(getPath());
+        if (recursionDepth == 0) {
+            getEngine().getWebSocketServer().notifyDeleted(getPath(), getWebSocketID());
+        }
     }
 
     @Override
     public void copyTo(Folder folder, String destName, boolean deep)
             throws LockedException, MultistatusException, ServerException, ConflictException {
+        copyToInternal(folder, destName, deep, 0);
+    }
+
+    @Override
+    public void copyToInternal(Folder folder, String destName, boolean deep, int recursionDepth) throws LockedException, MultistatusException, ServerException, ConflictException {
         ((FolderImpl) folder).ensureHasToken();
         final HierarchyItem item = getEngine().getDataClient().locateObject(folder.getPath(), getEngine());
         if (item == null) {
             throw new ConflictException();
         }
-        String destPath = folder.getPath() + destName;
+        String destPath = folder.getPath() + getEngine().getDataClient().encode(destName);
         try {
             getEngine().getDataClient().copy(getPath(), destPath);
         } catch (SdkException e) {
@@ -264,12 +276,19 @@ public final class FileImpl extends HierarchyItemImpl implements File, Lock,
         }
         // Locks should not be copied, delete them
         getEngine().getDataClient().setMetadata(destPath, ACTIVE_LOCKS_ATTRIBUTE, null);
-        getEngine().getWebSocketServer().notifyCreated(destPath);
+        if (recursionDepth == 0) {
+            getEngine().getWebSocketServer().notifyCreated(destPath, getWebSocketID());
+        }
     }
 
     @Override
     public void moveTo(Folder folder, String destName) throws LockedException,
             ConflictException, MultistatusException, ServerException {
+        moveToInternal(folder, destName, 0);
+    }
+
+    @Override
+    public void moveToInternal(Folder folder, String destName, int recursionDepth) throws LockedException, ConflictException, MultistatusException, ServerException {
         ensureHasToken();
         ((FolderImpl) folder).ensureHasToken();
         final HierarchyItem item = getEngine().getDataClient().locateObject(folder.getPath(), getEngine());
@@ -286,6 +305,8 @@ public final class FileImpl extends HierarchyItemImpl implements File, Lock,
         setName(destName);
         // Locks should not be copied, delete them
         getEngine().getDataClient().setMetadata(destPath, ACTIVE_LOCKS_ATTRIBUTE, null);
-        getEngine().getWebSocketServer().notifyMoved(getPath(), destPath);
+        if (recursionDepth == 0) {
+            getEngine().getWebSocketServer().notifyMoved(getPath(), getEngine().getDataClient().encode(destPath), getWebSocketID());
+        }
     }
 }

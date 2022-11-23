@@ -106,12 +106,18 @@ public class FileImpl extends HierarchyItemImpl implements
 
     @Override
     public void delete() throws LockedException, MultistatusException, ServerException {
+        deleteInternal(0);
+    }
 
+    @Override
+    public void deleteInternal(int recursionDepth) throws LockedException, MultistatusException, ServerException {
         getParent().ensureHasToken();
         ensureHasToken();
 
         deleteThisItem();
-        getEngine().getWebSocketServer().notifyDeleted(getPath());
+        if (recursionDepth == 0) {
+            getEngine().getWebSocketServer().notifyDeleted(getPath(), getWebSocketID());
+        }
         try {
             getEngine().getSearchFacade().getIndexer().deleteIndex(this);
         } catch (Exception ex) {
@@ -192,7 +198,11 @@ public class FileImpl extends HierarchyItemImpl implements
     @Override
     public void copyTo(Folder folder, String destName, boolean deep)
             throws LockedException, MultistatusException, ServerException {
+        copyToInternal(folder, destName, deep, 0);
+    }
 
+    @Override
+    public void copyToInternal(Folder folder, String destName, boolean deep, int recursionDepth) throws LockedException, MultistatusException, ServerException {
         FolderImpl destFolder = getDataAccess().getFolderImpl(folder);
 
         destFolder.ensureHasToken();
@@ -213,7 +223,9 @@ public class FileImpl extends HierarchyItemImpl implements
         } else {
             copy = copyThisItem(destFolder, null, destName);
         }
-        getEngine().getWebSocketServer().notifyCreated(folder.getPath() + destName);
+        if (recursionDepth == 0) {
+            getEngine().getWebSocketServer().notifyCreated(folder.getPath() + getDataAccess().encode(destName), getWebSocketID());
+        }
         try {
             if (copy != null) {
                 newID = copy.getId();
@@ -344,7 +356,7 @@ public class FileImpl extends HierarchyItemImpl implements
                 if (os != null)
                     os.close();
             }
-            getEngine().getWebSocketServer().notifyUpdated(getPath());
+            getEngine().getWebSocketServer().notifyUpdated(getPath(), getWebSocketID());
             try {
                 getEngine().getSearchFacade().getIndexer().indexFile(getName(), getId(), getId(), this);
             } catch (Exception ex) {
@@ -359,6 +371,11 @@ public class FileImpl extends HierarchyItemImpl implements
     @Override
     public void moveTo(Folder folder, String destName)
             throws LockedException, ConflictException, MultistatusException, ServerException {
+        moveToInternal(folder, destName, 0);
+    }
+
+    @Override
+    public void moveToInternal(Folder folder, String destName, int recursionDepth) throws LockedException, ConflictException, MultistatusException, ServerException {
         FolderImpl destFolder = getDataAccess().getFolderImpl(folder);
 
         FolderImpl parent = getParent();
@@ -382,7 +399,9 @@ public class FileImpl extends HierarchyItemImpl implements
         } else {
             moveThisItem(destFolder, destName, parent);
         }
-        getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + destName);
+        if (recursionDepth == 0) {
+            getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + getDataAccess().encode(destName), getWebSocketID());
+        }
         try {
             getEngine().getSearchFacade().getIndexer().indexFile(destName, getId(), getId(), this);
         } catch (Exception ex) {

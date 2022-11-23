@@ -4,10 +4,7 @@ import com.ithit.webdav.server.File;
 import com.ithit.webdav.server.Folder;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Property;
-import com.ithit.webdav.server.exceptions.ConflictException;
-import com.ithit.webdav.server.exceptions.LockedException;
-import com.ithit.webdav.server.exceptions.ServerException;
-import com.ithit.webdav.server.exceptions.WebDavStatus;
+import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.paging.OrderProperty;
 import com.ithit.webdav.server.paging.PageResults;
 import com.ithit.webdav.server.quota.Quota;
@@ -17,7 +14,10 @@ import com.ithit.webdav.server.search.SearchOptions;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -105,7 +105,7 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
             } catch (IOException e) {
                 throw new ServerException(e);
             }
-            getEngine().getWebSocketServer().notifyCreated(getPath() + name);
+            getEngine().getWebSocketServer().notifyCreated(getPath() + encode(name), getWebSocketID());
             return FileImpl.getFile(getContextAwarePath() + encode(name), getEngine());
         }
         return null;
@@ -121,13 +121,19 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
     @Override
     public void createFolder(String name) throws LockedException,
             ServerException {
+        createFolderInternal(name);
+
+        getEngine().getWebSocketServer().notifyCreated(getPath() + encode(name), getWebSocketID());
+    }
+
+    private void createFolderInternal(String name) throws LockedException,
+            ServerException {
         ensureHasToken();
 
         Path fullPath = Paths.get(this.getFullPath().toString(), name);
         if (!Files.exists(fullPath)) {
             try {
                 Files.createDirectory(fullPath);
-                getEngine().getWebSocketServer().notifyCreated(getPath() + name);
             } catch (IOException e) {
                 throw new ServerException(e);
             }
@@ -176,15 +182,15 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         try {
             removeIndex(getFullPath(), this);
             FileUtils.deleteDirectory(getFullPath().toFile());
-            getEngine().getWebSocketServer().notifyDeleted(getPath());
         } catch (IOException e) {
             throw new ServerException(e);
         }
+        getEngine().getWebSocketServer().notifyDeleted(getPath(), getWebSocketID());
     }
 
     @Override
     public void copyTo(Folder folder, String destName, boolean deep)
-            throws LockedException, ServerException {
+            throws LockedException, MultistatusException, ServerException {
         ((FolderImpl) folder).ensureHasToken();
 
         String relUrl = HierarchyItemImpl.decodeAndConvertToPath(((FolderImpl) folder).getContextAwarePath());
@@ -198,12 +204,12 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
             Path sourcePath = this.getFullPath();
             Path destinationFullPath = Paths.get(destinationFolder, destName);
             FileUtils.copyDirectory(sourcePath.toFile(), destinationFullPath.toFile());
-            getEngine().getWebSocketServer().notifyCreated(((FolderImpl) folder).getContextAwarePath() + destName);
             addIndex(destinationFullPath, ((FolderImpl) folder).getContextAwarePath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
         }
         setName(destName);
+        getEngine().getWebSocketServer().notifyCreated(((FolderImpl) folder).getContextAwarePath() + encode(destName), getWebSocketID());
     }
 
     /**
@@ -297,7 +303,7 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
             throw new ServerException(e);
         }
         setName(destName);
-        getEngine().getWebSocketServer().notifyMoved(getContextAwarePath(), ((FolderImpl) folder).getContextAwarePath() + destName);
+        getEngine().getWebSocketServer().notifyMoved(getContextAwarePath(), ((FolderImpl) folder).getContextAwarePath() + encode(destName), getWebSocketID());
     }
 
     /**
