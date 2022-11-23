@@ -101,4 +101,3 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 </ul>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="WebDAV Server Example with File System Back-end in Java and Kotlin" href="https://www.webdavsystem.com/javaserver/server_examples/storage_file_system/">WebDAV Server Example with File System Back-end, Java and Kotlin</a>
-
