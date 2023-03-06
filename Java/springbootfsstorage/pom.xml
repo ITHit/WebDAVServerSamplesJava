@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springbootfsstorage</artifactId>
-    <version>6.0.7539-Beta</version>
+    <version>6.1.7901-Beta</version>
     <name>springbootfsstorage</name>
     <description>Demo project for Spring Boot</description>
 
@@ -17,7 +17,7 @@
         <azure.version>3.1.0</azure.version>
         <java.version>1.8</java.version>
         <lucene-core.version>7.5.0</lucene-core.version>
-        <tika-core.version>1.28.4</tika-core.version>
+        <tika-core.version>1.28.5</tika-core.version>
     </properties>
 
     <dependencies>
@@ -52,19 +52,19 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>6.0.7539-Beta</version>
+            <version>6.1.7901-Beta</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>6.0.7539-Beta</version>
+            <version>6.1.7901-Beta</version>
         </dependency>
 
         <!-- JNA dependencies -->
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>4.5.1</version>
+            <version>5.13.0</version>
         </dependency>
 
         <!-- Gson -->

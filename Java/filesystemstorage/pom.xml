@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>6.0.7539-Beta</version>
+    <version>6.1.7901-Beta</version>
     <packaging>war</packaging>
 
     <properties>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>6.0.7539-Beta</version>
+            <version>6.1.7901-Beta</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -78,12 +78,12 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.28.4</version>
+            <version>1.28.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
-            <version>1.28.4</version>
+            <version>1.28.5</version>
             <exclusions>
                 <exclusion>
                     <artifactId>cxf-core</artifactId>
@@ -142,12 +142,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>6.0.7539-Beta</version>
+            <version>6.1.7901-Beta</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>4.4.0</version>
+            <version>5.13.0</version>
         </dependency>
     </dependencies>
 
@@ -228,7 +228,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-6.0.7539-Beta</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-6.1.7901-Beta</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
@@ -256,7 +256,7 @@
                         <configuration>
                             <arguments>update</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
-                            <installDirectory>c:\temp\</installDirectory>
+                            <installDirectory>C:\Users\build\AppData\Local\Temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>

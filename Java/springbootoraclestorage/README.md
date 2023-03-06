@@ -42,3 +42,4 @@ spring.datasource.password=pwd</pre>
 <p>&nbsp;</p>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="WebDAV server running on the Spring Boot framework on Amazon S3 bucket" href="https://www.webdavsystem.com/javaserver/server_examples/spring_boot_s3/">Spring Boot WebDAV Server Example with Amazon S3 Back-end, Java</a>
+
