@@ -18,22 +18,22 @@
 &lt;param-value&gt;C:\License.lic&lt;/param-value&gt;
 &lt;/init-param&gt;</pre>
 The IT Hit Java WebDAV Server Library is fully functional and does not have any limitations. However, the trial period is limited to 1 month. After the trial period expires the Java WebDAV Server will stop working.</li>
-<li><strong>Download the IT Hit WebDAV Ajax Library.</strong>&nbsp;You can do this with NPM command-line tool, which is included with Node.js.&nbsp;Install the&nbsp;<a href="https://nodejs.org/en/download/">Node.js</a>&nbsp;and navigate to&nbsp;<span class="code">\filesystemstorage\WEB-INF\wwwroot\js\</span>&nbsp;folder. Run:&nbsp;
+<li><strong>Download the IT Hit WebDAV Ajax Library.</strong>&nbsp;You can do this with NPM command-line tool, which is included with Node.js.&nbsp;Install the&nbsp;<a href="https://nodejs.org/en/download/">Node.js</a>&nbsp;and navigate to&nbsp;<code class="code">\filesystemstorage\WEB-INF\wwwroot\js\</code>&nbsp;folder. Run:&nbsp;
 <pre class="brush:html;auto-links:false;toolbar:false">npm install&nbsp;webdav.client</pre>
 This will download IT Hit WebDAV Ajax Library files into your project. Note that Node.js itself is <strong>NOT</strong> required to run the server, it is used <strong>ONLY</strong> to install the required JavaScript files.</li>
-<li><strong>Configure the storage folder.</strong> By default, this sample publishes documents from the <span class="code">WEB-INF/Storage</span>&nbsp;folder. For the sake of configuration simplicity, documents are extracted from project resources during the first run. You can publish documents from any other folder specifying a path in the 'root' section in&nbsp;<span class="code">web.xml</span>:<br>
+<li><strong>Configure the storage folder.</strong> By default, this sample publishes documents from the <code class="code">WEB-INF/Storage</code>&nbsp;folder. For the sake of configuration simplicity, documents are extracted from project resources during the first run. You can publish documents from any other folder specifying a path in the 'root' section in&nbsp;<code class="code">web.xml</code>:<br>
 <pre class="brush:xml;auto-links:false;toolbar:false">&lt;init-param&gt;
 &lt;param-name&gt;root&lt;/param-name&gt;
 &lt;param-value&gt;C:\Storage\&lt;/param-value&gt;
 &lt;/init-param&gt;</pre>
 </li>
-<li><strong>Configure the application server.</strong>&nbsp;Here we will configure WebDAV server to run on the website root (<span class="code">http://server.com/</span>). <span class="warn"><strong>Note:</strong> While you can configure WebDAV server to run on site non-root (for instance on&nbsp;<span class="code">http://server.com/webdavroot/</span>) some WebDAV clients (such as some old versions or Mini-redirector, Microsoft Web Folders and MS Office 2007 and earlier) will fail to connect to non-root server. They submit configuration requests to server root and if they do not get the response they will not be able to connect.&nbsp;See also&nbsp;<a title="Working with MS Office" href="https://www.webdavsystem.com/javaserver/doc/ms_office_read_only/">Making Microsoft Office to Work with WebDAV Server</a> and&nbsp;<a title="Opening Docs" href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/opening_ms_office_docs/">Opening Microsoft Office Documents and Other Types of Files for Editing From a Web Page</a>.</span>
+<li><strong>Configure the application server.</strong>&nbsp;Here we will configure WebDAV server to run on the website root (<code class="code">http://server.com/</code>). <span class="warn"><strong>Note:</strong> While you can configure WebDAV server to run on site non-root (for instance on&nbsp;<code class="code">http://server.com/webdavroot/</code>) some WebDAV clients (such as some old versions or Mini-redirector, Microsoft Web Folders and MS Office 2007 and earlier) will fail to connect to non-root server. They submit configuration requests to server root and if they do not get the response they will not be able to connect.&nbsp;See also&nbsp;<a title="Working with MS Office" href="https://www.webdavsystem.com/javaserver/doc/ms_office_read_only/">Making Microsoft Office to Work with WebDAV Server</a> and&nbsp;<a title="Opening Docs" href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/opening_ms_office_docs/">Opening Microsoft Office Documents and Other Types of Files for Editing From a Web Page</a>.</span>
 <ul>
 <li><strong>In the case of Tomcat:</strong><br>Copy&nbsp;<em>\filesystemstorage</em> folder to&nbsp;<em>&lt;Your Tomcat location&gt;\Tomcat x.x\webapps</em>&nbsp;folder. Add the following lines under the &lt;Host&gt; tag in&nbsp;<em>&lt;Your Tomcat location&gt;</em><em>\Tomcat x.x\conf\server.xml</em>:<br>
 <pre class="brush:csharp;auto-links:false;toolbar:false">&lt;Context path="" debug="0" docBase="filesystemstorage"&gt;
 &lt;/Context&gt;</pre>
 <p><span>To see if your server is running type the root URL of your WebDAV site in a browser and you will see the list of folders. Now&nbsp;</span><a href="https://www.webdavsystem.com/server/access/">connect to the server with any WebDAV client</a><span>.</span></p>
-<p>If you experience any problems examine the log created by tomcat:&nbsp;<span class="code">&lt;Your Tomcat location&gt;\Tomcat x.x\logs\localhost.xxxx-xx-xx.log</span>.</p>
+<p>If you experience any problems examine the log created by tomcat:&nbsp;<code class="code">&lt;Your Tomcat location&gt;\Tomcat x.x\logs\localhost.xxxx-xx-xx.log</code>.</p>
 </li>
 <li><strong>In the case of Glassfish:</strong><ol type="a">
 <li>Deploy the filesystem storage application.
@@ -83,3 +83,4 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 <p>&nbsp;</p>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="Java WebDAV Server for Android" href="https://www.webdavsystem.com/javaserver/server_examples/android/">Java WebDAV Server Example for Android</a>
+

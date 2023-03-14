@@ -23,10 +23,10 @@
 &lt;param-value&gt;C:\License.lic&lt;/param-value&gt;
 &lt;/init-param&gt;</pre>
 The IT Hit Java WebDAV Server Library is fully functional and does not have any limitations. However, the trial period is limited to 1 month. After the trial period expires the Java WebDAV Server will stop working.</li>
-<li><strong>Download the IT Hit WebDAV Ajax Library.</strong>&nbsp;You can do this with NPM command line tool, which is included with Node.js.&nbsp;Install the&nbsp;<a href="https://nodejs.org/en/download/">Node.js</a>&nbsp;and navigate to&nbsp;<span class="code">\oraclestorage\WEB-INF\wwwroot\js\</span>&nbsp;folder. Run:&nbsp;
+<li><strong>Download the IT Hit WebDAV Ajax Library.</strong>&nbsp;You can do this with NPM command line tool, which is included with Node.js.&nbsp;Install the&nbsp;<a href="https://nodejs.org/en/download/">Node.js</a>&nbsp;and navigate to&nbsp;<code class="code">\oraclestorage\WEB-INF\wwwroot\js\</code>&nbsp;folder. Run:&nbsp;
 <pre class="brush:html;auto-links:false;toolbar:false">npm install&nbsp;webdav.client</pre>
 This will download IT Hit WebDAV Ajax Library files into your project. Note that Node.js itself is&nbsp;<strong>NOT</strong>&nbsp;required to run the server, it is used&nbsp;<strong>ONLY</strong>&nbsp;to install the required JavaScript files.</li>
-<li><strong>Configure the application server.</strong>&nbsp;Here we will configure WebDAV server to run on the website root (<span class="code">http://server.com/</span>). <span class="warn"><strong>Note:</strong> While you can configure WebDAV server to run on site non-root (for instance on&nbsp;<span class="code">http://server.com/webdavroot/</span>) some WebDAV clients (such as some old versions or Mini-redirector, Microsoft Web Folders and MS Office 2007 and earlier) will fail to connect to non-root server. They submit configuration requests to server root and if they does not get the response they will not be able to connect.&nbsp;See also&nbsp;<a title="Working with MS Office" href="https://www.webdavsystem.com/javaserver/doc/ms_office_read_only/">Making Microsoft Office to Work with WebDAV Server</a> and&nbsp;<a title="Opening Docs" href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/opening_ms_office_docs/">Opening Microsoft Office Documents and Other Types of Files for Editing From a Web Page</a>.</span><br><ol>
+<li><strong>Configure the application server.</strong>&nbsp;Here we will configure WebDAV server to run on the website root (<code class="code">http://server.com/</code>). <span class="warn"><strong>Note:</strong> While you can configure WebDAV server to run on site non-root (for instance on&nbsp;<code class="code">http://server.com/webdavroot/</code>) some WebDAV clients (such as some old versions or Mini-redirector, Microsoft Web Folders and MS Office 2007 and earlier) will fail to connect to non-root server. They submit configuration requests to server root and if they does not get the response they will not be able to connect.&nbsp;See also&nbsp;<a title="Working with MS Office" href="https://www.webdavsystem.com/javaserver/doc/ms_office_read_only/">Making Microsoft Office to Work with WebDAV Server</a> and&nbsp;<a title="Opening Docs" href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/opening_ms_office_docs/">Opening Microsoft Office Documents and Other Types of Files for Editing From a Web Page</a>.</span><br><ol>
 <li><span>In the case of Tomcat:</span><br>Copy&nbsp;<em>\oraclestorage</em>&nbsp;folder to&nbsp;<em>&lt;Your Tomcat location&gt;\Tomcat x.x\webapps</em>&nbsp;folder. Add the following lines under the &lt;Host&gt; tag in&nbsp;<em>&lt;Your Tomcat location&gt;</em><em>\Tomcat x.x\conf\server.xml</em>:<br>
 <pre class="brush:csharp;auto-links:false;toolbar:false">&lt;Context path="" debug="0" docBase="oraclestorage"&gt;
 &nbsp;&lt;Resource name="jdbc/Oracle" auth="Container"
@@ -36,7 +36,7 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 &lt;/Context&gt;</pre>
 <p>Specify Oracle database login credentials in Context tag. Check you service instance Id in server url.&nbsp;<br>Finally, restart the Tomcat for configuration changes to take effect.</p>
 <p>To see if your server is running type the root URL of your WebDAV site in a browser and you will see the list of folders. Now&nbsp;<a href="https://www.webdavsystem.com/server/access/">connect to the server with any WebDAV client</a>.</p>
-<p>If you experience any problems examine the log created by tomcat:&nbsp;<span class="code">&lt;Your Tomcat location&gt;\Tomcat x.x\logs\localhost.xxxx-xx-xx.log</span>.</p>
+<p>If you experience any problems examine the log created by tomcat:&nbsp;<code class="code">&lt;Your Tomcat location&gt;\Tomcat x.x\logs\localhost.xxxx-xx-xx.log</code>.</p>
 </li>
 <li><span>In the case of Glassfish:</span><ol>
 <li><span>Create oracle connection pool.</span>
@@ -84,7 +84,7 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 <p>On the diagram below you can see the classes in&nbsp;WebDAV OracleStorage project.</p>
 <p><img id="__mcenew" alt="Oracle class diagram" src="https://www.webdavsystem.com/media/1562/oraclediagram.png" rel="109211"></p>
 <p>To adapt the sample to your needs, you will modify these classes to read and write data from and into your storage. You can find more about this in&nbsp;<a title="Creating WebDAV Server" href="https://www.webdavsystem.com/javaserver/doc/">Creating a Class 1 WebDAV Server</a>&nbsp;and&nbsp;<a title="Class 2 / 3 Server" href="https://www.webdavsystem.com/javaserver/doc/create_class_2_webdav_server/">Creating Class 2 WebDAV Server</a>&nbsp;article as well as in the&nbsp;<a href="http://java.webdavsystem.com/">class reference documentation</a>.</p>
-<h2>How Things Get Stored â€“ Overview of the Oracle Back-end</h2>
+<h2>How Things Get Stored – Overview of the Oracle Back-end</h2>
 <p>The database consists of 3 entities as depicted in the figure below.</p>
 <p><img id="__mcenew" alt="Oracle DB diagram" src="https://www.webdavsystem.com/media/1559/oraclestoragedb.jpg" rel="109205"></p>
 <h3>Repository Table</h3>
@@ -101,3 +101,4 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 </ul>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="WebDAV Server Example with File System Back-end in Java and Kotlin" href="https://www.webdavsystem.com/javaserver/server_examples/storage_file_system/">WebDAV Server Example with File System Back-end, Java and Kotlin</a>
+

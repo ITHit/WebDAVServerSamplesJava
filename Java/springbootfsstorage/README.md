@@ -13,24 +13,24 @@
 </ul>
 <h2>Running the sample</h2>
 <ol>
-<li><span><strong>Set the license</strong>.</span>&nbsp;Download your license file&nbsp;<a href="https://www.webdavsystem.com/javaserver/download/">here</a>. To set the license, edit the <span class="code">webdav.license</span>&nbsp;section in <span class="code"><em>\springboot\src\main\resources\application.properties</em></span>&nbsp;and specify the path to the&nbsp;<span class="code"><em>license.lic</em></span>&nbsp;file. <br>
+<li><span><strong>Set the license</strong>.</span>&nbsp;Download your license file&nbsp;<a href="https://www.webdavsystem.com/javaserver/download/">here</a>. To set the license, edit the <code class="code">webdav.license</code>&nbsp;section in <code class="code"><em>\springboot\src\main\resources\application.properties</em></code>&nbsp;and specify the path to the&nbsp;<code class="code"><em>license.lic</em></code>&nbsp;file. <br>
 <pre class="brush:html;auto-links:false;toolbar:false">webdav.license=C:\License.lic</pre>
 The IT Hit Java WebDAV Server Library is fully functional and does not have any limitations. However, the trial period is limited to 1 month. After the trial period expires the Java WebDAV Server will stop working.<span></span></li>
-<li><span><strong>Configure the storage folder</strong>.</span>&nbsp;By default, this sample publishes documents from the&nbsp;<span class="code">springboot\src\main\resources\Storage\</span>&nbsp;folder. For the sake of configuration simplicity, documents are extracted from project resources during the first run. You can publish documents from any other folder specifying a path in the <span class="code">webdav.rootFolder</span>&nbsp;section in&nbsp;<span class="code">application.properties</span>:<br>
+<li><span><strong>Configure the storage folder</strong>.</span>&nbsp;By default, this sample publishes documents from the&nbsp;<code class="code">springboot\src\main\resources\Storage\</code>&nbsp;folder. For the sake of configuration simplicity, documents are extracted from project resources during the first run. You can publish documents from any other folder specifying a path in the <code class="code">webdav.rootFolder</code>&nbsp;section in&nbsp;<code class="code">application.properties</code>:<br>
 <pre class="brush:html;auto-links:false;toolbar:false">webdav.rootFolder=C:\Storage</pre>
 </li>
-<li><span><span><span><strong>Configure the application server</strong>.</span>&nbsp;Here we will configure the WebDAV server to run on the website non-root context (<span class="code">https://server/DAV/</span>). This setting is located in the <span class="code">webdav.rootContext</span> section in the&nbsp;<em><span class="code">\springboot\src\main\resources\application.properties</span>.<br></em></span></span>
+<li><span><span><span><strong>Configure the application server</strong>.</span>&nbsp;Here we will configure the WebDAV server to run on the website non-root context (<code class="code">https://server/DAV/</code>). This setting is located in the <code class="code">webdav.rootContext</code> section in the&nbsp;<em><code class="code">\springboot\src\main\resources\application.properties</code>.<br></em></span></span>
 <pre class="brush:html;auto-links:false;toolbar:false">webdav.rootContext=/DAV/</pre>
 <span><span class="warn">Note:<span>&nbsp;Some WebDAV clients (such as some old versions or Mini-redirector, Microsoft Web Folders, and MS Office 2007 and earlier) will fail to connect to a non-root server. They submit configuration requests to server root and if they do not get the response they will not be able to connect.&nbsp;</span>For this reason, this sample processes OPTIONS and PROPFIND requests on all folders, including on the site root (https://server/).<span>&nbsp;See also&nbsp;</span><a title="Working with MS Office" href="https://www.webdavsystem.com/javaserver/doc/ms_office_read_only/">Making Microsoft Office to Work with WebDAV Server</a><span>&nbsp;and&nbsp;</span><a title="Opening Docs" href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/opening_ms_office_docs/">Opening Microsoft Office Documents and Other Types of Files for Editing From a Web Page</a><span>.</span><br><span>This Spring Boot sample supports those configuration requests and works properly on a non-root context.</span></span></span></li>
-<li><strong>Running the springboot sample.&nbsp;</strong>To start the sample, change the directory to&nbsp;<em><span class="code">springboot</span>&nbsp;</em>and execute the following command:
+<li><strong>Running the springboot sample.&nbsp;</strong>To start the sample, change the directory to&nbsp;<em><code class="code">springboot</code>&nbsp;</em>and execute the following command:
 <pre class="brush:html;auto-links:false;toolbar:false">mvnw spring-boot:run</pre>
-<p>If everything was set up properly you should see a sample web page on&nbsp;&nbsp;<span class="code">https://server/DAV/</span>&nbsp;URL with a list of sample files and folders from your storge folder in the file system, configured in step 2. Now you can open documents for editing, manage documents, as well as&nbsp;<a href="https://www.webdavsystem.com/server/access/">connect to the server with any WebDAV client</a>.</p>
-<p>If anything goes wrong examine the log file. For Spring Boot, the log file is usually located at&nbsp;<span class="code">springboot/log/engine.log</span>. You may also need to capture and examine the HTTP requests. See&nbsp;<a title="Troubleshooting" href="https://www.webdavsystem.com/javaserver/server_examples/troubleshooting/">this article</a>&nbsp;for more details.&nbsp;</p>
+<p>If everything was set up properly you should see a sample web page on&nbsp;&nbsp;<code class="code">https://server/DAV/</code>&nbsp;URL with a list of sample files and folders from your storge folder in the file system, configured in step 2. Now you can open documents for editing, manage documents, as well as&nbsp;<a href="https://www.webdavsystem.com/server/access/">connect to the server with any WebDAV client</a>.</p>
+<p>If anything goes wrong examine the log file. For Spring Boot, the log file is usually located at&nbsp;<code class="code">springboot/log/engine.log</code>. You may also need to capture and examine the HTTP requests. See&nbsp;<a title="Troubleshooting" href="https://www.webdavsystem.com/javaserver/server_examples/troubleshooting/">this article</a>&nbsp;for more details.&nbsp;</p>
 </li>
 </ol>
 <h2>Authentication</h2>
 <p>This sample supports Anonymous access as well as&nbsp;<strong>MS-OFBA</strong>&nbsp;authentication against&nbsp;<strong>Azure AD</strong>.&nbsp;<span>By default, the authentication is disabled and this sample allows full anonymous access.</span></p>
-<p>To enable the MS-OFBA, uncomment&nbsp;<strong>MS-OFBA&nbsp;</strong>settings block in the <span class="code">application.properties</span><strong>&nbsp;</strong>file of the sample.</p>
+<p>To enable the MS-OFBA, uncomment&nbsp;<strong>MS-OFBA&nbsp;</strong>settings block in the <code class="code">application.properties</code><strong>&nbsp;</strong>file of the sample.</p>
 <pre class="brush:html;auto-links:false;toolbar:false">## This is Azure security configuration section.
 ## If you want to use Azure login - uncomment configurations bellow.
 # Specifies your Active Directory ID:
@@ -52,12 +52,12 @@ The IT Hit Java WebDAV Server Library is fully functional and does not have any 
 <li>
 <p>Open the newly created app registration.</p>
 <p><img id="__mcenew" alt="Copy the Application (client) ID and Directory (tenant) ID into settings." src="https://www.webdavsystem.com/media/2059/11azureadclientidtenantid1.png" rel="120368"></p>
-<p>Copy the&nbsp;<em>Application (client) ID</em>&nbsp;and&nbsp;<em>Directory (tenant) ID</em>&nbsp;fields and paste them into&nbsp;<span class="code">client-id</span>&nbsp;and&nbsp;<span class="code">tenant-id</span>&nbsp;settings&nbsp;in&nbsp;the&nbsp;<span class="code">application.properties</span><span>&nbsp;</span>file.</p>
+<p>Copy the&nbsp;<em>Application (client) ID</em>&nbsp;and&nbsp;<em>Directory (tenant) ID</em>&nbsp;fields and paste them into&nbsp;<code class="code">client-id</code>&nbsp;and&nbsp;<code class="code">tenant-id</code>&nbsp;settings&nbsp;in&nbsp;the&nbsp;<code class="code">application.properties</code><span>&nbsp;</span>file.</p>
 </li>
 <li>
 <p>Navigate to&nbsp;<em>Certificates &amp; secrets</em>. Select&nbsp;<em>New client secret</em>. Enter the secret name and confirm the client secret creation.</p>
 <p><img id="__mcenew" alt="Create new client secret" src="https://www.webdavsystem.com/media/2050/12azureadnewclientsecret.png" rel="120359"></p>
-<p>Copy the newly created secret value and past it into&nbsp;<span class="code">client-secret</span>&nbsp;setting in&nbsp;the&nbsp;<span class="code">application.properties</span><span>&nbsp;</span>file.</p>
+<p>Copy the newly created secret value and past it into&nbsp;<code class="code">client-secret</code>&nbsp;setting in&nbsp;the&nbsp;<code class="code">application.properties</code><span>&nbsp;</span>file.</p>
 <p><img id="__mcenew" alt="Copy the newly created secret value and past it into client-secret setting." src="https://www.webdavsystem.com/media/2052/14azureadcopyappsecret.png" rel="120360"></p>
 </li>
 </ol>
@@ -78,3 +78,4 @@ The IT Hit Java WebDAV Server Library is fully functional and does not have any 
 <p>&nbsp;</p>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="Spring Boot framework WebDAV Server Example with Oracle back-end. Can both process WebDAV requests and serve web pages on the rest of the website." href="https://www.webdavsystem.com/javaserver/server_examples/spring_boot_sql/">Spring Boot WebDAV Server Example with Oracle Back-end, Java</a>
+

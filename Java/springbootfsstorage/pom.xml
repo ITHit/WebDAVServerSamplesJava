@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springbootfsstorage</artifactId>
-    <version>6.1.7901-Beta</version>
+    <version>6.1.7907-Beta</version>
     <name>springbootfsstorage</name>
     <description>Demo project for Spring Boot</description>
 
@@ -52,12 +52,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>6.1.7901-Beta</version>
+            <version>6.1.7907-Beta</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>6.1.7901-Beta</version>
+            <version>6.1.7907-Beta</version>
         </dependency>
 
         <!-- JNA dependencies -->

@@ -13,7 +13,7 @@
 <li><strong>Create the database.</strong>&nbsp;The Oracle database script is located in&nbsp;<em>\samples\deltav\db\<em>deltav</em>.sql</em>&nbsp;file. This script creates tables and populates them with data so your WebDAV server initially has several folders and files. To run the script login to Oracle administration web interface, go to&nbsp;<em>SQL-&gt;SQL Scripts-&gt;Create</em>, then paste content of deltav.sql to script field, specify a script name and click Run.<br>
 <p>It is also recommended to increase the datafile. After creating the database run the following command:</p>
 <div class="code">
-<pre class="brush:csharp;auto-links:false;toolbar:false"><span class="code">alter database datafile ' C:\oraclexe\oradata\XE\SYSTEM.DBF' resize 4g;</span></pre>
+<pre class="brush:csharp;auto-links:false;toolbar:false"><code class="code">alter database datafile ' C:\oraclexe\oradata\XE\SYSTEM.DBF' resize 4g;</code></pre>
 </div>
 <p>&nbsp;This is especially required if you would like to test WebDAV server running Oracle XE with&nbsp;<a href="https://www.webdavsystem.com/ajaxfilebrowser/">IT Hit AJAX File Browser</a>.</p>
 </li>
@@ -23,10 +23,10 @@
 &lt;param-value&gt;C:\License.lic&lt;/param-value&gt;
 &lt;/init-param&gt;</pre>
 The IT Hit Java WebDAV Server Library is fully functional and does not have any limitations. However, the trial period is limited to 1 month. After the trial period expires the Java WebDAV Server will stop working.</li>
-<li><span><strong>Download the IT Hit WebDAV Ajax Library.</strong>&nbsp;</span>You can do this with NPM command line tool, which is included with Node.js.&nbsp;Install the&nbsp;<a href="https://nodejs.org/en/download/">Node.js</a>&nbsp;and navigate to&nbsp;<span class="code">\deltav\WEB-INF\wwwroot\js\</span>&nbsp;folder. Run:&nbsp;
+<li><span><strong>Download the IT Hit WebDAV Ajax Library.</strong>&nbsp;</span>You can do this with NPM command line tool, which is included with Node.js.&nbsp;Install the&nbsp;<a href="https://nodejs.org/en/download/">Node.js</a>&nbsp;and navigate to&nbsp;<code class="code">\deltav\WEB-INF\wwwroot\js\</code>&nbsp;folder. Run:&nbsp;
 <pre class="brush:html;auto-links:false;toolbar:false">npm install&nbsp;webdav.client</pre>
 This will download IT Hit WebDAV Ajax Library files into your project. Note that Node.js itself is <strong>NOT</strong> required to run the server, it is used <strong>ONLY</strong> to install the required JavaScript files.</li>
-<li><strong>Configure the application server.</strong>&nbsp;Here we will configure WebDAV server to run on the website root (<span class="code">http://server.com/</span>).<span class="warn">While you can configure WebDAV server to run on site non-root (for instance on&nbsp;<span class="code">http://server.com/webdavroot/</span>) some WebDAV clients (such as some old versions or Mini-redirector, Microsoft Web Folders and MS Office 2007 and earlier) will fail to connect to non-root server. They submit configuration requests to server root and if they does not get the response they will not be able to connect.&nbsp;See also&nbsp;<a title="Working with MS Office" href="https://www.webdavsystem.com/javaserver/doc/ms_office_read_only/">Making Microsoft Office to Work with WebDAV Server</a> and&nbsp;<a title="Opening Docs" href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/opening_ms_office_docs/">Opening Microsoft Office Documents and Other Types of Files for Editing From a Web Page</a>.</span> <br><ol>
+<li><strong>Configure the application server.</strong>&nbsp;Here we will configure WebDAV server to run on the website root (<code class="code">http://server.com/</code>).<span class="warn">While you can configure WebDAV server to run on site non-root (for instance on&nbsp;<code class="code">http://server.com/webdavroot/</code>) some WebDAV clients (such as some old versions or Mini-redirector, Microsoft Web Folders and MS Office 2007 and earlier) will fail to connect to non-root server. They submit configuration requests to server root and if they does not get the response they will not be able to connect.&nbsp;See also&nbsp;<a title="Working with MS Office" href="https://www.webdavsystem.com/javaserver/doc/ms_office_read_only/">Making Microsoft Office to Work with WebDAV Server</a> and&nbsp;<a title="Opening Docs" href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/opening_ms_office_docs/">Opening Microsoft Office Documents and Other Types of Files for Editing From a Web Page</a>.</span> <br><ol>
 <li><span>In the case of Tomcat:</span><br>Copy&nbsp;<em>\<em>deltav&nbsp;</em></em>folder to&nbsp;<em>&lt;Your Tomcat location&gt;</em><em>\Tomcat x.x\webapps</em>&nbsp;folder. Add the following lines under the &lt;Host&gt; tag in&nbsp;<em>&lt;Your Tomcat location&gt;</em><em>\Tomcat x.x\conf\server.xml</em>:<br>
 <pre class="brush:csharp;auto-links:false;toolbar:false">&lt;Context path="" debug="0" docBase="deltav"&gt;
 &nbsp;&lt;Resource name="jdbc/Oracle" auth="Container"
@@ -36,7 +36,7 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 &lt;/Context&gt;</pre>
 <p>Specify Oracle database login credentials in Context tag. Check you service instance Id in server url.&nbsp;<br>Finally, restart the Tomcat for configuration changes to take effect.</p>
 <p>To see if your server is running type the root URL of your WebDAV site in a browser and you will see the list of folders. Now&nbsp;<a href="https://www.webdavsystem.com/server/access/">connect to the server with any WebDAV client</a>.</p>
-<p>If you experience any problems examine the log created by tomcat:&nbsp;<span class="code">&lt;Your Tomcat location&gt;\Tomcat x.x\logs\localhost.xxxx-xx-xx.log</span>.</p>
+<p>If you experience any problems examine the log created by tomcat:&nbsp;<code class="code">&lt;Your Tomcat location&gt;\Tomcat x.x\logs\localhost.xxxx-xx-xx.log</code>.</p>
 </li>
 <li><span>In the case of Glassfish:</span><ol>
 <li><span>Create oracle connection pool.</span>
@@ -88,8 +88,8 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 <p>On the diagram below you can see the classes in WebDAV DeltaV&nbsp;project.</p>
 <p><img id="__mcenew" alt="DeltaV diagram" src="https://www.webdavsystem.com/media/1561/deltavdiagram.png" rel="109210"></p>
 <p align="left">You can find more about&nbsp;building a server with versioning in&nbsp;<a title="DeltaV Server" href="https://www.webdavsystem.com/javaserver/doc/deltavserver/">Creating WebDAV Server with Versioning Support</a>&nbsp;article. You may also want to read&nbsp;<a title="Creating WebDAV Server" href="https://www.webdavsystem.com/javaserver/doc/">Creating a Class 1 WebDAV Server</a>&nbsp;and&nbsp;<a title="Class 2 / 3 Server" href="https://www.webdavsystem.com/javaserver/doc/create_class_2_webdav_server/">Creating Class 2 WebDAV Server</a>&nbsp;articles.</p>
-<h2>How Things Get Stored ? Overview of the Oracle Back-end</h2>
-<p>The database consists of 5 entities as depicted in the figure below. 2 of them, Property and Lock, are identical to the tables found in&nbsp;<a title="WebDAV SQL" href="https://www.webdavsystem.com/javaserver/server_examples/sql_storage/">SqlStorage example</a>&nbsp;- Properties and Lock. The&nbsp;<span class="code">Repository</span>&nbsp;table contains additional fields:&nbsp;<span class="code">CREATORDISPLAYNAME</span>,&nbsp;<span class="code">CHANGENOTES</span>,&nbsp;<span class="code">CHECKEDOUT</span>,&nbsp;<span class="code">AUTOVERSION</span>,&nbsp;<span class="code">VERSIONCONTROLLED,</span> <span class="code">CHECKEDINDURINGUNLCOK</span>and&nbsp;<span class="code">CHECKEDINONFILECOMPLETE</span>.</p>
+<h2>How Things Get Stored – Overview of the Oracle Back-end</h2>
+<p>The database consists of 5 entities as depicted in the figure below. 2 of them, Property and Lock, are identical to the tables found in&nbsp;<a title="WebDAV SQL" href="https://www.webdavsystem.com/javaserver/server_examples/sql_storage/">SqlStorage example</a>&nbsp;- Properties and Lock. The&nbsp;<code class="code">Repository</code>&nbsp;table contains additional fields:&nbsp;<code class="code">CREATORDISPLAYNAME</code>,&nbsp;<code class="code">CHANGENOTES</code>,&nbsp;<code class="code">CHECKEDOUT</code>,&nbsp;<code class="code">AUTOVERSION</code>,&nbsp;<code class="code">VERSIONCONTROLLED,</code> <code class="code">CHECKEDINDURINGUNLCOK</code>and&nbsp;<code class="code">CHECKEDINONFILECOMPLETE</code>.</p>
 <p><img id="__mcenew" alt="DeltaV DB diagram" src="https://www.webdavsystem.com/media/1560/deltavstoragedb.jpg" rel="109208"></p>
 <h3>Version table</h3>
 <p>The Version table contains file versions. If versioning is enabled each file contains at least one version in this table.</p>
@@ -104,3 +104,4 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 <p>&nbsp;</p>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="Running the WebDAV Samples" href="https://www.webdavsystem.com/javaserver/server_examples/running_webdav_samples/">Running the WebDAV Samples</a>
+

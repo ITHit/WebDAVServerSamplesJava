@@ -12,7 +12,7 @@
 <h2>Running the sample</h2>
 <ol>
 <li>
-<p><strong>Set the license</strong>.&nbsp;Download your license file&nbsp;<a href="https://www.webdavsystem.com/javaserver/download/">here</a>. To set the license, edit the <span class="code">webdav.license</span>&nbsp;section in <span class="code"><em>\springboot\src\main\resources\application.properties</em></span>&nbsp;and specify the path to the&nbsp;<span class="code"><em>license.lic</em></span>&nbsp;file.</p>
+<p><strong>Set the license</strong>.&nbsp;Download your license file&nbsp;<a href="https://www.webdavsystem.com/javaserver/download/">here</a>. To set the license, edit the <code class="code">webdav.license</code>&nbsp;section in <code class="code"><em>\springboot\src\main\resources\application.properties</em></code>&nbsp;and specify the path to the&nbsp;<code class="code"><em>license.lic</em></code>&nbsp;file.</p>
 <pre class="brush:html;auto-links:false;toolbar:false">webdav.license=C:\License.lic</pre>
 The IT Hit Java WebDAV Server Library is fully functional and does not have any limitations. However, the trial period is limited to 1 month. After the trial period expires the Java WebDAV Server will stop working.<span></span></li>
 <li>
@@ -21,7 +21,7 @@ The IT Hit Java WebDAV Server Library is fully functional and does not have any 
 <p>After creating the S3 bucket you can create some folders and upload files for testing purposes.</p>
 </li>
 <li>
-<p><strong>Configure the Amazon S3 project settings.</strong>&nbsp;In&nbsp;<span class="code">application.properties</span>&nbsp;set the following properties:</p>
+<p><strong>Configure the Amazon S3 project settings.</strong>&nbsp;In&nbsp;<code class="code">application.properties</code>&nbsp;set the following properties:</p>
 <pre class="brush:xml;auto-links:false;toolbar:false"># Amazon S3 region
 webdav.s3.region=
 # Amazon S3 access key
@@ -33,14 +33,14 @@ webdav.s3.bucket=
 </pre>
 </li>
 <li>
-<p><strong>Configure the application server</strong>.&nbsp;Here we will configure the WebDAV server to run on the website non-root context (<span class="code">https://server/DAV/</span>). This setting is located in the <span class="code">webdav.rootContext</span>&nbsp;section in the&nbsp;<em><span class="code">\springboot\src\main\resources\application.properties</span>.</em></p>
+<p><strong>Configure the application server</strong>.&nbsp;Here we will configure the WebDAV server to run on the website non-root context (<code class="code">https://server/DAV/</code>). This setting is located in the <code class="code">webdav.rootContext</code>&nbsp;section in the&nbsp;<em><code class="code">\springboot\src\main\resources\application.properties</code>.</em></p>
 <pre class="brush:html;auto-links:false;toolbar:false">webdav.rootContext=/DAV/</pre>
 <span><span class="warn"><span>Note:</span>&nbsp;Some WebDAV clients (such as some old versions or Mini-redirector, Microsoft Web Folders, and MS Office 2007 and earlier) will fail to connect to a non-root server. They submit configuration requests to server root and if they do not get the response they will not be able to connect.&nbsp;<span>For this reason, this sample processes OPTIONS and PROPFIND requests on all folders, including on the site root (https://server/).</span> See also&nbsp;<a title="Working with MS Office" href="https://www.webdavsystem.com/javaserver/doc/ms_office_read_only/">Making Microsoft Office to Work with WebDAV Server</a>&nbsp;and&nbsp;<a title="Opening Docs" href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/opening_ms_office_docs/">Opening Microsoft Office Documents and Other Types of Files for Editing From a Web Page</a>.<br>This Spring Boot sample supports those configuration requests and works properly on a non-root context.<br></span></span></li>
 <li>
-<p><strong>Running the springboot sample.&nbsp;</strong>To start the sample, change the directory to&nbsp;<em><span class="code">springboot</span>&nbsp;</em>and execute the following command:</p>
+<p><strong>Running the springboot sample.&nbsp;</strong>To start the sample, change the directory to&nbsp;<em><code class="code">springboot</code>&nbsp;</em>and execute the following command:</p>
 <pre class="brush:html;auto-links:false;toolbar:false">mvnw spring-boot:run</pre>
-<p>If everything was set up properly you should see a sample web page on&nbsp;&nbsp;<span class="code">https://server/DAV/</span>&nbsp;URL with a list of sample files and folders previously created in S3. Now you can open documents for editing, manage documents, as well as&nbsp;<a href="https://www.webdavsystem.com/server/access/">connect to the server with any WebDAV client</a>.</p>
-<p>If anything goes wrong examine the log file. For Spring Boot, the log file is usually located at <span class="code">springboot/log/engine.log</span>. You may also need to capture and examine the HTTP requests. See <a title="Troubleshooting" href="https://www.webdavsystem.com/javaserver/server_examples/troubleshooting/">this article</a> for more details.&nbsp;</p>
+<p>If everything was set up properly you should see a sample web page on&nbsp;&nbsp;<code class="code">https://server/DAV/</code>&nbsp;URL with a list of sample files and folders previously created in S3. Now you can open documents for editing, manage documents, as well as&nbsp;<a href="https://www.webdavsystem.com/server/access/">connect to the server with any WebDAV client</a>.</p>
+<p>If anything goes wrong examine the log file. For Spring Boot, the log file is usually located at <code class="code">springboot/log/engine.log</code>. You may also need to capture and examine the HTTP requests. See <a title="Troubleshooting" href="https://www.webdavsystem.com/javaserver/server_examples/troubleshooting/">this article</a> for more details.&nbsp;</p>
 </li>
 </ol>
 <h2>The Project&nbsp;Classes</h2>
@@ -58,3 +58,4 @@ webdav.s3.bucket=
 <p>&nbsp;</p>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="WebDAV Server Example with Oracle Back-end, Java" href="https://www.webdavsystem.com/javaserver/server_examples/sql_storage/">WebDAV Server Example with Oracle Back-end, Java</a>
+

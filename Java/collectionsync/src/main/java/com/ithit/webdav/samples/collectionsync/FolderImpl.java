@@ -208,12 +208,8 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         try {
             removeIndex(getFullPath(), this);
             FileUtils.cleanDirectory(getFullPath().toFile());
-            if (isHidden(getFullPath())) {
-                // hide folder, it is needed for sync-collection report.
-                Files.setAttribute(getFullPath(), "dos:hidden", true, LinkOption.NOFOLLOW_LINKS);
-            } else {
-                FileUtils.deleteDirectory(getFullPath().toFile());
-            }
+            // hide folder, it is needed for sync-collection report.
+            Files.setAttribute(getFullPath(), "dos:hidden", true, LinkOption.NOFOLLOW_LINKS);
         } catch (IOException e) {
             throw new ServerException(e);
         }

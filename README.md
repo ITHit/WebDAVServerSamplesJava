@@ -81,7 +81,7 @@ This sample&nbsp;is a fully functional Class 2 WebDAV server that stores all dat
 <a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/androidfsstorage">
 <p>
 This sample is a Class 2 WebDAV server that runs on Android. It uses modified&nbsp;NanoHTTPD as an application server and publishes files from a mobile application folder or from media folder. Locks and properties in SQLite database.
-To see the documents                                             <span>...</span>
+To see the documents                                            <span>...</span>
 </p>
 </a>
 </li>
@@ -105,7 +105,7 @@ The sample provides&nbsp;DeltaV WebDAV server implementation that can be hosted 
 <p>
 Once your&nbsp;sample is configured&nbsp;and running you will see the following web page (note that&nbsp;the port that the sample is using may be different from the one on the screenshots):
 
-This web page is a MyCustomHandlerPage.html&nbsp;included in&nbsp;each sample&nbsp;and di                                            <span>...</span>
+This web page is a MyCustomHandlerPage.html&nbsp;included in&nbsp;each sample&nbsp;and                                             <span>...</span>
 </p>
 </a>
 </li>
@@ -117,7 +117,7 @@ This web page is a MyCustomHandlerPage.html&nbsp;included in&nbsp;each sample&nb
 <a href="https://www.webdavsystem.com/javaserver/server_examples/search/">
 <p>
 The&nbsp;samples provided with SDK&nbsp;use Apache Lucene&nbsp;as indexing engine and Apache Tika&nbsp;as content analysis toolkit.
-The server implementation searches both file names and file content including content of Microsoft Office documents as well as any other d                                            <span>...</span>
+The server implementation searches both file names and file content including content of Microsoft Office documents as well as any other                                             <span>...</span>
 </p>
 </a>
 </li>
@@ -129,8 +129,9 @@ The server implementation searches both file names and file content including co
 <a href="https://www.webdavsystem.com/javaserver/server_examples/troubleshooting/">
 <p>
 Examining Logs
-If things are not going as planned and you run into issues the first place to look would be the log file&nbsp;&amp;lt;Your Tomcat location&amp;gt;\Tomcat x.x\logs\localhost.xxxx-xx-xx.log&nbsp;. The logs will reflect as to what is going on and it will h                                            <span>...</span>
+If things are not going as planned and you run into issues the first place to look would be the log file&nbsp;&amp;lt;Your Tomcat location&amp;gt;\Tomcat x.x\logs\localhost.xxxx-xx-xx.log&nbsp;. The logs will reflect as to what is going on and it will                                             <span>...</span>
 </p>
 </a>
 </li>
 </ul>
+
