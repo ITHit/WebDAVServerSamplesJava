@@ -1,11 +1,15 @@
 package com.ithit.webdav.samples.collectionsync;
 
 import com.ithit.webdav.samples.collectionsync.extendedattributes.ExtendedAttributesExtension;
+import com.ithit.webdav.samples.collectionsync.filesystem.FileSystemExtension;
 import com.ithit.webdav.samples.collectionsync.websocket.WebSocketServer;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
+import com.ithit.webdav.server.synchronization.Bind;
 import com.ithit.webdav.server.synchronization.Change;
 import com.ithit.webdav.server.synchronization.ChangedItem;
+import com.ithit.webdav.server.util.RequestUtil;
+import com.ithit.webdav.server.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +30,10 @@ import java.util.stream.Collectors;
 /**
  * Base class for WebDAV items (folders, files, etc).
  */
-abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem {
+abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bind {
 
     static final String SNIPPET = "snippet";
+    private static final String SERVER_ROOT_CONTEXT = "ServerRoot/";
     private final String path;
     private final long created;
     private final long modified;
@@ -399,6 +404,31 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem {
     }
 
     /**
+     * Unique identifier of the resource.
+     * The server will return ID in the resource-id property.
+     * In most cases you will return a URI that the client application will use to access and manipulate the resource.
+     * The Id of the resource MUST NOT change through the life of the resource. Even after the resource is no longer accessible through any URI, that value MUST NOT be reassigned to another resource's ID.
+     * @return Id.
+     */
+    @Override
+    public String getId() {
+        return RequestUtil.createUrl(SERVER_ROOT_CONTEXT + FileSystemExtension.getId(getFullPath().toString()), DavContext.currentRequest());
+    }
+
+    /**
+     * Unique identifier of the resource parent.
+     * The server will return parent ID in the parent-resource-id property.
+     * In most cases you will return a URI that the client application will use to identify the parent of the resource.
+     * Unlike Id, the parent ID CAN change through the life of the resource, as a result of move operation.
+     *
+     * @return parent Id.
+     */
+    @Override
+    public String getParentId() {
+        return RequestUtil.createUrl(SERVER_ROOT_CONTEXT + FileSystemExtension.getId(getFullPath().getParent().toString()), DavContext.currentRequest());
+    }
+
+    /**
      * Locks this item.
      *
      * @param shared  Indicates whether a lock is shared or exclusive.
@@ -549,6 +579,39 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem {
             return attributes.isHidden();
         } catch (IOException ex) {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    static ItemMapping mapPath(String path, boolean root) {
+        String rootFolder = getRootFolder();
+        final Path rootFolderPath = Paths.get(rootFolder);
+        if (path.contains(SERVER_ROOT_CONTEXT)) {
+            final String pathForId = FileSystemExtension.getPathByItemId(Arrays.stream(path.split("/"))
+                    .map(String::trim)
+                    .map(HierarchyItemImpl::decode).reduce((f, l) -> l).orElse(""));
+            if (pathForId != null) {
+                final Path itemPath = Paths.get(pathForId);
+                final Path pathFragment = rootFolderPath.relativize(itemPath);
+                final String relativePath = pathFragment.toString();
+                return new ItemMapping("/" + StringUtil.trimStart(relativePath.replace(File.separator, "/"), "/"),
+                        itemPath, relativePath);
+            }
+        }
+        String pathFragment = decodeAndConvertToPath(path);
+        Path fullPath = root ? rootFolderPath : Paths.get(rootFolder, pathFragment);
+        return new ItemMapping(path, fullPath, pathFragment);
+    }
+
+    static class ItemMapping {
+
+        protected final String davPath;
+        protected final Path fullPath;
+        protected final String relativePath;
+
+        public ItemMapping(String davPath, Path fullPath, String relativePath) {
+            this.davPath = davPath;
+            this.fullPath = fullPath;
+            this.relativePath = relativePath;
         }
     }
 }

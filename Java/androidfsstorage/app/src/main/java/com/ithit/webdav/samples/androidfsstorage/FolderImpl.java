@@ -103,11 +103,12 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
      * Creates new {@link FolderImpl} folder with the specified name in this folder.
      *
      * @param name Name of the folder to create.
+     * @return Instance of newly created Folder.
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
     @Override
-    public void createFolder(String name) throws LockedException,
+    public Folder createFolder(String name) throws LockedException,
             ServerException {
         ensureHasToken();
 
@@ -115,6 +116,7 @@ class FolderImpl extends HierarchyItemImpl implements Folder, Quota {
         if (!fullPath.exists()) {
             fullPath.mkdir();
         }
+        return FolderImpl.getFolder(getPath() + encode(name), getEngine());
     }
 
     /**

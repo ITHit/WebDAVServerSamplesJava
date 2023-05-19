@@ -5,6 +5,7 @@ import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.ServerException;
+import com.ithit.webdav.server.synchronization.Change;
 
 import java.util.Set;
 
@@ -47,11 +48,11 @@ public class WebDavEngine extends Engine {
         }
         HierarchyItemImpl item;
         item = FolderImpl.getFolder(contextPath, this);
-        if (item != null) {
+        if (item != null && item.getChangeType() != Change.DELETED) {
             return item;
         }
         item = FileImpl.getFile(contextPath, this);
-        if (item != null) {
+        if (item != null && item.getChangeType() != Change.DELETED) {
             return item;
         }
         getLogger().logDebug("Could not find item that corresponds to path: " + contextPath);

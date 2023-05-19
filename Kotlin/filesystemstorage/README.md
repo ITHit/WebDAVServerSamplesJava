@@ -58,9 +58,9 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 <p>Restart WildFly.</p>
 </li>
 <li>Deploy the filesystem storage application.
-<p>Create folder <em>filsystemstorage.war </em>under&nbsp;<em><em>&lt;WILDFLY_ROOT&gt;/deployments.</em></em></p>
-<p>Copy content of <em>samples/filesystemstorage </em>to&nbsp;<em><em><em>&lt;<em><em>WILDFLY_ROOT</em></em>&gt;/deployments/<em>filsystemstorage.war.</em></em></em></em></p>
-<p>Create file&nbsp;<em>filsystemstorage.war.dodeploy in&nbsp;<em><em>&lt;<em><em>WILDFLY_ROOT</em></em>&gt;/deployments/<em>filsystemstorage.war.</em></em></em></em></p>
+<p>Create folder <em>filesystemstorage.war </em>under&nbsp;<em><em>&lt;WILDFLY_ROOT&gt;/deployments.</em></em></p>
+<p>Copy content of <em>samples/filesystemstorage </em>to&nbsp;<em><em><em>&lt;<em><em>WILDFLY_ROOT</em></em>&gt;/deployments/<em>filesystemstorage.war.</em></em></em></em></p>
+<p>Create file&nbsp;<em>filesystemstorage.war.dodeploy in&nbsp;<em><em>&lt;<em><em>WILDFLY_ROOT</em></em>&gt;/deployments/<em>filesystemstorage.war.</em></em></em></em></p>
 <p><span>If everything was set up properly you should see a sample page on the WildFly root context with a list of sample files and folders. Now&nbsp;</span><a href="https://www.webdavsystem.com/server/access/">connect to the server with any WebDAV client</a><span>.</span></p>
 <p>If anything goes wrong please consult log usually located at&nbsp;<em>&lt;<em><em>WILDFLY_ROOT</em></em>&gt;/log/server.log.</em></p>
 </li>
@@ -82,5 +82,5 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 </ul>
 <p>&nbsp;</p>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
-<a title="Java WebDAV Server for Android" href="https://www.webdavsystem.com/javaserver/server_examples/android/">Java WebDAV Server Example for Android</a>
+<a title="WebDAV Server Example with Collection Synchronization support" href="https://www.webdavsystem.com/javaserver/server_examples/collection_sync/">WebDAV Server Example with Collection Synchronization support</a>
 

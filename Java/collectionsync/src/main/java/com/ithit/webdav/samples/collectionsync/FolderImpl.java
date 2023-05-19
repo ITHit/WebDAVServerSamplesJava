@@ -61,16 +61,14 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
      */
     static FolderImpl getFolder(String path, WebDavEngine engine) throws ServerException {
         BasicFileAttributes view = null;
-        Path fullPath;
         String name = null;
+        ItemMapping itemMapping;
         try {
             boolean root = path.equals("/");
-            String pathFragment = decodeAndConvertToPath(path);
-            String rootFolder = getRootFolder();
-            fullPath = root ? Paths.get(rootFolder) : Paths.get(rootFolder, pathFragment);
-            if (Files.exists(fullPath)) {
-                name = root ? "ROOT" : Paths.get(pathFragment).getFileName().toString();
-                view = Files.getFileAttributeView(fullPath, BasicFileAttributeView.class).readAttributes();
+            itemMapping = mapPath(path, root);
+            if (Files.exists(itemMapping.fullPath)) {
+                name = root ? "ROOT" : Paths.get(itemMapping.relativePath).getFileName().toString();
+                view = Files.getFileAttributeView(itemMapping.fullPath, BasicFileAttributeView.class).readAttributes();
             }
             if (view == null || !view.isDirectory()) {
                 return null;
@@ -81,7 +79,7 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
 
         long created = view.creationTime().toMillis();
         long modified = view.lastModifiedTime().toMillis();
-        return new FolderImpl(name, fixPath(path), created, modified, engine);
+        return new FolderImpl(name, fixPath(itemMapping.davPath), created, modified, engine);
     }
 
     private static String fixPath(String path) {
@@ -123,16 +121,17 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
      * Creates new {@link FolderImpl} folder with the specified name in this folder.
      *
      * @param name Name of the folder to create.
+     * @return Instance of newly created Folder.
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
     // <<<< createFolderImpl
     @Override
-    public void createFolder(String name) throws LockedException,
+    public Folder createFolder(String name) throws LockedException,
             ServerException {
         createFolderInternal(name);
-
         getEngine().getWebSocketServer().notifyCreated(getPath() + encode(name), getWebSocketID());
+        return FolderImpl.getFolder(getPath() + encode(name), getEngine());
     }
 
     private void createFolderInternal(String name) throws LockedException,

@@ -74,6 +74,17 @@ This sample&nbsp;is a fully functional Class 2 WebDAV server that stores all dat
 </a>
 </li>
 <li>
+<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/collectionsync">
+<h2>WebDAV Server Example with Collection Synchronization support</h2>
+</a>
+
+<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/collectionsync">
+<p>
+This sample&nbsp;is a fully functional Class 2 WebDAV server that stores all data in the file system. It supports collection synchronization as per RFC 6578. The&nbsp;IT Hit WebDAV Ajax Library&nbsp;is used to display and browse server content on a default web page                                            <span>...</span>
+</p>
+</a>
+</li>
+<li>
 <a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/androidfsstorage">
 <h2>Java WebDAV Server Example for Android</h2>
 </a>
@@ -81,7 +92,7 @@ This sample&nbsp;is a fully functional Class 2 WebDAV server that stores all dat
 <a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/androidfsstorage">
 <p>
 This sample is a Class 2 WebDAV server that runs on Android. It uses modified&nbsp;NanoHTTPD as an application server and publishes files from a mobile application folder or from media folder. Locks and properties in SQLite database.
-To see the documents                                            <span>...</span>
+To see the documents                                             <span>...</span>
 </p>
 </a>
 </li>

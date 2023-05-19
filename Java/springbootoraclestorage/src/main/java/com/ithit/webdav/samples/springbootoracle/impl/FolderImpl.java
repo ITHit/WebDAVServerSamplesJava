@@ -114,13 +114,15 @@ public final class FolderImpl extends HierarchyItemImpl implements Folder, Searc
      * Creates new {@link FolderImpl} folder with the specified name in this folder.
      *
      * @param name Name of the folder to create.
+     * @return Instance of newly created Folder.
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
-    public void createFolder(String name) throws LockedException, ServerException {
+    public Folder createFolder(String name) throws LockedException, ServerException {
         ensureHasToken();
-        createChild(name, ItemType.FOLDER);
+        final Folder folder = (Folder) createChild(name, ItemType.FOLDER);
         getEngine().getWebSocketServer().notifyCreated(getPath() + getDataAccess().encode(name), getWebSocketID());
+        return folder;
     }
 
     /**

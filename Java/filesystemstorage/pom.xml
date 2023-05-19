@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>6.1.7907-Beta</version>
+    <version>6.2.9080-Beta</version>
     <packaging>war</packaging>
 
     <properties>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>6.1.7907-Beta</version>
+            <version>6.2.9080-Beta</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -55,9 +55,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc7</artifactId>
-            <version>12.1.0.2</version>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>23.2.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>6.1.7907-Beta</version>
+            <version>6.2.9080-Beta</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -228,7 +228,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-6.1.7907-Beta</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-6.2.9080-Beta</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>

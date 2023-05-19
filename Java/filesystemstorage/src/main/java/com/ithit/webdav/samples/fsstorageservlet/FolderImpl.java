@@ -112,15 +112,17 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
      * Creates new {@link FolderImpl} folder with the specified name in this folder.
      *
      * @param name Name of the folder to create.
+     * @return Instance of newly created Folder.
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
     @Override
-    public void createFolder(String name) throws LockedException,
+    public Folder createFolder(String name) throws LockedException,
             ServerException {
         createFolderInternal(name);
 
         getEngine().getWebSocketServer().notifyCreated(getPath() + encode(name), getWebSocketID());
+        return FolderImpl.getFolder(getPath() + encode(name), getEngine());
     }
 
     private void createFolderInternal(String name) throws LockedException,

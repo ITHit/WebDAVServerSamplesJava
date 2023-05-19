@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>oraclestorage</artifactId>
-    <version>6.1.7907-Beta</version>
+    <version>6.2.9080-Beta</version>
     <packaging>war</packaging>
 
     <properties>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>servlet-integration</artifactId>
-            <version>6.1.7907-Beta</version>
+            <version>6.2.9080-Beta</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -38,9 +38,9 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc7</artifactId>
-            <version>12.1.0.2</version>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>23.2.0.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>6.1.7907-Beta</version>
+            <version>6.2.9080-Beta</version>
         </dependency>
 
         <dependency>
@@ -165,7 +165,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/oraclestorage-6.1.7907-Beta/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/oraclestorage-6.2.9080-Beta/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -244,7 +244,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/oraclestorage-6.1.7907-Beta</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-6.2.9080-Beta</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -253,9 +253,9 @@
                 <version>1.5</version>
                 <dependencies>
                     <dependency>
-                        <groupId>com.oracle</groupId>
-                        <artifactId>ojdbc7</artifactId>
-                        <version>12.1.0.2</version>
+                        <groupId>com.oracle.database.jdbc</groupId>
+                        <artifactId>ojdbc8</artifactId>
+                        <version>23.2.0.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>

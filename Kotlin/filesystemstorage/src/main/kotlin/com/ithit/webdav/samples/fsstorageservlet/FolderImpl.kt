@@ -67,14 +67,15 @@ private constructor(name: String, path: String, created: Long, modified: Long,
      * Creates new [FolderImpl] folder with the specified name in this folder.
      *
      * @param name Name of the folder to create.
+     * @return Instance of newly created Folder.
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
     @Throws(LockedException::class, ServerException::class)
-    override fun createFolder(name: String) {
+    override fun createFolder(name: String): Folder {
         createFolderInternal(name)
-
         engine.webSocketServer?.notifyCreated(path + encode(name), getWebSocketID())
+        return getFolder(path + encode(name), engine) as Folder
     }
 
     private fun createFolderInternal(name: String) {

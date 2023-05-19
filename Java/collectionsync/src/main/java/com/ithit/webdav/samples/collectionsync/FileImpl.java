@@ -2,6 +2,7 @@ package com.ithit.webdav.samples.collectionsync;
 
 import com.ithit.webdav.samples.collectionsync.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.server.*;
+import com.ithit.webdav.server.File;
 import com.ithit.webdav.server.exceptions.ConflictException;
 import com.ithit.webdav.server.exceptions.LockedException;
 import com.ithit.webdav.server.exceptions.MultistatusException;
@@ -9,9 +10,7 @@ import com.ithit.webdav.server.exceptions.ServerException;
 import com.ithit.webdav.server.resumableupload.ResumableUpload;
 import com.ithit.webdav.server.resumableupload.UploadProgress;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.*;
@@ -30,7 +29,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
     private static final int BUFFER_SIZE = 1048576; // 1 Mb
 
     private String snippet;
-    
+
     private final OpenOption[] allowedOpenFileOptions;
 
     /**
@@ -44,7 +43,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
      */
     private FileImpl(String name, String path, long created, long modified, WebDavEngine engine) {
         super(name, path, created, modified, engine);
-        
+
         /* Mac OS X and Ubuntu doesn't work with ExtendedOpenOption.NOSHARE_DELETE */
         String systemName = System.getProperty("os.name").toLowerCase();
         this.allowedOpenFileOptions = (systemName.contains("mac") || systemName.contains("linux")) ?
@@ -76,15 +75,13 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
      */
     static FileImpl getFile(String path, WebDavEngine engine) throws ServerException {
         BasicFileAttributes view = null;
-        Path fullPath;
         String name = null;
+        ItemMapping itemMapping;
         try {
-            String pathFragment = decodeAndConvertToPath(path);
-            String rootFolder = getRootFolder();
-            fullPath = Paths.get(rootFolder, pathFragment);
-            if (Files.exists(fullPath)) {
-                name = Paths.get(pathFragment).getFileName().toString();
-                view = Files.getFileAttributeView(fullPath, BasicFileAttributeView.class).readAttributes();
+            itemMapping = mapPath(path, false);
+            if (Files.exists(itemMapping.fullPath)) {
+                name = Paths.get(itemMapping.relativePath).getFileName().toString();
+                view = Files.getFileAttributeView(itemMapping.fullPath, BasicFileAttributeView.class).readAttributes();
             }
             if (view == null) {
                 return null;
@@ -94,7 +91,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
         }
         long created = view.creationTime().toMillis();
         long modified = view.lastModifiedTime().toMillis();
-        return new FileImpl(name, path, created, modified, engine);
+        return new FileImpl(name, itemMapping.davPath, created, modified, engine);
     }
 
     /**
@@ -330,7 +327,10 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
     public void delete() throws LockedException, MultistatusException, ServerException {
         ensureHasToken();
         try {
-            Files.delete(getFullPath());
+            try (RandomAccessFile raf = new RandomAccessFile(getFullPath().toFile(), "rw")) {
+                raf.setLength(0);
+            }
+            Files.setAttribute(getFullPath(), "dos:hidden", true, LinkOption.NOFOLLOW_LINKS);
         } catch (IOException e) {
             getEngine().getLogger().logError("Tried to delete file in use.", e);
             throw new ServerException(e);
