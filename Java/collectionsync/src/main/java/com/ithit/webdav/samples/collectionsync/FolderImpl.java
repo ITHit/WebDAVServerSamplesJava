@@ -438,17 +438,21 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
             throw new ServerException(ex);
         }
 
-        for (Pair<HierarchyItemImpl, Long> item : children.stream().sorted(Comparator.comparingLong(Pair::getRight)).collect(Collectors.toCollection(LinkedHashSet::new))) {
-            // Don't include deleted files/folders when syncToken is empty, because this is full sync.
-            if (!(item.getLeft().getChangeType() == Change.DELETED && StringUtil.isNullOrEmpty(syncToken))) {
-                maxUsn = item.getValue();
-                if (syncUsn == null || item.getRight() > syncUsn) {
-                    changes.add(item.getLeft());
-                }
+        if (limit != null && limit == 0) {
+            maxUsn = children.stream().mapToLong(Pair::getValue).max().orElse(0);
+        } else {
+            for (Pair<HierarchyItemImpl, Long> item : children.stream().sorted(Comparator.comparingLong(Pair::getValue)).collect(Collectors.toCollection(LinkedHashSet::new))) {
+                // Don't include deleted files/folders when syncToken is empty, because this is full sync.
+                if (!(item.getLeft().getChangeType() == Change.DELETED && StringUtil.isNullOrEmpty(syncToken))) {
+                    maxUsn = item.getValue();
+                    if (syncUsn == null || item.getValue() > syncUsn) {
+                        changes.add(item.getLeft());
+                    }
 
-                if (limit != null && limit == changes.size()) {
-                    changes.setMoreResults(true);
-                    break;
+                    if (limit != null && limit <= changes.size()) {
+                        changes.setMoreResults(true);
+                        break;
+                    }
                 }
             }
         }
