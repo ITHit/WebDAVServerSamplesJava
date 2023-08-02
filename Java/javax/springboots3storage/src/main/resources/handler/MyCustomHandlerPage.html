@@ -1,0 +1,453 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>IT Hit WebDAV Server Engine</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/wwwroot/css/webdav-layout.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="container-fluid d-flex justify-content-between" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-brand d-flex align-items-center ellipsis">
+                    <img src="/wwwroot/images/logo.svg" alt="IT Hit logo" class="logo"/>
+                    <span>IT Hit Java WebDAV Server Engine v<%version%></span>
+                </span>
+                <button class="navbar-toggler burger-button collapsed" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+                    <div class="burger-icon"><span></span><span></span><span></span></div>
+                </button>
+            </div>
+        </div>
+        <div class="collapse bg-dark" id="navbarHeader">
+            <div class="header-content">
+                <div class="container-fluid justify-content-between">
+                    <div class="row">
+                        <div class="col">
+                            <p>
+                                This page is displayed when user accesses any folder on your WebDAV server in a web browser.
+                                You can customize this page to your needs.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row blocks">
+                        <div class="col-12 col-lg-4 d-flex flex-column">
+                            <h3>Test Your Server</h3>
+                            <p>
+                                To test your WebDAV server you can run Ajax integration tests right from this page.
+                            </p>
+                            <a href="javascript:void(0)" onclick="OpenTestsWindow()" class="align-self-start btn btn-primary" role="button">Run Integration Tests</a>
+                        </div>
+                        <div class="col-12 col-lg-4 d-flex flex-column">
+                            <h3>Manage Docs with Ajax File Browser</h3>
+                            <p>
+                                Use the <a href="https://www.webdavsystem.com/ajaxfilebrowser/programming/">IT Hit Ajax File Browser</a> to browse your documents, open for editing from a web page and
+-                              uploading with pause/resume and auto-restore upload.
+                            </p>
+                            <a href="javascript:void(0)" onclick="OpenAjaxFileBrowserWindow()" class="align-self-start btn btn-primary" role="button">Browse Using Ajax File Browser</a>
+                        </div>
+                        <div class="col-12 col-lg-4 d-flex flex-column">
+                            <h3>Connect with WebDAV Client</h3>
+                            <p>
+                                Use a WebDAV client provided with almost any OS. Refer to <a href="https://www.webdavsystem.com/server/access">Accessing WebDAV Server</a> page for
+                -              detailed instructions. The button below is using <a href="https://www.webdavsystem.com/ajax/">IT Hit WebDAV Ajax Library</a> to mount WebDAV
+                -              folder and open the default OS file manager.
+                            </p>
+                            <a href="javascript:void(0)" onclick="WebDAVController && WebDAVController.OpenCurrentFolderInOsFileManager()" class="align-self-start btn btn-primary" role="button">Browse Using OS File Manager</a>
+                        </div>
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col">
+                            <p class="versions">
+                            IT Hit Java WebDAV Server Engine: v<%version%>
+                            </p>
+                            <p class="versions">
+                                IT Hit WebDAV AJAX Library: <span class="ithit-version-value"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main role="main" id="ithit-dropzone" class="container-fluid">
+        <div class="row no-gutters">
+            <div id="leftPanel" class="col">
+                <nav aria-label="breadcrumb" class="ithit-breadcrumb-container d-flex">
+                    <div><a href="javascript.void()" class="btn-up-one-level disabled" title="Up one level"></a></div>
+                    <ol class="breadcrumb"></ol>
+                </nav>
+                <div class="ithit-search-container">
+                    <input class="form-control" type="text" />
+                </div>
+                <div class="ithit-grid-toolbar row">
+                    <div class="first-section col">
+                        <!-- Toolbar buttons here -->
+                    </div>
+                    <div class="col-auto px-2">
+                        <label class="btn-upload-items"
+                               title="Upload Items"
+                               for="ithit-button-input"><span class="d-none d-xl-inline d-xxl-inline">Upload</span></label>
+                        <input id="ithit-button-input"
+                               class="d-none"
+                               type="file"
+                               multiple
+                               hidden />
+                    </div>
+                    <div class="second-section col-auto px-0 px-lg-2">
+                        <!-- Toolbar buttons here -->
+                    </div>
+                    <div class="third-section col-auto px-0 px-lg-2">
+                        <!-- Toolbar buttons here -->
+                    </div>
+                    <div class="fourth-section col-auto px-0 px-md-1">
+                        <!-- Toolbar buttons here -->
+                    </div>
+                    <div class="fifth-section col-auto px-1 px-lg-3">
+                        <!-- Toolbar buttons here -->
+                    </div>
+                    <div class="sixth-section col-auto px-1 pr-lg-3 pl-lg-1">
+                        <!-- Toolbar buttons here -->
+                    </div>
+                </div>
+                <div class="ithit-grid-uploads d-none">
+                    <div class="progress-wrapper">
+                        <div class="progress">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 aria-valuenow="0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="uploading-block">
+                        <div class="uploading-controls">
+                            Uploaded <span class="persent">0 %</span>
+                            <button class="pause-button pause-all-button float-right" title="Pause  upload"></button>
+                            <button class="play-button play-all-button float-right" title="Resume  upload"></button>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary details-button">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                    <div class="uploading-details d-none">
+                        <div class="details-header text-center">
+                            <span class="details-title">Files upload</span>
+                            <button class="close-button float-right" title="Close window"></button>
+                        </div>
+                        <div class="uploading-items">
+
+                        </div>
+                        <div class="text-right">
+                            <button class="pause-all-button btn btn-outline-primary" title="Pause all upload">Pause upload</button>
+                            <button class="play-all-button btn btn-outline-primary" title="Resume all upload">Resume upload</button>
+                            <button class="btn btn-outline-primary cancel-all-button" title="Cancel all">
+                                Сancel all uploads
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="ithit-grid-wrapper">
+                        <div class="drop-files-header">
+                            <div class="drop-files-title">Drag files here</div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover ithit-grid-container">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            <label class="custom-checkbox">
+                                                <input type="checkbox" /><span class="checkmark"></span></label></th>
+                                        <th scope="col"></th>
+                                        <th class="ellipsis sort" scope="col" data-sort-column="displayname"><span>Display Name</span></th>
+                                        <th class="d-none d-xl-table-cell sort" scope="col" data-sort-column="getcontenttype">Type</th>
+                                        <th class="sort" scope="col" data-sort-column="quota-used-bytes">Size</th>
+                                        <th class="d-none d-lg-table-cell sort" scope="col" data-sort-column="getlastmodified">Modified</th>
+                                        <th class="column-action" scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 align-items-end">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination flex-wrap justify-content-end ithit-pagination-container"></ul>
+                        </nav>
+                    </div>
+                </div>
+                <div id="ConfirmModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="ConfirmModalLabel">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirm</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="message"></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary btn-ok">OK</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="CreateFolderModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="CreateFolderModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form action="/" method="post">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Create Folder</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="NameFolder" placeholder="Folder Name" />
+                                        <div class="alert alert-danger d-none">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary btn-submit">OK</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="RenameItemModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="RenameItemModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form action="/" method="post">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Rename Item</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="NameItem" placeholder="Item Name" />
+                                        <div class="alert alert-danger d-none">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary btn-submit">OK</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="ConfirmRewriteModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="ConfirmRewriteModalLabel">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirm</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="message"></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary btn-ok">Yes to All</button>
+                                <button type="button" class="btn btn-no">No to All</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="ErrorModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="ConfirmModalLabel">
+                    <div class="modal-dialog modal-md" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Error</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <p>Error message:</p>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <p class="error-message"></p>
+                                        </div>
+                                    </div>
+                                    <div class="row error-details-row">
+                                        <div class="col-md-12">
+                                            <p>
+                                                <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#error-details-collapse" aria-expanded="false" aria-controls="error-details-collapse">
+                                                    Error Details
+                                                </button>
+                                            </p>
+                                            <div class="collapse" id="error-details-collapse">
+                                                <div class="card card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-2">
+                                                            <p>Url:</p>
+                                                        </div>
+                                                        <div class="col-md-10">
+                                                            <p class="error-details-url"></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-4 ">
+                                                            <p>Error message:</p>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <p class="error-details-message"></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row error-details-row">
+                                                        <div class="col-md-12">
+                                                            <iframe style="width: 100%; border: none"></iframe>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="DownloadProtocolModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="DownloadProtocolModalLabel">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Install a Custom Protocol</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <p>To open this document, you must install a custom protocol on a client machine and enable a web browser extension.</p>
+                                            <ol>
+                                                <li>Download and install the file below:<br />
+                                                    <span class="current-os"></span>
+                                                    <a href="javascript:void(0)" class="more-lnk"><span>+</span>Other OS:</a>
+                                                    <p class="more-pnl">
+                                                        <span class="window">Windows:&nbsp;&nbsp;<a target="_blank" href="/wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.msi">ITHitEditDocumentOpener.msi</a><br />
+                                                        </span>
+                                                    <span class="linux">Linux:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="/wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.deb">ITHitEditDocumentOpener.deb</a><br />
+                                                        </span>
+                                                    <span class="mac-os">Mac OS:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a target="_blank" href="/wwwroot/js/node_modules/webdav.client/Plugins/ITHitEditDocumentOpener.pkg">ITHitEditDocumentOpener.pkg</a><br />
+                                                        </span>
+                                                    </p>
+                                                </li>
+                                                <li>Enable the IT Hit Edit Document Opener web browser extension:<br />
+                                                    <span class="not-required-internet-explorer" style="display:none">The extension is not required for Internet Explorer.<br />
+                                                    </span>
+                                                    <span class="current-browser"></span>
+                                                    <a href="javascript:void(0)" class="more-lnk"><span>+</span> Other web browsers:</a>
+                                                    <p class="more-pnl">
+                                                        <span class="goole-chrome"><a href="https://chrome.google.com/webstore/detail/it-hit-edit-doc-opener-5/nakgflbblpkdafokdokmjdfglijajhlp" target="_blank">Extension for Google Chrome.</a><br />
+                                                        </span>
+                                                        <span class="mozilla-firefox"><a href="https://addons.mozilla.org/en-CA/firefox/addon/it-hit-edit-doc-opener-5/" target="_blank">Extension for Mozilla Firefox.</a><br />
+                                                        </span>
+                                                        <span class="edge-chromium"><a href="https://microsoftedge.microsoft.com/addons/detail/mdfaonmaoigngflemfmkboffllkopopm" target="_blank">Extension for Microsoft Edge Chromium.</a><br />
+                                                        </span>
+                                                    </p>
+                                                </li>
+                                            </ol>
+                                            <br />
+                                            See <a href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/install/windows/" target="_blank">how to install the protocol app</a> and&nbsp;
+                                            <a href="https://www.webdavsystem.com/ajax/programming/open-doc-webpage/install/web_browser_extensions/" target="_blank">install and verify web browser extensions.</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        var webDavSettings = {
+        ApplicationPath: '<%context root%>',
+        WebSocketPath: '',
+        ApplicationProtocolsPath: '/wwwroot/js/node_modules/webdav.client/Plugins/',
+            EditDocAuth: {
+            Authentication: 'anonymous',                       // Authentication to use when opening documents for editing: 'anonymous', 'challenge', 'ms-ofba', 'cookies'
+                CookieNames: null,                                 // Coma separated list of cookie names to search for.
+                SearchIn: null,                                    // Web browsers to search and copy permanent cookies from: 'current', 'none'.
+                LoginUrl: null                                     // Login URL to redirect to in case any cookies specified in CookieNames parameter are not found.
+            }
+        }
+
+        function OpenAjaxFileBrowserWindow() {
+        window.open("/wwwroot/AjaxFileBrowser.html", "", "menubar=1,location=1,status=1,scrollbars=1,resizable=1,width=900,height=600");
+        }
+
+        function OpenTestsWindow() {
+            var width = Math.round(screen.width * 0.5);
+            var height = Math.round(screen.height * 0.8);
+        window.open("/wwwroot/AjaxIntegrationTests.html", "", "menubar=1,location=1,status=1,scrollbars=1,resizable=1,width=" + width + ",height=" + height);
+        }
+    </script>
+    <!--
+    JavaScript file required to run WebDAV Ajax library is loaded from Node.js Package Manager.
+    To load files from your website download them here: https://www.webdavsystem.com/ajax/download,
+    deploy them to your website and replace the path below in this file.
+    -->
+<script src="/wwwroot/js/node_modules/webdav.client/ITHitWebDAVClient.js?version=<%startTime%>"></script>
+    <script>
+        // IT Hit WebDAV Ajax Library activation info: 
+        // https://www.webdavsystem.com/ajax/programming/activating/
+        // - The trial version is fully functional and does not have any limitations, however it is time-limited and will stop working when the trial period expires.
+        // - In case you have a perpetual license, replace the JavaScript file(s) with the file(s) from the non-trial version. Download the non-trial version in the product download area.
+        // - In case of a subscription license set the License ID in JavaScript. Get the License ID in the product download area: 
+        // ITHit.WebDAV.Client.LicenseId = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX';
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.3.5/split.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="/wwwroot/js/webdav-common.js"></script>
+    <script src="/wwwroot/js/toolbar/webdav-basebutton.js"></script>
+    <script src="/wwwroot/js/toolbar/webdav-downloadbutton.js"></script>
+    <script src="/wwwroot/js/toolbar/webdav-deletebutton.js"></script>
+    <script src="/wwwroot/js/toolbar/webdav-copypastecutbuttons.js"></script>
+    <script src="/wwwroot/js/toolbar/webdav-printbutton.js"></script>
+    <script src="/wwwroot/js/toolbar/webdav-reloadbutton.js"></script>
+    <script src="/wwwroot/js/toolbar/webdav-renamebutton.js"></script>
+    <script src="/wwwroot/js/toolbar/webdav-createfolderbutton.js"></script>
+    <script src="/wwwroot/js/toolbar/webdav-toolbar.js"></script>
+    <script src="/wwwroot/js/webdav-gridview.js"></script>
+    <script src="/wwwroot/js/webdav-uploader.js"></script>
+    <script src="/wwwroot/js/webdav-websocket.js"></script>
+</body>
+</html>

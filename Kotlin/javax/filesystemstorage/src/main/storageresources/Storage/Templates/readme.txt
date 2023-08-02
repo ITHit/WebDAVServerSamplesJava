@@ -1,0 +1,1 @@
+This folder contains templates used by Microsoft Office to create documents via New Document menu in AJAX File Browser.
