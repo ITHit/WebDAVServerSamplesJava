@@ -1,7 +1,7 @@
 
 <h1 class="d-xl-block d-none">Spring Boot WebDAV Server Example with Amazon S3 Back-end, Java</h1>
 <p>This sample&nbsp;is a fully functional Class 2 WebDAV server that runs on the Spring Boot framework and stores all data in the Amazon S3 bucket.&nbsp;The WebDAV requests are processed on a /DAV/ context, while the rest of the website processes regular HTTP requests, serving web pages. Documents are being published from the Amazon S3 bucket with locks and custom attributed being stored in S3 Metadata.&nbsp;</p>
-<p>This sample can be downloaded in the <a title="Download" href="https://www.webdavsystem.com/javaserver/download/">product download area</a> as well as it is published on&nbsp;<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springboots3storage">GitHub</a>.</p>
+<p>This sample can be downloaded in the <a title="Download" href="https://www.webdavsystem.com/javaserver/download/">product download area</a> as well as it is published on&nbsp;<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/springboots3storage">GitHub</a>.</p>
 <p><span>This sample is using&nbsp;</span><a title="AJAX Library" href="https://www.webdavsystem.com/ajax/">IT Hit WebDAV Ajax Library</a><span>&nbsp;to display and browse server content on a default web page as well as to open documents for editing from a web page and save back directly to the server.</span><span></span></p>
 <p>&nbsp;</p>
 <h2>Requirements</h2>

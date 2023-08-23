@@ -1,7 +1,7 @@
 
 <h1 class="d-xl-block d-none">Spring Boot WebDAV Server Example with File System Back-end, Java</h1>
 <p>This sample provides a WebDAV server running on the Spring Boot framework with files being stored in the file system. The WebDAV requests are processed in a dedicated context, while the rest of the website processes regular HTTP requests, serving web pages. Documents are being published from the file system while the locks and custom attributes are being stored in Alternating Data Streams (in case of NTFS) or in Extended Attributes (in case of Linux and macOS).&nbsp;</p>
-<p>This sample can be downloaded in the&nbsp;<a title="Download" href="https://www.webdavsystem.com/javaserver/download/">product download area</a>&nbsp;as well as it is published on&nbsp;<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springbootfsstorage">GitHub</a>.</p>
+<p>This sample can be downloaded in the&nbsp;<a title="Download" href="https://www.webdavsystem.com/javaserver/download/">product download area</a>&nbsp;as well as it is published on&nbsp;GitHub. It is available for both <a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/jakarta/springboot3fsstorage">jakarta</a> and <a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/springbootfsstorage">javax</a>.</p>
 <p><span>This sample is using&nbsp;</span><a title="AJAX Library" href="https://www.webdavsystem.com/ajax/">IT Hit WebDAV Ajax Library</a><span>&nbsp;to display and browse server content on a default web page as well as to open documents for editing from a web page and save back directly to the server.</span></p>
 <h2>Requirements</h2>
 <ul>

@@ -1,7 +1,7 @@
 
 <h1 class="d-xl-block d-none">Spring Boot WebDAV Server Example with Oracle Back-end, Java</h1>
 <p>This sample provides a WebDAV server running on the Spring Boot framework.&nbsp;All data including file content, document structure, and custom attributes are stored in the Oracle database.&nbsp;The&nbsp;<a title="AJAX Library" href="https://www.webdavsystem.com/ajax/">IT Hit WebDAV Ajax Library</a>&nbsp;is used to display and browse server content on a default web page as well as to open documents for editing from a web page and save them back directly to the server.</p>
-<p>This sample can be downloaded in the&nbsp;<a title="Download" href="https://www.webdavsystem.com/javaserver/download/">product download area</a>&nbsp;as well as it is published on&nbsp;<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springbootoraclestorage">GitHub</a>.</p>
+<p>This sample can be downloaded in the&nbsp;<a title="Download" href="https://www.webdavsystem.com/javaserver/download/">product download area</a>&nbsp;as well as it is published on&nbsp;<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/springbootoraclestorage">GitHub</a>.</p>
 <h2>Requirements</h2>
 <ul>
 <li>Java 1.8.</li>

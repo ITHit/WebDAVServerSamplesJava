@@ -1,6 +1,8 @@
 
-<h1 class="d-xl-block d-none">WebDAV Server Example with Collection Synchronization support</h1>
-<p><span>This sample&nbsp;is a fully functional Class 2 WebDAV server that stores all data in the file system. It supports collection synchronization as per RFC 6578. The&nbsp;<a title="AJAX Library" href="https://www.webdavsystem.com/ajax/">IT Hit WebDAV Ajax Library</a>&nbsp;is used to display and browse server content on a default web page as well as to open documents for editing from a web page and save back directly to the server. It is provided in Java and Kotlin, with identical functionality.</span></p>
+<h1 class="d-xl-block d-none">WebDAV Server Example with Collection Synchronization Support</h1>
+<p><span>This sample&nbsp;is a fully functional Class 2 WebDAV server with&nbsp;collection synchronization support (RFC 6578) that stores all data in the file system.&nbsp;This sample is similar to what is provided by the Java demo WebDAV server at: https://webdavserver.com&nbsp;</span></p>
+<p><span></span>To access this sample server and test synchronization you can use the WebDAV Drive sample for <a href="https://www.userfilesystem.com/examples/webdav_drive/">Windows</a> and <a href="https://www.userfilesystem.com/examples/webdav_drive_mac/">macOS</a>.</p>
+<p><span>This sample can be downloaded in the&nbsp;<a title="Download" href="https://www.webdavsystem.com/javaserver/download/">product download area</a>&nbsp;as well as it is published on&nbsp;GitHub. It is available for both&nbsp;<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/jakarta/collectionsync">jakarta</a>&nbsp;and&nbsp;<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/collectionsync">javax</a>.</span></p>
 <h2>Requirements</h2>
 <ul>
 <li>Java 1.8.</li>

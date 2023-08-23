@@ -82,5 +82,5 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 </ul>
 <p>&nbsp;</p>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
-<a title="WebDAV Server Example with Collection Synchronization support" href="https://www.webdavsystem.com/javaserver/server_examples/collection_sync/">WebDAV Server Example with Collection Synchronization support</a>
+<a title="WebDAV Server Example with Collection Synchronization support" href="https://www.webdavsystem.com/javaserver/server_examples/collection_sync/">WebDAV Server Example with Collection Synchronization Support</a>
 
