@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>6.3.9510-Beta</version>
+    <version>6.3.9561</version>
     <packaging>war</packaging>
 
     <properties>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>jakarta-integration</artifactId>
-            <version>6.3.9510-Beta</version>
+            <version>6.3.9561</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>6.3.9510-Beta</version>
+            <version>6.3.9561</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -202,7 +202,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-jakarta-6.3.9510-Beta</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-jakarta-6.3.9561</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>

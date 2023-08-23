@@ -5,11 +5,11 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.1.2</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springboot3fsstorage</artifactId>
-    <version>6.3.9510-Beta</version>
+    <version>6.3.9561</version>
     <name>springboot3fsstorage</name>
     <description>Demo project for Spring Boot 3</description>
 
@@ -53,12 +53,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>6.3.9510-Beta</version>
+            <version>6.3.9561</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>jakarta-integration</artifactId>
-            <version>6.3.9510-Beta</version>
+            <version>6.3.9561</version>
         </dependency>
 
         <!-- JNA dependencies -->
