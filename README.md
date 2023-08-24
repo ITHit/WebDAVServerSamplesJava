@@ -19,77 +19,77 @@
 <p style="line-height: 22px; font-size: 15px; font-weight: normal;">The server implementation searches both file names and file content including content of Microsoft Office documents as well as any other documents which format is supported by Apache Tika, such as LibreOffice, OpenOffice, PDF, etc.</p></div>
 <ul class="list">
 <li>
-<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springbootfsstorage">
+<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/jakarta/springboot3fsstorage">
 <h2>Spring Boot WebDAV Server Example with File System Back-end, Java</h2>
 </a>
 
-<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springbootfsstorage">
+<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/jakarta/springboot3fsstorage">
 <p>
 This sample provides a WebDAV server running on the Spring Boot framework with files being stored in the file system. The WebDAV requests are processed in a dedicated context, while the rest of the website processes regular HTTP requests, serving web                                            <span>...</span>
 </p>
 </a>
 </li>
 <li>
-<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springbootoraclestorage">
+<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/springbootoraclestorage">
 <h2>Spring Boot WebDAV Server Example with Oracle Back-end, Java</h2>
 </a>
 
-<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springbootoraclestorage">
+<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/springbootoraclestorage">
 <p>
 This sample provides a WebDAV server running on the Spring Boot framework.&nbsp;All data including file content, document structure, and custom attributes are stored in the Oracle database.&nbsp;The&nbsp;IT Hit WebDAV Ajax Library&nbsp;is used to display and browse serv                                            <span>...</span>
 </p>
 </a>
 </li>
 <li>
-<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springboots3storage">
+<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/springboots3storage">
 <h2>Spring Boot WebDAV Server Example with Amazon S3 Back-end, Java</h2>
 </a>
 
-<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/springboots3storage">
+<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/springboots3storage">
 <p>
 This sample&nbsp;is a fully functional Class 2 WebDAV server that runs on the Spring Boot framework and stores all data in the Amazon S3 bucket.&nbsp;The WebDAV requests are processed on a /DAV/ context, while the rest of the website processes regular HTTP req                                            <span>...</span>
 </p>
 </a>
 </li>
 <li>
-<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/oraclestorage">
+<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/oraclestorage">
 <h2>WebDAV Server Example with Oracle Back-end, Java</h2>
 </a>
 
-<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/oraclestorage">
+<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/oraclestorage">
 <p>
 The sample provides Class 2 WebDAV server implementation that can be hosted in Apache Tomcat, GlassFish, JBoss,&nbsp;WebLogic,&nbsp;WebSphere or other compliant application server. All data including file content, documents structure and custom attributes is s                                            <span>...</span>
 </p>
 </a>
 </li>
 <li>
-<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/filesystemstorage">
+<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/jakarta/filesystemstorage">
 <h2>WebDAV Server Example with File System Back-end, Java and Kotlin</h2>
 </a>
 
-<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/filesystemstorage">
+<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/jakarta/filesystemstorage">
 <p>
 This sample&nbsp;is a fully functional Class 2 WebDAV server that stores all data in the file system. It utilizes file system Extended Attributes (in case of Linux and macOS) or Alternate Data&nbsp;Streams (in case of Windows/NTFS) to store locks and custom pr                                            <span>...</span>
 </p>
 </a>
 </li>
 <li>
-<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/collectionsync">
+<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/jakarta/collectionsync">
 <h2>WebDAV Server Example with Collection Synchronization Support</h2>
 </a>
 
-<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/collectionsync">
+<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/jakarta/collectionsync">
 <p>
 This sample&nbsp;is a fully functional Class 2 WebDAV server with&nbsp;collection synchronization support (RFC 6578) that stores all data in the file system.&nbsp;This sample is similar to what is provided by the Java demo WebDAV server at: https://webdavserver.com                                            <span>...</span>
 </p>
 </a>
 </li>
 <li>
-<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/androidfsstorage">
+<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/android/androidfsstorage">
 <h2>Java WebDAV Server Example for Android</h2>
 </a>
 
-<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/androidfsstorage">
+<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/android/androidfsstorage">
 <p>
 This sample is a Class 2 WebDAV server that runs on Android. It uses modified&nbsp;NanoHTTPD as an application server and publishes files from a mobile application folder or from media folder. Locks and properties in SQLite database.
 To see the documents                                             <span>...</span>
@@ -97,11 +97,11 @@ To see the documents                                             <span>...</span
 </a>
 </li>
 <li>
-<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/deltav">
+<a class="link-header" href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/deltav">
 <h2>WebDAV Server Example with Versioning, Java</h2>
 </a>
 
-<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/deltav">
+<a href="https://github.com/ITHit/WebDAVServerSamplesJava/tree/master/Java/javax/deltav">
 <p>
 The sample provides&nbsp;DeltaV WebDAV server implementation that can be hosted in Apache Tomcat, GlassFish, JBoss,&nbsp;WebLogic or&nbsp;WebSphere. The data is stored in Oracle database.&nbsp;The IT Hit WebDAV Ajax Library is used to display and browse server content o                                            <span>...</span>
 </p>
