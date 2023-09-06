@@ -175,7 +175,6 @@ public class WebDavServlet extends HttpServlet {
      * @throws ServletException in case of unexpected exceptions.
      * @throws IOException      in case of read write exceptions.
      */
-    // <<<< registerMethodHandlerUsage
     @Override
     protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws ServletException, IOException {
@@ -198,7 +197,6 @@ public class WebDavServlet extends HttpServlet {
             }
         }
     }
-    // registerMethodHandlerUsage >>>>
 
     private Set<String> toSet(String parameters) {
         if (parameters == null) {

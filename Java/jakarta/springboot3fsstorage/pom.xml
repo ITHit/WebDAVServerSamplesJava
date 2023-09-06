@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springboot3fsstorage</artifactId>
-    <version>6.3.9561</version>
+    <version>6.3.9578</version>
     <name>springboot3fsstorage</name>
     <description>Demo project for Spring Boot 3</description>
 
@@ -53,12 +53,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>6.3.9561</version>
+            <version>6.3.9578</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>jakarta-integration</artifactId>
-            <version>6.3.9561</version>
+            <version>6.3.9578</version>
         </dependency>
 
         <!-- JNA dependencies -->
