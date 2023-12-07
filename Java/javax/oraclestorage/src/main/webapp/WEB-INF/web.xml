@@ -7,7 +7,7 @@
     <!-- This is servlet for handling static resources when main servlet is on the root context, otherwise simple root filter is enough -->
     <servlet>
         <servlet-name>FileServlet</servlet-name>
-        <servlet-class>com.ithit.webdav.samples.oraclestorageservlet.staticresourceservlet.FileServlet</servlet-class>
+        <servlet-class>com.ithit.webdav.integration.servlet.DavStaticFileServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>FileServlet</servlet-name>

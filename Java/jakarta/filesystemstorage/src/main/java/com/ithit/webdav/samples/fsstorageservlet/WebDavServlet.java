@@ -1,5 +1,8 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
+import com.ithit.webdav.integration.servlet.DavServletConfig;
+import com.ithit.webdav.integration.servlet.HttpServletDav;
+import com.ithit.webdav.integration.servlet.HttpServletDavException;
 import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.integration.servlet.HttpServletDavResponse;
 import com.ithit.webdav.integration.servlet.HttpServletLoggerImpl;
@@ -11,11 +14,6 @@ import com.ithit.webdav.server.exceptions.WebDavStatus;
 import com.ithit.webdav.server.util.StringUtil;
 import org.apache.commons.io.FileUtils;
 
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -30,7 +28,7 @@ import java.util.Set;
 /**
  * This servlet processes WEBDAV requests.
  */
-public class WebDavServlet extends HttpServlet {
+public class WebDavServlet extends HttpServletDav {
 
     private static final long serialVersionUID = 4668224632937178086L;
     private static final String DEFAULT_ROOT_PATH = "WEB-INF/Storage";
@@ -87,12 +85,10 @@ public class WebDavServlet extends HttpServlet {
      * Servlet initialization logic. Reads license file here. Creates instance of {@link com.ithit.webdav.server.Engine}.
      *
      * @param servletConfig Config.
-     * @throws ServletException if license file not found.
+     * @throws HttpServletDavException if license file not found.
      */
     @Override
-    public void init(ServletConfig servletConfig) throws ServletException {
-        super.init(servletConfig);
-
+    public void initDav(DavServletConfig servletConfig) throws HttpServletDavException {
         String licenseFile = servletConfig.getInitParameter("license");
         showExceptions = Boolean.parseBoolean(servletConfig.getInitParameter("showExceptions"));
         try {
@@ -172,16 +168,14 @@ public class WebDavServlet extends HttpServlet {
      *
      * @param httpServletRequest  Servlet request.
      * @param httpServletResponse Servlet response.
-     * @throws ServletException in case of unexpected exceptions.
+     * @throws HttpServletDavException in case of unexpected exceptions.
      * @throws IOException      in case of read write exceptions.
      */
     // <<<< registerMethodHandlerUsage
     @Override
-    protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
-            throws ServletException, IOException {
+    protected void serviceDav(HttpServletDavRequest httpServletRequest, HttpServletDavResponse httpServletResponse)
+            throws HttpServletDavException, IOException {
         WebDavEngine engine = new WebDavEngine(logger, license, localMaskRequestHeaders);
-        HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest);
-        HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
         CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), Engine.getVersion());
         CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), Engine.getVersion());
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
@@ -189,12 +183,12 @@ public class WebDavServlet extends HttpServlet {
         engine.setSearchFacade(searchFacade);
 
         try {
-            engine.service(davRequest, davResponse);
+            engine.service(httpServletRequest, httpServletResponse);
         } catch (DavException e) {
             if (e.getStatus() == WebDavStatus.INTERNAL_ERROR) {
                 logger.logError("Exception during request processing", e);
                 if (showExceptions)
-                    e.printStackTrace(new PrintStream(davResponse.getOutputStream()));
+                    e.printStackTrace(new PrintStream(httpServletResponse.getOutputStream()));
             }
         }
     }

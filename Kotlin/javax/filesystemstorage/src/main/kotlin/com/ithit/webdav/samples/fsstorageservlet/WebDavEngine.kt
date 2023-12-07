@@ -1,6 +1,6 @@
 package com.ithit.webdav.samples.fsstorageservlet
 
-import com.ithit.webdav.samples.fsstorageservlet.websocket.WebSocketServer
+import com.ithit.webdav.integration.servlet.websocket.DavWebSocketEndpoint
 import com.ithit.webdav.server.Engine
 import com.ithit.webdav.server.HierarchyItem
 import com.ithit.webdav.server.Logger
@@ -19,7 +19,7 @@ class WebDavEngine
  */
 internal constructor(private val logger: Logger?, private val license: String?) : Engine() {
 
-    internal var webSocketServer: WebSocketServer? = WebSocketServer.getInstance()
+    internal var webSocketServer: DavWebSocketEndpoint? = DavWebSocketEndpoint.getInstance()
     /**
      * Returns SearchFacade instance
      *

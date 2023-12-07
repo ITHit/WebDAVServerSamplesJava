@@ -1,6 +1,6 @@
 package com.ithit.webdav.samples.collectionsync;
 
-import com.ithit.webdav.samples.collectionsync.websocket.WebSocketServer;
+import com.ithit.webdav.integration.servlet.websocket.DavWebSocketEndpoint;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
@@ -88,8 +88,8 @@ public class WebDavEngine extends Engine {
      *
      * @return web socket server instance
      */
-    WebSocketServer getWebSocketServer() {
-        return WebSocketServer.getInstance();
+    DavWebSocketEndpoint getWebSocketServer() {
+        return DavWebSocketEndpoint.getInstance();
     }
 
     /**

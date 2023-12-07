@@ -1,5 +1,8 @@
 package com.ithit.webdav.samples.deltavservlet;
 
+import com.ithit.webdav.integration.servlet.DavServletConfig;
+import com.ithit.webdav.integration.servlet.HttpServletDav;
+import com.ithit.webdav.integration.servlet.HttpServletDavException;
 import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.integration.servlet.HttpServletDavResponse;
 import com.ithit.webdav.integration.servlet.HttpServletLoggerImpl;
@@ -10,11 +13,6 @@ import com.ithit.webdav.server.exceptions.DavException;
 import com.ithit.webdav.server.exceptions.WebDavStatus;
 import org.apache.commons.io.FileUtils;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,7 +24,7 @@ import java.nio.file.Paths;
 /**
  * This servlet processes WEBDAV requests.
  */
-public class WebDavServlet extends HttpServlet {
+public class WebDavServlet extends HttpServletDav {
     private static String realPath;
     private static String servletContext;
     private Logger logger;
@@ -60,12 +58,10 @@ public class WebDavServlet extends HttpServlet {
      * Servlet initialization logic. Reads license file here. Creates instance of {@link com.ithit.webdav.server.Engine}.
      *
      * @param servletConfig Config.
-     * @throws ServletException if license file not found.
+     * @throws HttpServletDavException if license file not found.
      */
     @Override
-    public void init(ServletConfig servletConfig) throws ServletException {
-        super.init(servletConfig);
-
+    public void initDav(DavServletConfig servletConfig) throws HttpServletDavException {
         logger = new HttpServletLoggerImpl(servletConfig.getServletContext());
 
         String licenseFile = servletConfig.getInitParameter("license");
@@ -115,12 +111,10 @@ public class WebDavServlet extends HttpServlet {
      * @throws IOException      in case of read write exceptions.
      */
     @Override
-    protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+    protected void serviceDav(HttpServletDavRequest httpServletRequest, HttpServletDavResponse httpServletResponse)
             throws IOException {
 
         WebDavEngine engine = new WebDavEngine(logger, license);
-        HttpServletDavRequest davRequest = new HttpServletDavRequest(httpServletRequest);
-        HttpServletDavResponse davResponse = new HttpServletDavResponse(httpServletResponse);
         CustomFolderGetHandler handler = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), Engine.getVersion());
         CustomFolderGetHandler handlerHead = new CustomFolderGetHandler(engine.getResponseCharacterEncoding(), Engine.getVersion());
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler));
@@ -131,14 +125,14 @@ public class WebDavServlet extends HttpServlet {
         engine.setSearchFacade(searchFacade);
         DataAccess dataAccess = new DataAccess(engine);
         try {
-            engine.service(davRequest, davResponse);
+            engine.service(httpServletRequest, httpServletResponse);
             dataAccess.commit();
         } catch (DavException e) {
             dataAccess.rollback();
             if (e.getStatus() == WebDavStatus.INTERNAL_ERROR) {
                 logger.logError("Exception during request processing", e);
                 if (showExceptions)
-                    e.printStackTrace(new PrintWriter(davResponse.getOutputStream()));
+                    e.printStackTrace(new PrintWriter(httpServletResponse.getOutputStream()));
             }
         } finally {
             dataAccess.closeConnection();

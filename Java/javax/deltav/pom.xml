@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>deltav</artifactId>
-    <version>6.3.9578</version>
+    <version>7.0.10120-Beta</version>
     <packaging>war</packaging>
 
     <properties>
@@ -15,15 +15,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
-            <artifactId>servlet-integration</artifactId>
-            <version>6.3.9578</version>
+            <artifactId>javax-integration</artifactId>
+            <version>7.0.10120-Beta</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -125,13 +119,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>6.3.9578</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-            <version>1.1</version>
+            <version>7.0.10120-Beta</version>
         </dependency>
     </dependencies>
 
@@ -156,7 +144,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/deltav-6.3.9578/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/deltav-7.0.10120-Beta/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -235,7 +223,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/deltav-6.3.9578</warSourceDirectory>
+                    <warSourceDirectory>target/deltav-7.0.10120-Beta</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>

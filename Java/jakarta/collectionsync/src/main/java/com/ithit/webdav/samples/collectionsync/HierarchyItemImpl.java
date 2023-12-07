@@ -1,8 +1,9 @@
 package com.ithit.webdav.samples.collectionsync;
 
+import static com.ithit.webdav.integration.servlet.websocket.DavHttpSessionConfigurator.INSTANCE_HEADER_NAME;
+
 import com.ithit.webdav.samples.collectionsync.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.samples.collectionsync.filesystem.FileSystemExtension;
-import com.ithit.webdav.samples.collectionsync.websocket.WebSocketServer;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.synchronization.Bind;
@@ -565,7 +566,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      * @return InstanceId
      */
     protected String getWebSocketID() {
-        return DavContext.currentRequest().getHeader(WebSocketServer.INSTANCE_HEADER_NAME);
+        return DavContext.currentRequest().getHeader(INSTANCE_HEADER_NAME);
     }
 
     /**

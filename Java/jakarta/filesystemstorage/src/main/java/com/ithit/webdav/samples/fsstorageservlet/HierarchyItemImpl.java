@@ -1,7 +1,8 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
+import static com.ithit.webdav.integration.servlet.websocket.DavHttpSessionConfigurator.INSTANCE_HEADER_NAME;
+
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
-import com.ithit.webdav.samples.fsstorageservlet.websocket.WebSocketServer;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 
@@ -522,6 +523,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return InstanceId
      */
     protected String getWebSocketID() {
-        return DavContext.currentRequest().getHeader(WebSocketServer.INSTANCE_HEADER_NAME);
+        return DavContext.currentRequest().getHeader(INSTANCE_HEADER_NAME);
     }
 }

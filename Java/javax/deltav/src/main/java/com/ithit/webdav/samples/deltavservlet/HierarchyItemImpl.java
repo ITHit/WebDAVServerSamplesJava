@@ -1,6 +1,7 @@
 package com.ithit.webdav.samples.deltavservlet;
 
-import com.ithit.webdav.samples.deltavservlet.websocket.WebSocketServer;
+import static com.ithit.webdav.integration.servlet.websocket.DavHttpSessionConfigurator.INSTANCE_HEADER_NAME;
+
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.util.StringUtil;
@@ -832,6 +833,6 @@ public abstract class HierarchyItemImpl implements com.ithit.webdav.server.Hiera
      * @return InstanceId
      */
     protected String getWebSocketID() {
-        return DavContext.currentRequest().getHeader(WebSocketServer.INSTANCE_HEADER_NAME);
+        return DavContext.currentRequest().getHeader(INSTANCE_HEADER_NAME);
     }
 }

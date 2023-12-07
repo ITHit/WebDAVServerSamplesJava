@@ -1,8 +1,6 @@
 package com.ithit.webdav.samples.fsstorageservlet
 
-import com.ithit.webdav.integration.servlet.HttpServletDavRequest
-import com.ithit.webdav.integration.servlet.HttpServletDavResponse
-import com.ithit.webdav.integration.servlet.HttpServletLoggerImpl
+import com.ithit.webdav.integration.servlet.*
 import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension
 import com.ithit.webdav.server.Engine
 import com.ithit.webdav.server.Logger
@@ -16,11 +14,6 @@ import java.io.PrintStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
-import javax.servlet.ServletConfig
-import javax.servlet.ServletException
-import javax.servlet.http.HttpServlet
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 const val DEFAULT_ROOT_PATH = "WEB-INF/Storage"
 const val DEFAULT_INDEX_PATH = "WEB-INF/Index"
@@ -28,7 +21,7 @@ const val DEFAULT_INDEX_PATH = "WEB-INF/Index"
 /**
  * This servlet processes WEBDAV requests.
  */
-class WebDavServlet : HttpServlet() {
+class WebDavServlet : HttpServletDav() {
     private var logger: Logger? = null
     private var showExceptions: Boolean = false
     private var searchFacade: SearchFacade? = null
@@ -38,12 +31,10 @@ class WebDavServlet : HttpServlet() {
      * Servlet initialization logic. Reads license file here. Creates instance of [com.ithit.webdav.server.Engine].
      *
      * @param servletConfig Config.
-     * @throws ServletException if license file not found.
+     * @throws HttpServletDavException if license file not found.
      */
-    @Throws(ServletException::class)
-    override fun init(servletConfig: ServletConfig) {
-        super.init(servletConfig)
-
+    @Throws(HttpServletDavException::class)
+    override fun initDav(servletConfig: DavServletConfig) {
         val licenseFile = servletConfig.getInitParameter("license")
         showExceptions = java.lang.Boolean.parseBoolean(servletConfig.getInitParameter("showExceptions"))
         license = try {
@@ -123,14 +114,12 @@ class WebDavServlet : HttpServlet() {
      *
      * @param httpServletRequest  Servlet request.
      * @param httpServletResponse Servlet response.
-     * @throws ServletException in case of unexpected exceptions.
+     * @throws HttpServletDavException in case of unexpected exceptions.
      * @throws IOException      in case of read write exceptions.
      */
-    @Throws(ServletException::class, IOException::class)
-    override fun service(httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse) {
+    @Throws(HttpServletDavException::class, IOException::class)
+    override fun serviceDav(httpServletRequest: HttpServletDavRequest, httpServletResponse: HttpServletDavResponse) {
         val engine = WebDavEngine(logger, license)
-        val davRequest = HttpServletDavRequest(httpServletRequest)
-        val davResponse = HttpServletDavResponse(httpServletResponse)
         val handler = CustomFolderGetHandler(engine.responseCharacterEncoding, Engine.getVersion())
         val handlerHead = CustomFolderGetHandler(engine.responseCharacterEncoding, Engine.getVersion())
         handler.setPreviousHandler(engine.registerMethodHandler("GET", handler))
@@ -138,12 +127,12 @@ class WebDavServlet : HttpServlet() {
         engine.searchFacade = searchFacade
 
         try {
-            engine.service(davRequest, davResponse)
+            engine.service(httpServletRequest, httpServletResponse)
         } catch (e: DavException) {
             if (e.status === WebDavStatus.INTERNAL_ERROR) {
                 logger!!.logError("Exception during request processing", e)
                 if (showExceptions)
-                    e.printStackTrace(PrintStream(davResponse.outputStream))
+                    e.printStackTrace(PrintStream(httpServletResponse.outputStream))
             }
         }
     }
