@@ -1,5 +1,6 @@
 package com.ithit.webdav.samples.springboots3.impl;
 
+import com.ithit.webdav.integration.utils.SerializationUtils;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.ConflictException;
 import com.ithit.webdav.server.exceptions.LockedException;

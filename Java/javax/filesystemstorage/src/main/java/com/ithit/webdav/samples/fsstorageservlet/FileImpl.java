@@ -1,6 +1,7 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
-import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
+import com.ithit.webdav.integration.extendedattributes.ExtendedAttributesExtension;
+import com.ithit.webdav.integration.utils.SerializationUtils;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.ConflictException;
 import com.ithit.webdav.server.exceptions.LockedException;
@@ -30,7 +31,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
     private static final int BUFFER_SIZE = 1048576; // 1 Mb
 
     private String snippet;
-    
+
     private final OpenOption[] allowedOpenFileOptions;
 
     /**
@@ -44,7 +45,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
      */
     private FileImpl(String name, String path, long created, long modified, WebDavEngine engine) {
         super(name, path, created, modified, engine);
-        
+
         /* Mac OS X and Ubuntu doesn't work with ExtendedOpenOption.NOSHARE_DELETE */
         String systemName = System.getProperty("os.name").toLowerCase();
         this.allowedOpenFileOptions = (systemName.contains("mac") || systemName.contains("linux")) ?

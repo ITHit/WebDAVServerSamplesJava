@@ -1,6 +1,7 @@
 package com.ithit.webdav.samples.springbootfs.impl;
 
-import com.ithit.webdav.samples.springbootfs.websocket.WebSocketServer;
+import com.ithit.webdav.integration.spring.SpringBootLogger;
+import com.ithit.webdav.integration.spring.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;

@@ -1,11 +1,11 @@
 package com.ithit.webdav.samples.springboots3.configuration;
 
+import com.ithit.webdav.integration.spring.websocket.HandshakeHeadersInterceptor;
+import com.ithit.webdav.integration.spring.websocket.SocketHandler;
+import com.ithit.webdav.integration.spring.websocket.WebSocketServer;
 import com.ithit.webdav.samples.springboots3.impl.CustomFolderGetHandler;
 import com.ithit.webdav.samples.springboots3.impl.WebDavEngine;
 import com.ithit.webdav.samples.springboots3.s3.DataClient;
-import com.ithit.webdav.samples.springboots3.websocket.HandshakeHeadersInterceptor;
-import com.ithit.webdav.samples.springboots3.websocket.SocketHandler;
-import com.ithit.webdav.samples.springboots3.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,8 @@
 package com.ithit.webdav.samples.fsstorageservlet
 
-import com.ithit.webdav.integration.servlet.websocket.DavHttpSessionConfigurator.INSTANCE_HEADER_NAME
-import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension
+import com.ithit.webdav.integration.extendedattributes.ExtendedAttributesExtension
+import com.ithit.webdav.integration.utils.IntegrationUtil.INSTANCE_HEADER_NAME
+import com.ithit.webdav.integration.utils.SerializationUtils
 import com.ithit.webdav.server.*
 import com.ithit.webdav.server.exceptions.*
 import java.io.File

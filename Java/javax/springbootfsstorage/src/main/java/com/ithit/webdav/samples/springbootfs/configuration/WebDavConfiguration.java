@@ -1,13 +1,13 @@
 package com.ithit.webdav.samples.springbootfs.configuration;
 
+import com.ithit.webdav.integration.extendedattributes.ExtendedAttributesExtension;
+import com.ithit.webdav.integration.spring.websocket.HandshakeHeadersInterceptor;
+import com.ithit.webdav.integration.spring.websocket.SocketHandler;
+import com.ithit.webdav.integration.spring.websocket.WebSocketServer;
 import com.ithit.webdav.samples.springbootfs.common.ResourceReader;
-import com.ithit.webdav.samples.springbootfs.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.samples.springbootfs.impl.CustomFolderGetHandler;
 import com.ithit.webdav.samples.springbootfs.impl.SearchFacade;
 import com.ithit.webdav.samples.springbootfs.impl.WebDavEngine;
-import com.ithit.webdav.samples.springbootfs.websocket.HandshakeHeadersInterceptor;
-import com.ithit.webdav.samples.springbootfs.websocket.SocketHandler;
-import com.ithit.webdav.samples.springbootfs.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.util.StringUtil;
 import lombok.AccessLevel;

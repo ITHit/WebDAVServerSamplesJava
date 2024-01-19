@@ -1,6 +1,7 @@
 package com.ithit.webdav.samples.fsstorageservlet
 
-import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension
+import com.ithit.webdav.integration.extendedattributes.ExtendedAttributesExtension
+import com.ithit.webdav.integration.utils.SerializationUtils
 import com.ithit.webdav.server.*
 import com.ithit.webdav.server.exceptions.ConflictException
 import com.ithit.webdav.server.exceptions.LockedException

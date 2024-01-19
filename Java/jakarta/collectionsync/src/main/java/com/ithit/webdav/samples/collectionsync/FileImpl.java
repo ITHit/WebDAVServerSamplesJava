@@ -1,6 +1,7 @@
 package com.ithit.webdav.samples.collectionsync;
 
-import com.ithit.webdav.samples.collectionsync.extendedattributes.ExtendedAttributesExtension;
+import com.ithit.webdav.integration.utils.SerializationUtils;
+import com.ithit.webdav.integration.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.File;
 import com.ithit.webdav.server.exceptions.ConflictException;

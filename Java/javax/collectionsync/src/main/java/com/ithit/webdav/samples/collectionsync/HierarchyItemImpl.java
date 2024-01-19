@@ -1,8 +1,7 @@
 package com.ithit.webdav.samples.collectionsync;
 
-import static com.ithit.webdav.integration.servlet.websocket.DavHttpSessionConfigurator.INSTANCE_HEADER_NAME;
-
-import com.ithit.webdav.samples.collectionsync.extendedattributes.ExtendedAttributesExtension;
+import com.ithit.webdav.integration.utils.SerializationUtils;
+import com.ithit.webdav.integration.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.samples.collectionsync.filesystem.FileSystemExtension;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
@@ -27,6 +26,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.ithit.webdav.integration.utils.IntegrationUtil.INSTANCE_HEADER_NAME;
 
 /**
  * Base class for WebDAV items (folders, files, etc).

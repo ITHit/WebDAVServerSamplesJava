@@ -1,13 +1,13 @@
 package com.ithit.webdav.samples.springbootoracle.configuration;
 
+import com.ithit.webdav.integration.spring.websocket.HandshakeHeadersInterceptor;
+import com.ithit.webdav.integration.spring.websocket.SocketHandler;
+import com.ithit.webdav.integration.spring.websocket.WebSocketServer;
 import com.ithit.webdav.samples.springbootoracle.SpringBootOracleSampleApplication;
 import com.ithit.webdav.samples.springbootoracle.impl.CustomFolderGetHandler;
 import com.ithit.webdav.samples.springbootoracle.impl.DataAccess;
 import com.ithit.webdav.samples.springbootoracle.impl.SearchFacade;
 import com.ithit.webdav.samples.springbootoracle.impl.WebDavEngine;
-import com.ithit.webdav.samples.springbootoracle.websocket.HandshakeHeadersInterceptor;
-import com.ithit.webdav.samples.springbootoracle.websocket.SocketHandler;
-import com.ithit.webdav.samples.springbootoracle.websocket.WebSocketServer;
 import com.ithit.webdav.server.Engine;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,7 @@
 package com.ithit.webdav.samples.springboots3.impl;
 
-import com.ithit.webdav.samples.springboots3.websocket.WebSocketServer;
+import com.ithit.webdav.integration.utils.IntegrationUtil;
+import com.ithit.webdav.integration.utils.SerializationUtils;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 
@@ -9,6 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.ithit.webdav.integration.utils.IntegrationUtil.INSTANCE_HEADER_NAME;
 
 /**
  * Base class for WebDAV items (folders, files, etc).
@@ -435,6 +438,6 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return InstanceId
      */
     protected String getWebSocketID() {
-        return DavContext.currentRequest().getHeader(WebSocketServer.INSTANCE_HEADER_NAME);
+        return DavContext.currentRequest().getHeader(INSTANCE_HEADER_NAME);
     }
 }

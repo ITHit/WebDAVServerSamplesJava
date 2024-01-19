@@ -1,6 +1,6 @@
 package com.ithit.webdav.samples.springbootoracle.impl;
 
-import com.ithit.webdav.samples.springbootoracle.websocket.WebSocketServer;
+import com.ithit.webdav.integration.utils.IntegrationUtil;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.util.StringUtil;
@@ -8,6 +8,8 @@ import com.ithit.webdav.server.util.StringUtil;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
+
+import static com.ithit.webdav.integration.utils.IntegrationUtil.INSTANCE_HEADER_NAME;
 
 /**
  * Represents file or folder in the Oracle DB repository.
@@ -765,6 +767,6 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return InstanceId
      */
     protected String getWebSocketID() {
-        return DavContext.currentRequest().getHeader(WebSocketServer.INSTANCE_HEADER_NAME);
+        return DavContext.currentRequest().getHeader(INSTANCE_HEADER_NAME);
     }
 }

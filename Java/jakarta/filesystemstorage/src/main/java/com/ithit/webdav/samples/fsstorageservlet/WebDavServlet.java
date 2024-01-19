@@ -1,12 +1,12 @@
 package com.ithit.webdav.samples.fsstorageservlet;
 
+import com.ithit.webdav.integration.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.integration.servlet.DavServletConfig;
 import com.ithit.webdav.integration.servlet.HttpServletDav;
 import com.ithit.webdav.integration.servlet.HttpServletDavException;
 import com.ithit.webdav.integration.servlet.HttpServletDavRequest;
 import com.ithit.webdav.integration.servlet.HttpServletDavResponse;
 import com.ithit.webdav.integration.servlet.HttpServletLoggerImpl;
-import com.ithit.webdav.samples.fsstorageservlet.extendedattributes.ExtendedAttributesExtension;
 import com.ithit.webdav.server.Engine;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.DavException;

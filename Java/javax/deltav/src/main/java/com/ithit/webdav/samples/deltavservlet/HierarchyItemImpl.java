@@ -1,7 +1,6 @@
 package com.ithit.webdav.samples.deltavservlet;
 
-import static com.ithit.webdav.integration.servlet.websocket.DavHttpSessionConfigurator.INSTANCE_HEADER_NAME;
-
+import com.ithit.webdav.integration.utils.IntegrationUtil;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 import com.ithit.webdav.server.util.StringUtil;
@@ -10,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
+
+import static com.ithit.webdav.integration.utils.IntegrationUtil.INSTANCE_HEADER_NAME;
 
 /**
  * Represents file or folder in the Oracle DB repository.

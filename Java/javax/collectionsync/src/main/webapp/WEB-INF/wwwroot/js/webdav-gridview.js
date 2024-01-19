@@ -1049,6 +1049,23 @@
         },
 
         /**
+         * Detects client`s browser
+         */
+        _detectBrowser: function ($currentBrowser) {
+            const userAgent = navigator.userAgent;
+
+            if (userAgent.match(/firefox|fxios/i)) {
+                $("#DownloadProtocolModal .mozilla-firefox").appendTo($currentBrowser);
+            } else if (userAgent.match(/edg/i)) {
+                $("#DownloadProtocolModal .edge-chromium").appendTo($currentBrowser);
+            } else if (userAgent.match(/chrome|chromium|crios/i)) {
+                $("#DownloadProtocolModal .goole-chrome").appendTo($currentBrowser);
+            } else if (userAgent.match(/trident/i)) {
+                $("#DownloadProtocolModal .not-required-internet-explorer").show();
+            }
+        },
+
+        /**
          * Function to be called when document or OS file manager failed to open.
          * @private
          */
@@ -1059,19 +1076,7 @@
 
                 // initialization browsers extension panel
                 if ($currentBrowser.children().length === 0) {
-                    let isChrome = !!window['chrome'] && (!!window['chrome']['webstore'] || !!window['chrome']['runtime']);
-
-                    // Edge (based on chromium) detection
-                    if (isChrome && (navigator.userAgent.indexOf('Edg') !== -1)) {
-                        $('#DownloadProtocolModal .edge-chromium').appendTo($currentBrowser);
-                    } else if (isChrome) {
-                        $('#DownloadProtocolModal .goole-chrome').appendTo($currentBrowser);
-                    } else if (typeof InstallTrigger !== 'undefined') {
-                        $('#DownloadProtocolModal .mozilla-firefox').appendTo($currentBrowser);
-                    }
-                    else if (navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-                        $('#DownloadProtocolModal .not-required-internet-explorer').show();
-                    }
+                    this._detectBrowser($currentBrowser);
                 }
 
                 // initialization custom protocol installers panel

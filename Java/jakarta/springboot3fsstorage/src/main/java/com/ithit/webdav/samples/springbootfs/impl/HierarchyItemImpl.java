@@ -1,7 +1,7 @@
 package com.ithit.webdav.samples.springbootfs.impl;
 
-import com.ithit.webdav.samples.springbootfs.extendedattributes.ExtendedAttributesExtension;
-import com.ithit.webdav.samples.springbootfs.websocket.WebSocketServer;
+import com.ithit.webdav.integration.extendedattributes.ExtendedAttributesExtension;
+import com.ithit.webdav.integration.utils.SerializationUtils;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
 
@@ -18,6 +18,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.ithit.webdav.integration.utils.IntegrationUtil.INSTANCE_HEADER_NAME;
 
 /**
  * Base class for WebDAV items (folders, files, etc).
@@ -511,6 +513,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return InstanceId
      */
     protected String getWebSocketID() {
-        return DavContext.currentRequest().getHeader(WebSocketServer.INSTANCE_HEADER_NAME);
+        return DavContext.currentRequest().getHeader(INSTANCE_HEADER_NAME);
     }
 }
