@@ -84,7 +84,7 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 <p>On the diagram below you can see the classes in&nbsp;WebDAV OracleStorage project.</p>
 <p><img id="__mcenew" alt="Oracle class diagram" src="https://www.webdavsystem.com/media/1562/oraclediagram.png" rel="109211"></p>
 <p>To adapt the sample to your needs, you will modify these classes to read and write data from and into your storage. You can find more about this in&nbsp;<a title="Creating WebDAV Server" href="https://www.webdavsystem.com/javaserver/doc/">Creating a Class 1 WebDAV Server</a>&nbsp;and&nbsp;<a title="Class 2 / 3 Server" href="https://www.webdavsystem.com/javaserver/doc/create_class_2_webdav_server/">Creating Class 2 WebDAV Server</a>&nbsp;article as well as in the&nbsp;<a href="http://java.webdavsystem.com/">class reference documentation</a>.</p>
-<h2>How Things Get Stored – Overview of the Oracle Back-end</h2>
+<h2>How Things Get Stored ? Overview of the Oracle Back-end</h2>
 <p>The database consists of 3 entities as depicted in the figure below.</p>
 <p><img id="__mcenew" alt="Oracle DB diagram" src="https://www.webdavsystem.com/media/1559/oraclestoragedb.jpg" rel="109205"></p>
 <h3>Repository Table</h3>
@@ -101,4 +101,3 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 </ul>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="WebDAV Server Example with File System Back-end in Java and Kotlin" href="https://www.webdavsystem.com/javaserver/server_examples/storage_file_system/">WebDAV Server Example with File System Back-end, Java and Kotlin</a>
-
