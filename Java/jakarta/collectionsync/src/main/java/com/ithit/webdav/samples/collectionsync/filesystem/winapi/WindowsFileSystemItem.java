@@ -7,17 +7,12 @@ import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
 
 import java.io.Closeable;
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents Windows file system file or folder. Provides functions that are not available via Java API.
  */
 public class WindowsFileSystemItem implements Closeable {
 
-    private static Map<Integer, String> _volumeNameCache = new ConcurrentHashMap<>();
     private static final int FILE_READ_ATTRIBUTES = WinNT.FILE_READ_ATTRIBUTES;
     private static final int GENERIC_READ = WinNT.GENERIC_READ;
     private static final int FILE_FLAG_BACKUP_SEMANTICS = WinNT.FILE_FLAG_BACKUP_SEMANTICS;
@@ -81,8 +76,8 @@ public class WindowsFileSystemItem implements Closeable {
         }
     }
 
-    public static String getPathByItemId(String itemId) {
-        try (WindowsFileSystemItem item = openById(itemId)) {
+    public static String getPathByItemId(String volumeName, long itemId) {
+        try (WindowsFileSystemItem item = openById(volumeName, itemId)) {
             if (item == null) {
                 return null;
             }
@@ -97,21 +92,12 @@ public class WindowsFileSystemItem implements Closeable {
         }
     }
 
-    private static WindowsFileSystemItem openById(String itemId) {
-        final WindowsFileSystemItemId fileSystemItemId = WindowsFileSystemItemId.deserialize(itemId);
-        if (fileSystemItemId == null) {
-            return null;
-        }
-        final String volumeName = getVolumeNameById(fileSystemItemId.getVolumeId());
-        if (volumeName == null) {
-            return null;
-        }
-
+    private static WindowsFileSystemItem openById(String volumeName, long itemId) {
         try (WindowsFileSystemItem volume = open(volumeName, GENERIC_READ, OPEN_EXISTING, READ_WRITE_DELETE)) {
             if (volume.fileHandle == null || invalidHandle(volume.fileHandle)) {
                 return null;
             }
-            Kernel32.FILE_ID_DESCRIPTOR fileIdDesc = new Kernel32.FILE_ID_DESCRIPTOR(128, 0, new Kernel32.FILE_ID_DESCRIPTOR.DUMMYUNIONNAME(fileSystemItemId.getFileId()));
+            Kernel32.FILE_ID_DESCRIPTOR fileIdDesc = new Kernel32.FILE_ID_DESCRIPTOR(128, 0, new Kernel32.FILE_ID_DESCRIPTOR.DUMMYUNIONNAME(itemId));
             WinNT.HANDLE handle = Kernel32.INSTANCE.OpenFileById(volume.fileHandle, fileIdDesc, FILE_READ_ATTRIBUTES, 1 | 2 | 4, null, FILE_FLAG_BACKUP_SEMANTICS);
             if (handle == null || invalidHandle(handle)) {
                 return null;
@@ -122,41 +108,6 @@ public class WindowsFileSystemItem implements Closeable {
 
     private static boolean invalidHandle(WinNT.HANDLE fileHandle) {
         return fileHandle.toString().startsWith("const");
-    }
-
-    private static String getVolumeNameById(int volumeId) {
-        final String volumeName = _volumeNameCache.get(volumeId);
-        if (volumeName != null) {
-            return volumeName;
-        }
-        List<String> logicalDrives = Kernel32Util.getLogicalDriveStrings();
-
-        for (String logicalDrive : logicalDrives) {
-            if ((logicalDrive != null) && (logicalDrive.charAt(logicalDrive.length() - 1) != File.separatorChar)) {
-                logicalDrive += File.separator;
-            }
-
-            char[] volumeNameBuffer = new char[WinDef.MAX_PATH + 1];
-            char[] fsNameBuffer = new char[WinDef.MAX_PATH + 1];
-            IntByReference volumeSerialNumber = new IntByReference();
-            IntByReference maximumComponentLength = new IntByReference();
-            IntByReference fileSystemFlags = new IntByReference();
-
-            Kernel32.INSTANCE.GetVolumeInformation(logicalDrive,
-                    volumeNameBuffer, volumeNameBuffer.length,
-                    volumeSerialNumber, maximumComponentLength, fileSystemFlags,
-                    fsNameBuffer, fsNameBuffer.length);
-            int hr = Kernel32.INSTANCE.GetLastError();
-            if ((hr == WinError.ERROR_ACCESS_DENIED) || (hr == WinError.ERROR_NOT_READY)) {
-                continue;
-            }
-            if (volumeId == volumeSerialNumber.getValue()) {
-                _volumeNameCache.put(volumeId, logicalDrive);
-                return logicalDrive;
-            }
-        }
-
-        return null;
     }
 
     /**

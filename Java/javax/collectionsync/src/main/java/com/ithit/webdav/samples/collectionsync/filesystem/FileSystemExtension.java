@@ -3,8 +3,7 @@ package com.ithit.webdav.samples.collectionsync.filesystem;
 import com.ithit.webdav.samples.collectionsync.filesystem.winapi.WindowsFileSystemItem;
 import com.ithit.webdav.server.exceptions.ServerException;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.nio.file.Path;
 
 /**
  * Helper utility class to get USN by path.
@@ -32,19 +31,20 @@ public class FileSystemExtension {
      * @param path Path.
      * @return id.
      */
-    public static String getId(String path) {
+    public static long getId(String path) {
         validateOS();
-        return Base64.getEncoder().encodeToString(WindowsFileSystemItem.getId(path).serialize().getBytes(StandardCharsets.UTF_8));
+        return WindowsFileSystemItem.getId(path).getFileId();
     }
 
     /**
      * Returns full path by file id.
+     * @param volumeName Windows volume drive letter.
      * @param itemId item ID.
      * @return file path.
      */
-    public static String getPathByItemId(String itemId) {
+    public static String getPathByItemId(Path volumeName, long itemId) {
         validateOS();
-        return WindowsFileSystemItem.getPathByItemId(new String(Base64.getDecoder().decode(itemId), StandardCharsets.UTF_8));
+        return WindowsFileSystemItem.getPathByItemId(volumeName.toString(), itemId);
     }
 
     private static void validateOS() {

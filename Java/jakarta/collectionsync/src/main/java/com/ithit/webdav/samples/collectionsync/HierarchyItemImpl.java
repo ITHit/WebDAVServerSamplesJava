@@ -588,9 +588,11 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
         String rootFolder = getRootFolder();
         final Path rootFolderPath = Paths.get(rootFolder);
         if (path.contains(SERVER_ROOT_CONTEXT)) {
-            final String pathForId = FileSystemExtension.getPathByItemId(Arrays.stream(path.split("/"))
+            final String pathForId = FileSystemExtension.getPathByItemId(Paths.get(getRootFolder()).getRoot(), Arrays.stream(path.split("/"))
                     .map(String::trim)
-                    .map(HierarchyItemImpl::decode).reduce((f, l) -> l).orElse(""));
+                    .map(HierarchyItemImpl::decode).reduce((f, l) -> l)
+                    .map(Long::parseLong)
+                    .orElse(0L));
             if (pathForId != null) {
                 final Path itemPath = Paths.get(pathForId);
                 final Path pathFragment = rootFolderPath.relativize(itemPath);
