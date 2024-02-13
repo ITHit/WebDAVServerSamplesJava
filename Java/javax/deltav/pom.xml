@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>deltav</artifactId>
-    <version>7.0.10347</version>
+    <version>7.0.10355</version>
     <packaging>war</packaging>
 
     <properties>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.0.10347</version>
+            <version>7.0.10355</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -119,7 +119,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.0.10347</version>
+            <version>7.0.10355</version>
         </dependency>
     </dependencies>
 
@@ -144,7 +144,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/deltav-7.0.10347/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/deltav-7.0.10355/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -223,7 +223,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/deltav-7.0.10347</warSourceDirectory>
+                    <warSourceDirectory>target/deltav-7.0.10355</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -276,7 +276,7 @@
                         <configuration>
                             <arguments>update</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
-                            <installDirectory>c:\temp\</installDirectory>
+                            <installDirectory>C:\Users\build\AppData\Local\Temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>

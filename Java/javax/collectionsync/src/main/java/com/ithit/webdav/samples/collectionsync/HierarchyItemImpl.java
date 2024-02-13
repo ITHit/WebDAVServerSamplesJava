@@ -464,8 +464,8 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      * @throws ServerException in case of errors.
      */
     private boolean hasLock(boolean skipShared) throws ServerException {
-        getActiveLocks();
-        return !activeLocks.isEmpty() && !(skipShared && activeLocks.get(0).isShared());
+        List<LockInfo> locks = getActiveLocks();
+        return !locks.isEmpty() && !(skipShared && locks.get(0).isShared());
     }
 
     /**

@@ -375,8 +375,8 @@ internal abstract class HierarchyItemImpl
      */
     @Throws(ServerException::class)
     private fun hasLock(skipShared: Boolean): Boolean {
-        getActiveLocks()
-        return activeLocks!!.isNotEmpty() && !(skipShared && activeLocks!![0].isShared)
+        val locks = getActiveLocks()
+        return locks.isNotEmpty() && !(skipShared && locks[0].isShared)
     }
 
     /**

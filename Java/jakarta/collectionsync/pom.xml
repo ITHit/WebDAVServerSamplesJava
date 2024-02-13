@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>collectionsync-jakarta</artifactId>
-    <version>7.0.10347</version>
+    <version>7.0.10355</version>
     <packaging>war</packaging>
 
     <properties>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>jakarta-integration</artifactId>
-            <version>7.0.10347</version>
+            <version>7.0.10355</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -114,7 +114,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.0.10347</version>
+            <version>7.0.10355</version>
         </dependency>
     </dependencies>
 
@@ -186,7 +186,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/collectionsync-jakarta-7.0.10347</warSourceDirectory>
+                    <warSourceDirectory>target/collectionsync-jakarta-7.0.10355</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
@@ -214,7 +214,7 @@
                         <configuration>
                             <arguments>update</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
-                            <installDirectory>c:\temp\</installDirectory>
+                            <installDirectory>C:\Users\build\AppData\Local\Temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>
