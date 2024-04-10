@@ -88,7 +88,7 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 <p>On the diagram below you can see the classes in WebDAV DeltaV&nbsp;project.</p>
 <p><img id="__mcenew" alt="DeltaV diagram" src="https://www.webdavsystem.com/media/1561/deltavdiagram.png" rel="109210"></p>
 <p align="left">You can find more about&nbsp;building a server with versioning in&nbsp;<a title="DeltaV Server" href="https://www.webdavsystem.com/javaserver/doc/deltavserver/">Creating WebDAV Server with Versioning Support</a>&nbsp;article. You may also want to read&nbsp;<a title="Creating WebDAV Server" href="https://www.webdavsystem.com/javaserver/doc/">Creating a Class 1 WebDAV Server</a>&nbsp;and&nbsp;<a title="Class 2 / 3 Server" href="https://www.webdavsystem.com/javaserver/doc/create_class_2_webdav_server/">Creating Class 2 WebDAV Server</a>&nbsp;articles.</p>
-<h2>How Things Get Stored ? Overview of the Oracle Back-end</h2>
+<h2>How Things Get Stored – Overview of the Oracle Back-end</h2>
 <p>The database consists of 5 entities as depicted in the figure below. 2 of them, Property and Lock, are identical to the tables found in&nbsp;<a title="WebDAV SQL" href="https://www.webdavsystem.com/javaserver/server_examples/sql_storage/">SqlStorage example</a>&nbsp;- Properties and Lock. The&nbsp;<code class="code">Repository</code>&nbsp;table contains additional fields:&nbsp;<code class="code">CREATORDISPLAYNAME</code>,&nbsp;<code class="code">CHANGENOTES</code>,&nbsp;<code class="code">CHECKEDOUT</code>,&nbsp;<code class="code">AUTOVERSION</code>,&nbsp;<code class="code">VERSIONCONTROLLED,</code> <code class="code">CHECKEDINDURINGUNLCOK</code>and&nbsp;<code class="code">CHECKEDINONFILECOMPLETE</code>.</p>
 <p><img id="__mcenew" alt="DeltaV DB diagram" src="https://www.webdavsystem.com/media/1560/deltavstoragedb.jpg" rel="109208"></p>
 <h3>Version table</h3>
@@ -104,3 +104,4 @@ This will download IT Hit WebDAV Ajax Library files into your project. Note that
 <p>&nbsp;</p>
 <h3 class="para d-inline next-article-heading">Next Article:</h3>
 <a title="Running the WebDAV Samples" href="https://www.webdavsystem.com/javaserver/server_examples/running_webdav_samples/">Running the WebDAV Samples</a>
+
