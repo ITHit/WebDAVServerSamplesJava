@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springbootfsstorage</artifactId>
-    <version>7.1.10406</version>
+    <version>7.2.10512</version>
     <name>springbootfsstorage</name>
     <description>Demo project for Spring Boot</description>
 
@@ -17,7 +17,7 @@
         <azure.version>3.1.0</azure.version>
         <java.version>1.8</java.version>
         <lucene-core.version>7.5.0</lucene-core.version>
-        <tika-core.version>1.28.5</tika-core.version>
+        <tika-core.version>2.9.2</tika-core.version>
     </properties>
 
     <dependencies>
@@ -52,12 +52,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.1.10406</version>
+            <version>7.2.10512</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.1.10406</version>
+            <version>7.2.10512</version>
         </dependency>
 
         <dependency>
@@ -90,62 +90,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parsers</artifactId>
+            <artifactId>tika-parsers-standard-package</artifactId>
             <version>${tika-core.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>cxf-core</artifactId>
-                    <groupId>org.apache.cxf</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>cxf-rt-rs-client</artifactId>
-                    <groupId>org.apache.cxf</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>httpservices</artifactId>
-                    <groupId>edu.ucar</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>maven-scm-provider-svnexe</artifactId>
-                    <groupId>org.apache.maven.scm</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>maven-scm-api</artifactId>
-                    <groupId>org.apache.maven.scm</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>c3p0</artifactId>
-                    <groupId>c3p0</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>httpclient</artifactId>
-                    <groupId>org.apache.httpcomponents</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>grib</artifactId>
-                    <groupId>edu.ucar</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>cdm</artifactId>
-                    <groupId>edu.ucar</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>unit-api</artifactId>
-                    <groupId>javax.measure</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>activation</artifactId>
-                    <groupId>javax.activation</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.sis.storage</groupId>
-                    <artifactId>sis-netcdf</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jdom</groupId>

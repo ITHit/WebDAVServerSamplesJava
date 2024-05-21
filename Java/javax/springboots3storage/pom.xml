@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springboots3storage</artifactId>
-    <version>7.1.10406</version>
+    <version>7.2.10512</version>
     <name>springboots3storage</name>
     <description>Demo project for Spring Boot S3 integration</description>
 
@@ -42,12 +42,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.1.10406</version>
+            <version>7.2.10512</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.1.10406</version>
+            <version>7.2.10512</version>
         </dependency>
 
         <dependency>
