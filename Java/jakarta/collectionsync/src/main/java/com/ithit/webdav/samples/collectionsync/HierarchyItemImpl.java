@@ -35,6 +35,8 @@ import static com.ithit.webdav.integration.utils.IntegrationUtil.INSTANCE_HEADER
 abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bind {
 
     static final String SNIPPET = "snippet";
+    protected Path newPath; // Used for metadata ETag
+    private static final String METADATA_ETAG = "metadata-Etag";
     private static final String SERVER_ROOT_CONTEXT = "ServerRoot/";
     private final String path;
     private final long created;
@@ -225,7 +227,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      * @return List of properties with values set. If property cannot be found it shall be omitted from the result.
      * @throws ServerException In case of an error.
      */
-    // <<<< getPropertiesImpl
     @Override
     public List<Property> getProperties(Property[] props) throws ServerException {
         List<Property> l = getPropertyNames();
@@ -235,14 +236,16 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
         }
         Set<String> propNames = Arrays.stream(props).map(Property::getName).collect(Collectors.toSet());
         result = l.stream().filter(x -> propNames.contains(x.getName())).collect(Collectors.toList());
-        Property snippet = Arrays.stream(props).filter(x -> propNames.contains(SNIPPET)).findFirst().orElse(null);
+        Property snippet = Arrays.stream(props).filter(x -> SNIPPET.equals(x.getName())).findFirst().orElse(null);
         if (snippet != null && this instanceof FileImpl) {
             result.add(Property.create(snippet.getNamespace(), snippet.getName(), ((FileImpl) this).getSnippet()));
         }
+        Property metadata = Arrays.stream(props).filter(x -> METADATA_ETAG.equals(x.getName())).findFirst().orElse(null);
+        if (metadata != null) {
+            result.add(Property.create(metadata.getNamespace(), metadata.getName(), getMetadataEtag()));
+        }
         return result;
     }
-    // getPropertiesImpl >>>>
-
 
     private List<Property> getProperties() throws ServerException {
         if (properties == null) {
@@ -253,12 +256,41 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
     }
 
     /**
+     * Returns Metadata ETag stored in extended attributes.
+     * @return Metadata ETag.
+     * @throws ServerException in case of reading exception.
+     */
+    private String getMetadataEtag() throws ServerException {
+        String serialJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), METADATA_ETAG);
+        List<Property> metadataProperties = SerializationUtils.deserializeList(Property.class, serialJson);
+        if (metadataProperties.size() == 1) {
+            return metadataProperties.get(0).getXmlValueRaw();
+        }
+        return "0";
+    }
+
+    /**
+     * Increments Metadata ETag by 1.
+     */
+    protected void incrementMetadataEtag() {
+        try {
+            Property metadataEtag = Property.create("", METADATA_ETAG, "1");
+            String sn = getMetadataEtag();
+            if (!Objects.equals(sn, "0")) {
+                metadataEtag.setValue(String.valueOf((Integer.parseInt(sn) + 1)));
+            }
+            ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), METADATA_ETAG, SerializationUtils.serialize(Collections.singletonList(metadataEtag)));
+        } catch (Exception ex) {
+            getEngine().getLogger().logError("Cannot update metadata etag.", ex);
+        }
+    }
+
+    /**
      * Gets names of all properties for this item.
      *
      * @return List of all property names for this item.
      * @throws ServerException In case of an error.
      */
-    // <<<< getPropertyNamesImpl
     @Override
     public List<Property> getPropertyNames() throws ServerException {
         if (ExtendedAttributesExtension.hasExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE)) {
@@ -267,7 +299,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
         }
         return new LinkedList<>();
     }
-    // getPropertyNamesImpl >>>>
 
     /**
      * Check whether client is the lock owner.
@@ -306,7 +337,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      *                              result of the operation for each property.
      * @throws ServerException      In case of other error.
      */
-    // <<<< updatePropertiesImpl
     @Override
     public void updateProperties(Property[] setProps, Property[] delProps)
             throws LockedException, MultistatusException, ServerException {
@@ -339,9 +369,9 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
                 .filter(e -> !propNamesToDel.contains(e.getName()))
                 .collect(Collectors.toList());
         ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), PROPERTIES_ATTRIBUTE, SerializationUtils.serialize(properties));
+        incrementMetadataEtag();
         getEngine().getWebSocketServer().notifyUpdated(getPath(), getWebSocketID());
     }
-    // updatePropertiesImpl >>>>
 
     /**
      * Updates basic file times in the following format - Thu, 28 Mar 2013 20:15:34 GMT.
@@ -388,6 +418,9 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      * @return Full path in the File System to the {@link HierarchyItemImpl}.
      */
     Path getFullPath() {
+        if (newPath != null) {
+            return newPath;
+        }
         String fullPath = "";
         try {
             fullPath = getRootFolder() + HierarchyItemImpl.decodeAndConvertToPath(getPath());
@@ -442,7 +475,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      * @throws MultistatusException Errors have occurred during processing of the subtree.
      * @throws ServerException      In case of an error.
      */
-    // <<<< lockImpl
     @Override
     public LockResult lock(boolean shared, boolean deep, long timeout, String owner)
             throws LockedException, MultistatusException, ServerException {
@@ -459,10 +491,10 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
         LockInfo lockInfo = new LockInfo(shared, deep, token, expires, owner);
         activeLocks.add(lockInfo);
         ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
+        incrementMetadataEtag();
         getEngine().getWebSocketServer().notifyLocked(getPath(), getWebSocketID());
         return new LockResult(token, timeout);
     }
-    // lockImpl >>>>
 
     /**
      * Checks whether {@link HierarchyItemImpl} has a lock and whether it is shared.
@@ -482,7 +514,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      * @return Array of locks.
      * @throws ServerException In case of an error.
      */
-    // <<<< getActiveLocksImpl
     @Override
     public List<LockInfo> getActiveLocks() throws ServerException {
         if (activeLocks == null) {
@@ -501,7 +532,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
                         lock.getOwner()))
                 .collect(Collectors.toList());
     }
-    // getActiveLocksImpl >>>>
 
     /**
      * Removes lock with the specified token from this item.
@@ -510,7 +540,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      * @throws PreconditionFailedException Included lock token was not enforceable on this item.
      * @throws ServerException             In case of an error.
      */
-    // <<<< unlockImpl
     @Override
     public void unlock(String lockToken) throws PreconditionFailedException,
             ServerException {
@@ -523,12 +552,12 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
             } else {
                 ExtendedAttributesExtension.deleteExtendedAttribute(getFullPath().toString(), activeLocksAttribute);
             }
+            incrementMetadataEtag();
             getEngine().getWebSocketServer().notifyUnlocked(getPath(), getWebSocketID());
         } else {
             throw new PreconditionFailedException();
         }
     }
-    // unlockImpl >>>>
 
     /**
      * Updates lock timeout information on this item.
@@ -539,7 +568,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      * @throws PreconditionFailedException Included lock token was not enforceable on this item.
      * @throws ServerException             In case of an error.
      */
-    // <<<< refreshLockImpl
     @Override
     public RefreshLockResult refreshLock(String token, long timeout)
             throws PreconditionFailedException, ServerException {
@@ -556,11 +584,11 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
         long expires = System.currentTimeMillis() + timeout * 1000;
         lockInfo.setTimeout(expires);
         ExtendedAttributesExtension.setExtendedAttribute(getFullPath().toString(), activeLocksAttribute, SerializationUtils.serialize(activeLocks));
+        incrementMetadataEtag();
         getEngine().getWebSocketServer().notifyLocked(getPath(), getWebSocketID());
         return new RefreshLockResult(lockInfo.isShared(), lockInfo.isDeep(),
                 timeout, lockInfo.getOwner());
     }
-    // refreshLockImpl >>>>
 
     /**
      * Returns instance ID from header

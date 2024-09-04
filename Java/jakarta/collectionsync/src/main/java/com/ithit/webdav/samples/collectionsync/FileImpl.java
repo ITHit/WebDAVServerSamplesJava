@@ -221,7 +221,6 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
      * @param count      Number of bytes to be written to the output stream.
      * @throws ServerException In case of an error.
      */
-    // <<<< readFileImpl
     @Override
     public void read(OutputStream out, long startIndex, long count) throws ServerException {
         Path fullPath = this.getFullPath();
@@ -242,7 +241,6 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
             throw new ServerException(x);
         }
     }
-    // readFileImpl >>>>
 
     /**
      * Saves the content of the file from the specified stream to the File System repository.
@@ -256,7 +254,6 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
      * @throws ServerException In case of an error.
      * @throws IOException     I/O error.
      */
-    // <<<< writeFileImpl
     @Override
     public long write(InputStream content, String contentType, long startIndex, long totalFileLength)
             throws LockedException, ServerException, IOException {
@@ -295,7 +292,6 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
         getEngine().getWebSocketServer().notifyUpdated(getPath(), getWebSocketID());
         return totalWrittenBytes;
     }
-    // writeFileImpl >>>>
 
     private void incrementSerialNumber() {
         try {
@@ -413,6 +409,8 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
         if (ExtendedAttributesExtension.hasExtendedAttribute(newPath.toString(), activeLocksAttribute)) {
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
         }
+        this.newPath = newPath;
+        incrementMetadataEtag();
         try {
             String currentPath = folder.getPath() + encode(destName);
             getEngine().getWebSocketServer().notifyMoved(getPath(), currentPath, getWebSocketID());

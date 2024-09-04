@@ -97,7 +97,6 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
-    // <<<< createFileImpl
     @Override
     public FileImpl createFile(String name) throws LockedException, ServerException {
         ensureHasToken();
@@ -115,7 +114,6 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         }
         return null;
     }
-    // createFileImpl >>>>
 
     /**
      * Creates new {@link FolderImpl} folder with the specified name in this folder.
@@ -125,7 +123,6 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
      * @throws LockedException This folder was locked. Client did not provide the lock token.
      * @throws ServerException In case of an error.
      */
-    // <<<< createFolderImpl
     @Override
     public Folder createFolder(String name) throws LockedException,
             ServerException {
@@ -147,7 +144,6 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
             }
         }
     }
-    // createFolderImpl >>>>
 
     private Path deleteIfHidden(String name) throws ServerException {
         Path fullPath = Paths.get(this.getFullPath().toString(), name);
@@ -171,7 +167,6 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
      * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in a folder.
      * @throws ServerException In case of an error.
      */
-    // <<<< getChildren
     @Override
     public PageResults getChildren(List<Property> propNames, Long offset, Long nResults, List<OrderProperty> orderProps) throws ServerException {
         String decodedPath = HierarchyItemImpl.decodeAndConvertToPath(getPath());
@@ -197,9 +192,7 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         }
         return new PageResults(children, total);
     }
-    // getChildren >>>>
 
-    // <<<< deleteFolderImpl
     @Override
     public void delete() throws LockedException, MultistatusException,
             ServerException {
@@ -214,9 +207,7 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         }
         getEngine().getWebSocketServer().notifyDeleted(getPath(), getWebSocketID());
     }
-    // deleteFolderImpl >>>>
 
-    // <<<< copyToFolderImpl
     @Override
     public void copyTo(Folder folder, String destName, boolean deep)
             throws LockedException, MultistatusException, ServerException {
@@ -241,7 +232,6 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         setName(destName);
         getEngine().getWebSocketServer().notifyCreated(folder.getPath() + encode(destName), getWebSocketID());
     }
-    // copyToFolderImpl >>>>
 
     /**
      * Check whether current folder is the parent to the destination.
@@ -316,7 +306,6 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
 
     }
 
-    // <<<< moveToFolderImpl
     @Override
     public void moveTo(Folder folder, String destName) throws LockedException,
             ConflictException, MultistatusException, ServerException {
@@ -329,15 +318,17 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         Path destinationFullPath = Paths.get(destinationFolder, destName);
         try {
             removeIndex(getFullPath(), this);
-            Files.move(sourcePath, destinationFullPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.deleteIfExists(destinationFullPath);
+            Files.move(sourcePath, destinationFullPath);
             addIndex(destinationFullPath, folder.getPath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
         }
         setName(destName);
+        this.newPath = destinationFullPath;
+        incrementMetadataEtag();
         getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + encode(destName), getWebSocketID());
     }
-    // moveToFolderImpl >>>>
 
     /**
      * Returns list of items that correspond to search request.
@@ -349,7 +340,6 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
      * @param nResults The number of items to return.
      * @return Instance of {@link PageResults} class that contains items on a requested page and total number of items in search results.
      */
-    // <<<< searchImpl
     @Override
     public PageResults search(String searchString, SearchOptions options, List<Property> propNames, Long offset, Long nResults) {
         List<HierarchyItem> results = new LinkedList<>();
@@ -380,7 +370,6 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         }
         return new PageResults((offset != null && nResults != null) ? results.stream().skip(offset).limit(nResults).collect(Collectors.toList()) : results, (long) results.size());
     }
-    // searchImpl >>>>
 
     /**
      * Returns free bytes available to current user.

@@ -387,6 +387,8 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
         if (ExtendedAttributesExtension.hasExtendedAttribute(newPath.toString(), activeLocksAttribute)) {
             ExtendedAttributesExtension.deleteExtendedAttribute(newPath.toString(), activeLocksAttribute);
         }
+        this.newPath = newPath;
+        incrementMetadataEtag();
         try {
             String currentPath = ((FolderImpl) folder).getContextAwarePath() + encode(destName);
             getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + encode(destName), getWebSocketID());

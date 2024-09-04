@@ -318,12 +318,15 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         Path destinationFullPath = Paths.get(destinationFolder, destName);
         try {
             removeIndex(getFullPath(), this);
-            Files.move(sourcePath, destinationFullPath, StandardCopyOption.REPLACE_EXISTING);
+            Files.deleteIfExists(destinationFullPath);
+            Files.move(sourcePath, destinationFullPath);
             addIndex(destinationFullPath, folder.getPath() + destName, destName);
         } catch (IOException e) {
             throw new ServerException(e);
         }
         setName(destName);
+        this.newPath = destinationFullPath;
+        incrementMetadataEtag();
         getEngine().getWebSocketServer().notifyMoved(getPath(), folder.getPath() + encode(destName), getWebSocketID());
     }
 

@@ -329,6 +329,8 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
             throw ConflictException()
         }
         val newPath = Paths.get(destinationFolder, destName)
+        this.newPath = newPath
+        incrementMetadataEtag()
         try {
             Files.move(fullPath, Paths.get(destinationFolder, destName), StandardCopyOption.REPLACE_EXISTING)
         } catch (e: IOException) {

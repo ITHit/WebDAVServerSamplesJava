@@ -20,6 +20,7 @@ import java.util.*
 import java.util.stream.Collectors
 
 const val SNIPPET = "snippet"
+const val METADATA_ETAG = "metadata-Etag"
 
 /**
  * Base class for WebDAV items (folders, files, etc).
@@ -41,6 +42,7 @@ internal abstract class HierarchyItemImpl
   * @return File System engine.
   */
  val engine: WebDavEngine) : HierarchyItem, Lock {
+    protected var newPath: Path? = null
     var activeLocksAttribute = "Locks"
     private val propertiesAttribute = "Properties"
     private var properties: MutableList<Property>? = null
@@ -200,9 +202,13 @@ internal abstract class HierarchyItemImpl
         }
         val propNames = Arrays.stream(props).map { it.name }.collect(Collectors.toSet())
         result = l.stream().filter { x -> propNames.contains(x.name) }.collect(Collectors.toList())
-        val snippet = Arrays.stream(props).filter { propNames.contains(SNIPPET) }.findFirst().orElse(null)
+        val snippet = Arrays.stream(props).filter { x: Property? -> SNIPPET == x?.name }.findFirst().orElse(null)
         if (snippet != null && this is FileImpl) {
             result.add(Property.create(snippet.namespace, snippet.name, this.snippet))
+        }
+        val metadata = Arrays.stream(props).filter { x: Property? -> METADATA_ETAG == x?.name }.findFirst().orElse(null)
+        if (metadata != null) {
+            result.add(Property.create(metadata.namespace, metadata.name, getMetadataEtag()))
         }
         return result
     }
@@ -214,6 +220,44 @@ internal abstract class HierarchyItemImpl
             properties = SerializationUtils.deserializeList(Property::class.java, propertiesJson).toMutableList()
         }
         return properties as MutableList<Property>
+    }
+
+    /**
+     * Returns Metadata ETag stored in extended attributes.
+     * @return Metadata ETag.
+     * @throws ServerException in case of reading exception.
+     */
+    @Throws(ServerException::class)
+    private fun getMetadataEtag(): String {
+        val serialJson =
+            ExtendedAttributesExtension.getExtendedAttribute(fullPath.toString(), METADATA_ETAG)
+        val metadataProperties = SerializationUtils.deserializeList(
+            Property::class.java, serialJson
+        )
+        if (metadataProperties.size == 1) {
+            return metadataProperties[0].xmlValueRaw
+        }
+        return "0"
+    }
+
+    /**
+     * Increments Metadata ETag by 1.
+     */
+    protected fun incrementMetadataEtag() {
+        try {
+            val metadataEtag = Property.create("", METADATA_ETAG, "1")
+            val sn = getMetadataEtag()
+            if (sn != "0") {
+                metadataEtag.value = (sn.toInt() + 1).toString()
+            }
+            ExtendedAttributesExtension.setExtendedAttribute(
+                fullPath.toString(), METADATA_ETAG, SerializationUtils.serialize(
+                    listOf<Property>(metadataEtag)
+                )
+            )
+        } catch (ex: java.lang.Exception) {
+            engine.logger?.logError("Cannot update metadata etag.", ex)
+        }
     }
 
     /**
@@ -301,6 +345,7 @@ internal abstract class HierarchyItemImpl
                 .filter { e -> !propNamesToDel.contains(e.name) }
                 .collect(Collectors.toList())
         ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), propertiesAttribute, SerializationUtils.serialize(properties as List<Property>))
+        incrementMetadataEtag()
         engine.webSocketServer?.notifyUpdated(getPath(), getWebSocketID())
     }
 
@@ -362,6 +407,7 @@ internal abstract class HierarchyItemImpl
         val lockInfo = LockInfo(shared, deep, token, expires, owner)
         activeLocks!!.add(lockInfo)
         ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), activeLocksAttribute, SerializationUtils.serialize<List<LockInfo>>(activeLocks!!))
+        incrementMetadataEtag()
         engine.webSocketServer?.notifyLocked(getPath(), getWebSocketID())
         return LockResult(token, localTimeout)
     }
@@ -426,6 +472,7 @@ internal abstract class HierarchyItemImpl
             } else {
                 ExtendedAttributesExtension.deleteExtendedAttribute(fullPath.toString(), activeLocksAttribute)
             }
+            incrementMetadataEtag()
             engine.webSocketServer?.notifyUnlocked(getPath(), getWebSocketID())
         } else {
             throw PreconditionFailedException()
@@ -455,6 +502,7 @@ internal abstract class HierarchyItemImpl
         val expires = System.currentTimeMillis() + localTimeout * 1000
         lockInfo.timeout = expires
         ExtendedAttributesExtension.setExtendedAttribute(fullPath.toString(), activeLocksAttribute, SerializationUtils.serialize<List<LockInfo>>(activeLocks!!))
+        incrementMetadataEtag()
         engine.webSocketServer?.notifyLocked(getPath(), getWebSocketID())
         return RefreshLockResult(lockInfo.isShared, lockInfo.isDeep,
                 localTimeout, lockInfo.owner)

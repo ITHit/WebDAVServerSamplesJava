@@ -252,8 +252,9 @@ private constructor(name: String, path: String, created: Long, modified: Long,
         } catch (e: IOException) {
             throw ServerException(e)
         }
-
         setName(destName)
+        this.newPath = destinationFullPath
+        incrementMetadataEtag()
         engine.webSocketServer?.notifyMoved(path, folder.path + encode(destName), getWebSocketID())
     }
 

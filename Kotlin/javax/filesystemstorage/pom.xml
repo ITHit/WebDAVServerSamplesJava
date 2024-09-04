@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>kotlinfs</artifactId>
-    <version>7.2.10512</version>
+    <version>7.2.10553</version>
     <packaging>war</packaging>
 
     <properties>
@@ -17,12 +17,12 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.2.10512</version>
+            <version>7.2.10553</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <version>2.14.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.2.10512</version>
+            <version>7.2.10553</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -155,7 +155,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/kotlinfs-7.2.10512</warSourceDirectory>
+                    <warSourceDirectory>target/kotlinfs-7.2.10553</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>

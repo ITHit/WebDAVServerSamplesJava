@@ -304,6 +304,8 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
             throw new ServerException(e);
         }
         setName(destName);
+        this.newPath = destinationFullPath;
+        incrementMetadataEtag();
         getEngine().getWebSocketServer().notifyMoved(getContextAwarePath(), ((FolderImpl) folder).getContextAwarePath() + encode(destName), getWebSocketID());
     }
 
