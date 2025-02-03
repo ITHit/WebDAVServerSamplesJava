@@ -4,17 +4,17 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.2</version>
+        <version>3.4.2</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springboot3fsstorage</artifactId>
-    <version>7.2.10560</version>
+    <version>7.2.10601</version>
     <name>springboot3fsstorage</name>
     <description>Demo project for Spring Boot 3</description>
 
     <properties>
-        <spring-cloud-azure.version>5.3.0</spring-cloud-azure.version>
+        <spring-cloud-azure.version>5.19.0</spring-cloud-azure.version>
         <java.version>17</java.version>
         <lucene-core.version>7.5.0</lucene-core.version>
         <tika-core.version>2.9.2</tika-core.version>
@@ -53,18 +53,18 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.2.10560</version>
+            <version>7.2.10601</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>jakarta-integration</artifactId>
-            <version>7.2.10560</version>
+            <version>7.2.10601</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.14.0</version>
+            <version>2.17.0</version>
             <scope>compile</scope>
         </dependency>
 

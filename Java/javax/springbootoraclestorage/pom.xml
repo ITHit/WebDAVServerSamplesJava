@@ -4,12 +4,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.11.RELEASE</version>
+        <version>2.7.18</version>
         <relativePath />
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springbootoraclestorage</artifactId>
-    <version>7.2.10560</version>
+    <version>7.2.10601</version>
     <name>springbootoraclestorage</name>
     <description>Demo project for Spring Boot</description>
 
@@ -46,7 +46,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
             <optional>true</optional>
         </dependency>
 
@@ -54,12 +53,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.2.10560</version>
+            <version>7.2.10601</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.2.10560</version>
+            <version>7.2.10601</version>
         </dependency>
 
         <!-- Oracle dependencies -->
@@ -72,13 +71,13 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>2.7.0</version>
+            <version>2.9.0</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.14.0</version>
+            <version>2.17.0</version>
             <scope>compile</scope>
         </dependency>
 
