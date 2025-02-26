@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>collectionsync</artifactId>
-    <version>7.2.10601</version>
+    <version>7.3.10625</version>
     <packaging>war</packaging>
 
     <properties>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.2.10601</version>
+            <version>7.3.10625</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.2.10601</version>
+            <version>7.3.10625</version>
         </dependency>
     </dependencies>
 
@@ -143,7 +143,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/collectionsync-7.2.10601</warSourceDirectory>
+                    <warSourceDirectory>target/collectionsync-7.3.10625</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
