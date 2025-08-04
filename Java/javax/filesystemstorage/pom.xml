@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>7.3.10641</version>
+    <version>7.3.10701</version>
     <packaging>war</packaging>
 
     <properties>
@@ -19,12 +19,12 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.3.10641</version>
+            <version>7.3.10701</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.17.0</version>
+            <version>2.19.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -35,32 +35,32 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>7.5.0</version>
+            <version>7.7.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>7.5.0</version>
+            <version>7.7.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-highlighter</artifactId>
-            <version>7.5.0</version>
+            <version>7.7.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>2.9.2</version>
+            <version>2.9.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers-standard-package</artifactId>
-            <version>2.9.2</version>
+            <version>2.9.4</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.3.10641</version>
+            <version>7.3.10701</version>
         </dependency>
     </dependencies>
 
@@ -69,7 +69,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.4.0</version>
                 <configuration>
                     <webResources>
                         <resource>
@@ -82,7 +82,7 @@
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
-                <version>1.8</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>windows</id>
@@ -122,13 +122,13 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-7.3.10641</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-7.3.10701</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.12.1</version>
+                <version>1.15.1</version>
                 <executions>
                     <execution>
                         <id>install node and npm</id>

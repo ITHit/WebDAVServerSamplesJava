@@ -3,7 +3,7 @@ package com.ithit.webdav.samples.fsstorageservlet;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.search.SearchOptions;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
