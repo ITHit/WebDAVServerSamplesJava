@@ -1,6 +1,5 @@
 package com.ithit.webdav.samples.springboots3.impl;
 
-import com.ithit.webdav.integration.utils.IntegrationUtil;
 import com.ithit.webdav.integration.utils.SerializationUtils;
 import com.ithit.webdav.server.*;
 import com.ithit.webdav.server.exceptions.*;
@@ -363,16 +362,17 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
             String activeLocksJson = getEngine().getDataClient().getMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE);
             activeLocks = new ArrayList<>(SerializationUtils.deserializeList(LockInfo.class, activeLocksJson));
         } else {
-            activeLocks = new LinkedList<>();
+            activeLocks = new ArrayList<>();
         }
+        final long currentTime = System.currentTimeMillis();
         return activeLocks
                 .stream()
-                .filter(x -> System.currentTimeMillis() < x.getTimeout())
+                .filter(x -> currentTime < x.getTimeout())
                 .map(lock -> new LockInfo(
                         lock.isShared(),
                         lock.isDeep(),
                         lock.getToken(),
-                        (lock.getTimeout() < 0 || lock.getTimeout() == Long.MAX_VALUE) ? lock.getTimeout() : (lock.getTimeout() - System.currentTimeMillis()) / 1000,
+                        (lock.getTimeout() < 0 || lock.getTimeout() == Long.MAX_VALUE) ? lock.getTimeout() : (lock.getTimeout() - currentTime) / 1000,
                         lock.getOwner())
                 )
                 .collect(Collectors.toList());

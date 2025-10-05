@@ -34,12 +34,10 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
      * @param name     Name of hierarchy item.
      * @param path     Relative to WebDAV root folder path.
      * @param created  Creation time of the hierarchy item.
-     * @param modified Modification time of the hierarchy item.
      * @param engine   Instance of current {@link WebDavEngine}
      */
-    private FolderImpl(String name, String path, long created, long modified,
-                       WebDavEngine engine) {
-        super(name, path, created, modified, engine);
+    private FolderImpl(String name, String path, long created, WebDavEngine engine) {
+        super(name, path, created, engine);
     }
 
     /**
@@ -71,8 +69,7 @@ final class FolderImpl extends HierarchyItemImpl implements Folder, Search, Quot
         }
 
         long created = view.creationTime().toMillis();
-        long modified = view.lastModifiedTime().toMillis();
-        return new FolderImpl(name, fixPath(path), created, modified, engine);
+        return new FolderImpl(name, fixPath(path), created, engine);
     }
 
     private static String fixPath(String path) {

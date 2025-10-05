@@ -32,11 +32,10 @@ internal class FolderImpl
  * @param name     Name of hierarchy item.
  * @param path     Relative to WebDAV root folder path.
  * @param created  Creation time of the hierarchy item.
- * @param modified Modification time of the hierarchy item.
  * @param engine   Instance of current [WebDavEngine]
  */
-private constructor(name: String, path: String, created: Long, modified: Long,
-                    engine: WebDavEngine) : HierarchyItemImpl(name, path, created, modified, engine), Folder, Search, Quota {
+private constructor(name: String, path: String, created: Long,
+                    engine: WebDavEngine) : HierarchyItemImpl(name, path, created, engine), Folder, Search, Quota {
 
     /**
      * Creates new [FileImpl] file with the specified name in this folder.
@@ -379,8 +378,7 @@ private constructor(name: String, path: String, created: Long, modified: Long,
             }
 
             val created = view.creationTime().toMillis()
-            val modified = view.lastModifiedTime().toMillis()
-            return FolderImpl(name!!, fixPath(path), created, modified, engine)
+            return FolderImpl(name!!, fixPath(path), created, engine)
         }
 
         private fun fixPath(path: String): String {

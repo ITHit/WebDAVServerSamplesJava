@@ -6,10 +6,12 @@ import com.ithit.webdav.integration.utils.SerializationUtils
 import com.ithit.webdav.server.*
 import com.ithit.webdav.server.exceptions.*
 import java.io.File
+import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributeView
@@ -32,10 +34,9 @@ internal abstract class HierarchyItemImpl
  * @param name     name of hierarchy item
  * @param path     Relative to WebDAV root folder path.
  * @param created  creation time of the hierarchy item
- * @param modified modification time of the hierarchy item
  * @param engine   instance of current [WebDavEngine]
  */
-(private var name: String?, private val path: String, private val created: Long, private val modified: Long,
+(private var name: String?, private val path: String, private val created: Long,
  /**
   * Returns File System engine.
   *
@@ -138,7 +139,11 @@ internal abstract class HierarchyItemImpl
      */
     @Throws(ServerException::class)
     override fun getModified(): Long {
-        return modified
+        try {
+            return Files.getLastModifiedTime(fullPath, LinkOption.NOFOLLOW_LINKS).toMillis()
+        } catch (e: IOException) {
+            throw ServerException(e)
+        }
     }
 
     /**
@@ -438,16 +443,17 @@ internal abstract class HierarchyItemImpl
                 ExtendedAttributesExtension.getExtendedAttribute(fullPath.toString(), activeLocksAttribute)
             ArrayList(SerializationUtils.deserializeList(LockInfo::class.java, activeLocksJson))
         } else {
-            LinkedList()
+            ArrayList()
         }
+        val currentTime = System.currentTimeMillis()
         return activeLocks!!.stream()
-            .filter { x -> System.currentTimeMillis() < x.timeout }
+            .filter { x -> currentTime < x.timeout }
             .map { lock ->
                 LockInfo(
                     lock.isShared,
                     lock.isDeep,
                     lock.token,
-                    if (lock.timeout < 0 || lock.timeout == Long.MAX_VALUE) lock.timeout else (lock.timeout - System.currentTimeMillis()) / 1000,
+                    if (lock.timeout < 0 || lock.timeout == Long.MAX_VALUE) lock.timeout else (lock.timeout - currentTime) / 1000,
                     lock.owner
                 )
             }

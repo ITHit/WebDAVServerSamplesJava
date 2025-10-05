@@ -28,10 +28,9 @@ internal class FileImpl
  * @param name     Name of hierarchy item.
  * @param path     Relative to WebDAV root folder path.
  * @param created  Creation time of the hierarchy item.
- * @param modified Modification time of the hierarchy item.
  * @param engine   Instance of current [WebDavEngine].
  */
-private constructor(name: String, path: String, created: Long, modified: Long, engine: WebDavEngine) : HierarchyItemImpl(name, path, created, modified, engine), File, Lock, ResumableUpload, UploadProgress {
+private constructor(name: String, path: String, created: Long, engine: WebDavEngine) : HierarchyItemImpl(name, path, created, engine), File, Lock, ResumableUpload, UploadProgress {
 
     private val bufferSize = 1048576 // 1 Mb
 
@@ -382,8 +381,7 @@ private constructor(name: String, path: String, created: Long, modified: Long, e
             }
 
             val created = view.creationTime().toMillis()
-            val modified = view.lastModifiedTime().toMillis()
-            return FileImpl(name!!, path, created, modified, engine)
+            return FileImpl(name!!, path, created, engine)
         }
     }
 }

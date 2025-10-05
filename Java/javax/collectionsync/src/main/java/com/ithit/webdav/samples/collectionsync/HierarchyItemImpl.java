@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
@@ -40,7 +41,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
     private static final String SERVER_ROOT_CONTEXT = "ServerRoot/";
     private final String path;
     private final long created;
-    private final long modified;
     private final WebDavEngine engine;
     private String name;
     String activeLocksAttribute = "Locks";
@@ -54,14 +54,12 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      * @param name     name of hierarchy item
      * @param path     Relative to WebDAV root folder path.
      * @param created  creation time of the hierarchy item
-     * @param modified modification time of the hierarchy item
      * @param engine   instance of current {@link WebDavEngine}
      */
-    HierarchyItemImpl(String name, String path, long created, long modified, WebDavEngine engine) {
+    HierarchyItemImpl(String name, String path, long created, WebDavEngine engine) {
         this.name = name;
         this.path = path;
         this.created = created;
-        this.modified = modified;
         this.engine = engine;
     }
 
@@ -173,7 +171,11 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
      */
     @Override
     public long getModified() throws ServerException {
-        return modified;
+        try {
+            return Files.getLastModifiedTime(getFullPath(), LinkOption.NOFOLLOW_LINKS).toMillis();
+        } catch (IOException e) {
+            throw new ServerException(e);
+        }
     }
 
     /**
@@ -521,15 +523,16 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
             String activeLocksJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), activeLocksAttribute);
             activeLocks = new ArrayList<>(SerializationUtils.deserializeList(LockInfo.class, activeLocksJson));
         } else {
-            activeLocks = new LinkedList<>();
+            activeLocks = new ArrayList<>();
         }
+        final long currentTime = System.currentTimeMillis();
         return activeLocks.stream()
-                .filter(x -> System.currentTimeMillis() < x.getTimeout())
+                .filter(x -> currentTime < x.getTimeout())
                 .map(lock -> new LockInfo(
                         lock.isShared(),
                         lock.isDeep(),
                         lock.getToken(),
-                        (lock.getTimeout() < 0 || lock.getTimeout() == Long.MAX_VALUE) ? lock.getTimeout() : (lock.getTimeout() - System.currentTimeMillis()) / 1000,
+                        (lock.getTimeout() < 0 || lock.getTimeout() == Long.MAX_VALUE) ? lock.getTimeout() : (lock.getTimeout() - currentTime) / 1000,
                         lock.getOwner()))
                 .collect(Collectors.toList());
     }

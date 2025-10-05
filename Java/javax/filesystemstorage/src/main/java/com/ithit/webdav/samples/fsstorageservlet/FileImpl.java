@@ -40,11 +40,10 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
      * @param name              Name of hierarchy item.
      * @param path              Relative to WebDAV root folder path.
      * @param created           Creation time of the hierarchy item.
-     * @param modified          Modification time of the hierarchy item.
      * @param engine            Instance of current {@link WebDavEngine}.
      */
-    private FileImpl(String name, String path, long created, long modified, WebDavEngine engine) {
-        super(name, path, created, modified, engine);
+    private FileImpl(String name, String path, long created, WebDavEngine engine) {
+        super(name, path, created, engine);
 
         /* Mac OS X and Ubuntu doesn't work with ExtendedOpenOption.NOSHARE_DELETE */
         String systemName = System.getProperty("os.name").toLowerCase();
@@ -94,8 +93,7 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
             throw new ServerException();
         }
         long created = view.creationTime().toMillis();
-        long modified = view.lastModifiedTime().toMillis();
-        return new FileImpl(name, path, created, modified, engine);
+        return new FileImpl(name, path, created, engine);
     }
 
     /**
