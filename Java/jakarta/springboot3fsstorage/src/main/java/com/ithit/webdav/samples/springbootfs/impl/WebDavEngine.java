@@ -7,6 +7,9 @@ import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.exceptions.ServerException;
 import com.ithit.webdav.server.util.StringUtil;
+
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -19,10 +22,14 @@ public class WebDavEngine extends Engine {
 
     private final Logger logger;
     private final String license;
-    private final String dataFolder;
-    private final boolean showExceptions;
     private final String rootContext;
+    @Getter
+    private final String dataFolder;
+    @Getter
+    private final boolean showExceptions;
+    @Setter
     private SearchFacade searchFacade;
+    @Setter
     private WebSocketServer webSocketServer;
 
     /**
@@ -78,14 +85,6 @@ public class WebDavEngine extends Engine {
     }
 
     /**
-     * Returns folder where data will be sourced for WebDAV
-     * @return data folder.
-     */
-    public String getDataFolder() {
-        return dataFolder;
-    }
-
-    /**
      * Returns license string.
      *
      * @return license string.
@@ -96,38 +95,12 @@ public class WebDavEngine extends Engine {
     }
 
     /**
-     * Returns flag if exception should be printed to response.
-     * @return true  if exception should be printed to response.
-     */
-    public boolean isShowExceptions() {
-        return showExceptions;
-    }
-
-    /**
      * Returns SearchFacade instance
      *
      * @return SearchFacade instance
      */
     SearchFacade getSearchFacade() {
         return searchFacade;
-    }
-
-    /**
-     * Sets SearchFacade instance
-     *
-     * @param searchFacade SearchFacade instance
-     */
-    public void setSearchFacade(SearchFacade searchFacade) {
-        this.searchFacade = searchFacade;
-    }
-
-    /**
-     * Sets web socket server instance
-     *
-     * @param webSocketServer web socket server instance
-     */
-    public void setWebSocketServer(WebSocketServer webSocketServer) {
-        this.webSocketServer = webSocketServer;
     }
 
     /**

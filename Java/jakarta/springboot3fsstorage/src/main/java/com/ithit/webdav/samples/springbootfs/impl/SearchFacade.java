@@ -3,6 +3,7 @@ package com.ithit.webdav.samples.springbootfs.impl;
 import com.ithit.webdav.server.HierarchyItem;
 import com.ithit.webdav.server.Logger;
 import com.ithit.webdav.server.search.SearchOptions;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -31,17 +32,20 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.regex.Pattern;
 
+import lombok.Getter;
+
 /**
  * Facade that encapsulates all functionality regarding indexing and searching
  */
 public final class SearchFacade {
     private static final StandardAnalyzer ANALYZER = new StandardAnalyzer();
-    private Indexer indexer;
     private Searcher searcher;
     private final WebDavEngine engine;
     private final Logger logger;
     private static SearchFacade instance;
     private boolean indexed;
+    @Getter
+    private Indexer indexer;
 
     private SearchFacade(WebDavEngine webDavEngine, Logger logger) {
         engine = webDavEngine;
@@ -53,15 +57,6 @@ public final class SearchFacade {
             instance = new SearchFacade(webDavEngine, logger);
         }
         return instance;
-    }
-
-    /**
-     * Returns Indexer instance
-     *
-     * @return Indexer instance
-     */
-    Indexer getIndexer() {
-        return indexer;
     }
 
     /**
@@ -182,7 +177,7 @@ public final class SearchFacade {
     /**
      * Index files in storage using Apache Lucene engine for indexing and Apache Tika.
      */
-    static class Indexer extends RecursiveAction {
+    public static class Indexer extends RecursiveAction {
         static final int MAX_CONTENT_LENGTH = 10 * 1024 * 1024;
         private static final int TASK_INTERVAL = 30 * 1000;
         static final String PATH = "path";
@@ -286,7 +281,7 @@ public final class SearchFacade {
         /**
          * Close index and release lock
          */
-        void stop() {
+        public void stop() {
             try {
                 indexWriter.close();
             } catch (Throwable e) {
@@ -450,8 +445,9 @@ public final class SearchFacade {
                 Document document = indexSearcher.doc(scoreDoc.doc);
                 String text = document.get(Indexer.CONTENTS);
                 String path = document.get(Indexer.PATH);
-                TokenStream tokenStream = TokenSources.getAnyTokenStream(indexReader,
-                        scoreDoc.doc, Indexer.CONTENTS, document, ANALYZER);
+                Fields tvFields = indexReader.getTermVectors(scoreDoc.doc);
+                TokenStream tokenStream = TokenSources.getTokenStream(Indexer.CONTENTS,
+                        tvFields, text, ANALYZER, -1);
                 String fragment = highlighter.getBestFragment(tokenStream, text);
                 result.put(path, fragment == null ? "" : fragment);
             }

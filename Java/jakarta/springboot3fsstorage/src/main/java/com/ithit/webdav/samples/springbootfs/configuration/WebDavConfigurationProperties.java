@@ -16,4 +16,6 @@ public class WebDavConfigurationProperties {
     String rootFolder;
     String rootContext;
     String rootWebSocket;
+    boolean cookieAuthEnabled = false;
+    String authCookieName = "auth";
 }

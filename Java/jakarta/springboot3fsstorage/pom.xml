@@ -4,27 +4,22 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>3.5.8</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springboot3fsstorage</artifactId>
-    <version>7.3.10843</version>
+    <version>7.3.10855</version>
     <name>springboot3fsstorage</name>
     <description>Demo project for Spring Boot 3</description>
 
     <properties>
-        <spring-cloud-azure.version>5.19.0</spring-cloud-azure.version>
         <java.version>17</java.version>
         <lucene-core.version>7.7.3</lucene-core.version>
         <tika-core.version>2.9.4</tika-core.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -34,10 +29,9 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.azure.spring</groupId>
-            <artifactId>spring-cloud-azure-starter-active-directory</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
@@ -53,12 +47,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.3.10843</version>
+            <version>7.3.10855</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>jakarta-integration</artifactId>
-            <version>7.3.10843</version>
+            <version>7.3.10855</version>
         </dependency>
 
         <dependency>
@@ -159,16 +153,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.azure.spring</groupId>
-                <artifactId>spring-cloud-azure-dependencies</artifactId>
-                <version>${spring-cloud-azure.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>

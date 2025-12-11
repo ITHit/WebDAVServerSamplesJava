@@ -6,11 +6,14 @@ import com.ithit.webdav.server.exceptions.DavException;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import lombok.Setter;
+
 /**
  * This handler processes GET requests to folders returning custom HTML page.
  */
 public class CustomFolderGetHandler implements MethodHandler {
 
+    @Setter
     private MethodHandler previousHandler;
     private final String charset;
     private final String version;
@@ -85,12 +88,4 @@ public class CustomFolderGetHandler implements MethodHandler {
         return false;
     }
 
-    /**
-     * Set previous handler fo GET operation.
-     *
-     * @param methodHandler previous handler.
-     */
-    public void setPreviousHandler(MethodHandler methodHandler) {
-        previousHandler = methodHandler;
-    }
 }

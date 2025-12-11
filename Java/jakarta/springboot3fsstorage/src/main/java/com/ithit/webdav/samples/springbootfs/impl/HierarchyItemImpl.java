@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -73,11 +74,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return Path.
      */
     static String decode(String url) {
-        try {
-            return URLDecoder.decode(url.replace("+", "%2B"), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return URLDecoder.decode(url.replace("+", "%2B"));
-        }
+        return URLDecoder.decode(url.replace("+", "%2B"), StandardCharsets.UTF_8);
     }
 
     /**
@@ -87,11 +84,7 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock {
      * @return Encoded string.
      */
     String encode(String val) {
-        try {
-            return URLEncoder.encode(val, "UTF-8").replace("+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            return URLEncoder.encode(val).replace("+", "%20");
-        }
+        return URLEncoder.encode(val, StandardCharsets.UTF_8).replace("+", "%20");
     }
 
     /**
