@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>7.3.10855</version>
+    <version>7.4.10910</version>
     <packaging>war</packaging>
 
     <properties>
@@ -19,13 +19,13 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.9</version>
+            <version>2.13.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>jakarta-integration</artifactId>
-            <version>7.3.10855</version>
+            <version>7.4.10910</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.3.10855</version>
+            <version>7.4.10910</version>
         </dependency>
     </dependencies>
 
@@ -138,7 +138,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-jakarta-7.3.10855</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-jakarta-7.4.10910</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
