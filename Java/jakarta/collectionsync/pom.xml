@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>collectionsync-jakarta</artifactId>
-    <version>7.4.10910</version>
+    <version>7.5.11011</version>
     <packaging>war</packaging>
 
     <properties>
@@ -25,42 +25,42 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>jakarta-integration</artifactId>
-            <version>7.4.10910</version>
+            <version>7.5.11011</version>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.20.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>7.7.3</version>
+            <version>9.12.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>7.7.3</version>
+            <version>9.12.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-highlighter</artifactId>
-            <version>7.7.3</version>
+            <version>9.12.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>2.9.4</version>
+            <version>3.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers-standard-package</artifactId>
-            <version>2.9.4</version>
+            <version>3.2.3</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.4.10910</version>
+            <version>7.5.11011</version>
         </dependency>
     </dependencies>
 
@@ -132,7 +132,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/collectionsync-jakarta-7.4.10910</warSourceDirectory>
+                    <warSourceDirectory>target/collectionsync-jakarta-7.5.11011</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
@@ -147,8 +147,8 @@
                         </goals>
                         <configuration>
                             <installDirectory>${java.io.tmpdir}</installDirectory>
-                            <nodeVersion>v16.14.2</nodeVersion>
-                            <npmVersion>8.7.0</npmVersion>
+                            <nodeVersion>v22.15.0</nodeVersion>
+                            <npmVersion>10.9.2</npmVersion>
                         </configuration>
                     </execution>
                     <execution>
@@ -160,7 +160,7 @@
                         <configuration>
                             <arguments>update</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
-                            <installDirectory>c:\temp\</installDirectory>
+                            <installDirectory>C:\Users\build\AppData\Local\Temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>
