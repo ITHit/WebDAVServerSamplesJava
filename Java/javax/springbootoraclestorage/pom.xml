@@ -9,14 +9,14 @@
     </parent>
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>springbootoraclestorage</artifactId>
-    <version>7.5.11011</version>
+    <version>7.6.11100-Beta</version>
     <name>springbootoraclestorage</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>11</java.version>
         <lucene-core.version>9.12.3</lucene-core.version>
-        <tika-core.version>3.2.3</tika-core.version>
+        <tika-core.version>3.3.0</tika-core.version>
     </properties>
 
     <dependencies>
@@ -53,12 +53,12 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.5.11011</version>
+            <version>7.6.11100-Beta</version>
         </dependency>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.5.11011</version>
+            <version>7.6.11100-Beta</version>
         </dependency>
 
         <!-- Oracle dependencies -->
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.20.0</version>
+            <version>2.22.0</version>
             <scope>compile</scope>
         </dependency>
 
