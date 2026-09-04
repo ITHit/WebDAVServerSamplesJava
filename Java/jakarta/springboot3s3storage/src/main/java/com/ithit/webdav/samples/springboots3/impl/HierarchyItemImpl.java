@@ -357,8 +357,6 @@ public abstract class HierarchyItemImpl implements HierarchyItem, Lock {
         if (activeLocks == null) {
             String activeLocksJson = getEngine().getDataClient().getMetadata(getPath(), ACTIVE_LOCKS_ATTRIBUTE);
             activeLocks = new ArrayList<>(SerializationUtils.deserializeList(LockInfo.class, activeLocksJson));
-        } else {
-            activeLocks = new ArrayList<>();
         }
         final long currentTime = System.currentTimeMillis();
         return activeLocks

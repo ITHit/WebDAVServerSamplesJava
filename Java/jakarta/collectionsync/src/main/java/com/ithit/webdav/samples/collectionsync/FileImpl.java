@@ -224,16 +224,20 @@ final class FileImpl extends HierarchyItemImpl implements File, Lock,
         Path fullPath = this.getFullPath();
         byte[] buf = new byte[BUFFER_SIZE];
         int retVal;
-        try (InputStream in = Files.newInputStream(fullPath)) {
-            in.skip(startIndex);
-            while ((retVal = in.read(buf)) > 0) {
+        try (SeekableByteChannel in = Files.newByteChannel(fullPath, StandardOpenOption.READ)) {
+            // Reliably position the channel at the requested offset. InputStream.skip() is not
+            // guaranteed to skip the requested number of bytes for large files/range requests,
+            // which could lead to misaligned/short reads and a prematurely closed response.
+            in.position(startIndex);
+            ByteBuffer byteBuffer = ByteBuffer.wrap(buf);
+            while (count > 0 && (retVal = in.read(byteBuffer)) > 0) {
                 // Strict servlet API doesn't allow to write more bytes then content length. So we do this trick.
                 if (retVal > count) {
                     retVal = (int) count;
                 }
                 out.write(buf, 0, retVal);
-                startIndex += retVal;
                 count -= retVal;
+                byteBuffer.clear();
             }
         } catch (IOException x) {
             throw new ServerException(x);

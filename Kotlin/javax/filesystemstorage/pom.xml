@@ -6,18 +6,30 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>kotlinfs</artifactId>
-    <version>7.6.11100-Beta</version>
+    <version>7.6.11223</version>
     <packaging>war</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <kotlin.version>1.9.25</kotlin.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.6.11100-Beta</version>
+            <version>7.6.11223</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-websocket</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.20.0</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -29,19 +41,18 @@
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>1.4</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.6</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
             <version>23.2.0.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -71,7 +82,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.6.11100-Beta</version>
+            <version>7.6.11223</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -94,7 +105,7 @@
     </repositories>
 
     <build>
-        <sourceDirectory>D:\myproj\Java\ithit\webdav-server-for-java\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
+        <sourceDirectory>C:\Java\Release\WebdavJavaRepo\DeltaV\samples\kotlinfs/src/main/kotlin</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -155,7 +166,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/kotlinfs-7.6.11100-Beta</warSourceDirectory>
+                    <warSourceDirectory>target/kotlinfs-7.6.11223</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
@@ -183,7 +194,7 @@
                         <configuration>
                             <arguments>update</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
-                            <installDirectory>c:\temp\</installDirectory>
+                            <installDirectory>C:\Users\build\AppData\Local\Temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>

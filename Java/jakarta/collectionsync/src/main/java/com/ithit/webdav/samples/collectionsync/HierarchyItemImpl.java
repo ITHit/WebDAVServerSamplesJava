@@ -521,8 +521,6 @@ abstract class HierarchyItemImpl implements HierarchyItem, Lock, ChangedItem, Bi
         if (activeLocks == null) {
             String activeLocksJson = ExtendedAttributesExtension.getExtendedAttribute(getFullPath().toString(), activeLocksAttribute);
             activeLocks = new ArrayList<>(SerializationUtils.deserializeList(LockInfo.class, activeLocksJson));
-        } else {
-            activeLocks = new ArrayList<>();
         }
         final long currentTime = System.currentTimeMillis();
         return activeLocks.stream()

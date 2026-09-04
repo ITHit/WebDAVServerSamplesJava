@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>oraclestorage</artifactId>
-    <version>7.6.11100-Beta</version>
+    <version>7.6.11223</version>
     <packaging>war</packaging>
 
     <properties>
@@ -17,7 +17,18 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>jakarta-integration</artifactId>
-            <version>7.6.11100-Beta</version>
+            <version>7.6.11223</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-websocket</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.20.0</version>
         </dependency>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -65,7 +76,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.6.11100-Beta</version>
+            <version>7.6.11223</version>
         </dependency>
     </dependencies>
 
@@ -90,7 +101,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/oraclestorage-jakarta-7.6.11100-Beta/META-INF</outputDirectory>
+                            <outputDirectory>${project.build.directory}/oraclestorage-jakarta-7.6.11223/META-INF</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -169,7 +180,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/oraclestorage-jakarta-7.6.11100-Beta</warSourceDirectory>
+                    <warSourceDirectory>target/oraclestorage-jakarta-7.6.11223</warSourceDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -222,7 +233,7 @@
                         <configuration>
                             <arguments>update</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
-                            <installDirectory>c:\temp\</installDirectory>
+                            <installDirectory>C:\Users\build\AppData\Local\Temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>

@@ -6,7 +6,7 @@
 
     <groupId>com.ithit.webdav.samples</groupId>
     <artifactId>filesystemstorage</artifactId>
-    <version>7.6.11100-Beta</version>
+    <version>7.6.11223</version>
     <packaging>war</packaging>
 
     <properties>
@@ -19,7 +19,13 @@
         <dependency>
             <groupId>com.ithit.webdav.integration</groupId>
             <artifactId>javax-integration</artifactId>
-            <version>7.6.11100-Beta</version>
+            <version>7.6.11223</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-websocket</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -60,7 +66,7 @@
         <dependency>
             <groupId>com.ithit.webdav</groupId>
             <artifactId>webdav-server</artifactId>
-            <version>7.6.11100-Beta</version>
+            <version>7.6.11223</version>
         </dependency>
     </dependencies>
 
@@ -122,7 +128,7 @@
                     <server>filesystem</server>
                     <port>11021</port>
                     <path>/</path>
-                    <warSourceDirectory>target/filesystemstorage-7.6.11100-Beta</warSourceDirectory>
+                    <warSourceDirectory>target/filesystemstorage-7.6.11223</warSourceDirectory>
                 </configuration>
             </plugin>
 			<plugin>
@@ -150,7 +156,7 @@
                         <configuration>
                             <arguments>update</arguments>
                             <workingDirectory>src/main/webapp/WEB-INF/wwwroot/js</workingDirectory>
-                            <installDirectory>c:\temp\</installDirectory>
+                            <installDirectory>C:\Users\build\AppData\Local\Temp\</installDirectory>
                         </configuration>
                     </execution>
                     <execution>
